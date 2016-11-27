@@ -21,7 +21,6 @@ public class GitHubIssue implements Serializable {
 
     private static final long serialVersionUID = MosaicApplication.MOSAIC_SERIAL_VERSION_UID;
 
-
     @JsonProperty("number")
     private Long id;
 
