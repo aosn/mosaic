@@ -1,0 +1,50 @@
+# local development profile (not a production profile)
+
+server:
+  port: 8080
+
+spring:
+  datasource:
+      url: jdbc:h2:mem:AZ
+      username: sa
+      password:
+      driverClassName: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: true
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+
+logging:
+  level:
+    org.springframework: INFO
+    io.github.aosn.mosaic: DEBUG
+
+security:
+  basic:
+    enabled: false
+  oauth2:
+    client:
+      client-id: acme
+      client-secret: acmesecret
+      scope: read,write
+      auto-approve-scopes: '.*'
+
+mosaic:
+  issue:
+    organization: aosn
+    repository: aosn.github.io
+    label-a: Aパート提案
+    label-b: Bパート提案
+
+# Demo application token
+github:
+  client:
+    clientId: 43327e9a3fb5f5136fef
+    clientSecret: a33799b22781dce33132d774e08cfc3da4baed5d
+    accessTokenUri: https://github.com/login/oauth/access_token
+    userAuthorizationUri: https://github.com/login/oauth/authorize
+    clientAuthenticationScheme: form
+  resource:
+    userInfoUri: https://api.github.com/user

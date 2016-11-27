@@ -1,0 +1,42 @@
+.title {
+    font-size: 150%;
+    font-weight: bold;
+    padding: 10px 10px 0 10px;
+    text-align: center;
+}
+
+.subtitle {
+    font-size: 75%;
+    padding: 0 10px 0 10px;
+    text-align: center;
+}
+
+.login-bar {
+    margin: 0 5px;
+}
+
+.polls-table {
+    width: 100%;
+    max-width: 600px;
+}
+
+.content-pane {
+    width: 100%;
+    max-width: 600px;
+    padding-bottom: 5px;
+}
+
+.heading {
+    font-size: 120%;
+    font-weight: bold;
+}
+
+.link {
+    color: darkblue;
+    text-decoration: underline;
+}
+
+.error-label {
+    color: red;
+    font-weight: bold;
+}

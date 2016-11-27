@@ -1,0 +1,62 @@
+buildscript {
+    ext {
+        springBootVersion = '1.4.1.RELEASE'
+        checkerFrameworkVersion = '2.1.5'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'spring-boot'
+apply plugin: 'war'
+
+war {
+    baseName = 'mosaic'
+    version = '0.1'
+    archiveName = baseName + "." + extension
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Spring Boot
+    compile('org.springframework.boot:spring-boot-starter-web')
+    compile('org.springframework.boot:spring-boot-starter-data-jpa')
+    compile('org.springframework.boot:spring-boot-starter-security')
+    compile('org.springframework.security.oauth:spring-security-oauth2')
+    // Vaadin
+    compile('com.vaadin:vaadin-spring-boot-starter:1.0.2')
+    compile('com.vaadin:vaadin-themes:7.7.5')
+    compile('org.vaadin.spring.addons:vaadin-spring-addon-i18n:0.0.7.RELEASE')
+    // Utilities
+    compile('org.projectlombok:lombok')
+    compile("org.checkerframework:checker-qual:${checkerFrameworkVersion}")
+    compile("com.google.guava:guava:20.0")
+    // Database
+    runtime('com.h2database:h2') // development and test
+    runtime('mysql:mysql-connector-java') // production
+    // Others
+    compile('org.pegdown:pegdown:1.6.0')
+    // Tests
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "com.vaadin:vaadin-bom:7.7.5"
+    }
+}
+
+springBoot {
+    executable = true
+}
