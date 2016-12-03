@@ -2,7 +2,9 @@
 
 AOSN Workshop book voting system.
 
-[mosaic.tasktoys.com](http://mosaic.tasktoys.com)
+Demo:
+
+* [vote.tasktoys.com](http://vote.tasktoys.com) (works on Bluemix US-South region)
 
 ## Key features
 
