@@ -5,6 +5,8 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.Reindeer;
 import io.github.aosn.mosaic.MosaicApplication;
+import io.github.aosn.mosaic.domain.service.auth.UserService;
+import org.vaadin.spring.i18n.I18N;
 
 /**
  * @author mikan
@@ -14,11 +16,12 @@ public class ViewRoot extends VerticalLayout {
 
     private static final long serialVersionUID = MosaicApplication.MOSAIC_SERIAL_VERSION_UID;
 
-    public ViewRoot(Header header, Component... components) {
+    public ViewRoot(I18N i18n, UserService userService, Component... components) {
         setSizeFull();
         setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
         setStyleName(Reindeer.LAYOUT_BLUE);
-        addComponent(header);
+        addComponent(new Header(i18n, userService));
         addComponents(components);
+        addComponent(new Footer(i18n));
     }
 }

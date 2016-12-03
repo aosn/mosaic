@@ -38,7 +38,7 @@ public class Book implements Serializable {
     @Column(nullable = false)
     private String url;
 
-    @Transient
+    @Transient // hand joining via IssueService
     @Setter
     private GitHubIssue gitHubIssue;
 
