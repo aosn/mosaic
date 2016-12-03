@@ -3,7 +3,7 @@
  */
 package io.github.aosn.mosaic.ui.view.layout;
 
-import com.vaadin.server.ClassResource;
+import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
@@ -29,8 +29,8 @@ class Header extends VerticalLayout {
         setSpacing(true);
 
         // Logo
-        Image logo = new Image(null, new ClassResource("logo.png"));
-        logo.addClickListener(e -> UI.getCurrent().getNavigator().navigateTo(MainUI.PATH));
+        Image logo = new Image(null, new ExternalResource("/VAADIN/img/logo.png"));
+        logo.addClickListener(e -> UI.getCurrent().getPage().setLocation(MainUI.PATH));
         addComponent(logo);
 
         // Login Bar
