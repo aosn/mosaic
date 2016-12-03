@@ -3,9 +3,8 @@
  */
 package io.github.aosn.mosaic.ui.view.layout;
 
-import com.vaadin.server.FileResource;
+import com.vaadin.server.ClassResource;
 import com.vaadin.server.FontAwesome;
-import com.vaadin.server.VaadinService;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import io.github.aosn.mosaic.MosaicApplication;
@@ -15,8 +14,6 @@ import io.github.aosn.mosaic.domain.service.auth.UserService;
 import io.github.aosn.mosaic.ui.MainUI;
 import io.github.aosn.mosaic.ui.view.style.Style;
 import org.vaadin.spring.i18n.I18N;
-
-import java.io.File;
 
 /**
  * UI-shared header component.
@@ -32,8 +29,7 @@ class Header extends VerticalLayout {
         setSpacing(true);
 
         // Logo
-        String basePath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath();
-        Image logo = new Image(null, new FileResource(new File(basePath + "/VAADIN/img/logo.png")));
+        Image logo = new Image(null, new ClassResource("logo.png"));
         logo.addClickListener(e -> UI.getCurrent().getNavigator().navigateTo(MainUI.PATH));
         addComponent(logo);
 
