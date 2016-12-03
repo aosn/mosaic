@@ -137,7 +137,7 @@ public class PollResultView extends CustomComponent implements View {
         contentPane.addComponent(backButton);
         contentPane.setComponentAlignment(backButton, Alignment.MIDDLE_CENTER);
 
-        if (poll.isClosable(userService.getUser())) {
+        if (poll.isOwner(userService.getUser())) {
             contentPane.addComponent(new HeadingLabel(i18n.get("result.label.owner.operation")));
 
             Book winner = poll.judgeWinner();
@@ -160,6 +160,11 @@ public class PollResultView extends CustomComponent implements View {
                 getUI().getNavigator().navigateTo(FrontView.VIEW_NAME);
             });
             contentPane.addComponent(closeButton);
+            if (poll.isClosed()) {
+                closeButton.setEnabled(false);
+                notifyCheck.setEnabled(false);
+                closeButton.setDescription(i18n.get("polling.error.closed"));
+            }
 
             contentPane.addComponent(new VoteTable(i18n.get("result.caption.votes"), poll.getVotes().stream()
                     .map(VoteTable.Row::from).collect(Collectors.toList()), i18n));

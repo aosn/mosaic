@@ -28,9 +28,9 @@ public class VoteTable extends Table {
     public VoteTable(String caption, List<Row> rows, I18N i18n) {
         super(caption, new BeanItemContainer<>(Row.class, rows));
         setPageLength(0);
-        setColumnHeader("user", "User");
-        setColumnHeader("time", "Timestamp");
-        setColumnHeader("book", "Book");
+        setColumnHeader("user", i18n.get("result.column.user"));
+        setColumnHeader("time", i18n.get("result.column.timestamp"));
+        setColumnHeader("book", i18n.get("result.column.book"));
         setVisibleColumns("user", "time", "book");
     }
 

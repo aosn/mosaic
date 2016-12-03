@@ -42,8 +42,8 @@ public class IssueTable extends Table {
         setColumnHeader("title", i18n.get("new.column.title"));
         setColumnHeader("category", i18n.get("new.column.part"));
         setColumnHeader("user", i18n.get("new.column.user"));
-        setColumnHeader("votesWithIcon", "Votes");
-        setColumnHeader("votes", "Count");
+        setColumnHeader("votesWithIcon", i18n.get("polling.column.votes"));
+        setColumnHeader("votes", i18n.get("polling.column.count"));
         setVisibleColumns((Object[]) columnGroup.columns);
         if (columnGroup == ColumnGroup.CLOSED) {
             setSortContainerPropertyId("votes");

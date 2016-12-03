@@ -115,11 +115,15 @@ public class Poll implements Serializable {
     }
 
     public boolean isAccessible(User user) {
-        return state != Poll.PollState.CLOSED && !owner.equals(user);
+        return state != PollState.CLOSED && !owner.equals(user);
     }
 
     public boolean isClosable(User user) {
-        return state != Poll.PollState.CLOSED && owner.equals(user);
+        return state != PollState.CLOSED && owner.equals(user);
+    }
+
+    public boolean isClosed() {
+        return state == PollState.CLOSED;
     }
 
     public enum PollState {
