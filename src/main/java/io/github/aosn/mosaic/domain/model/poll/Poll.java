@@ -111,15 +111,11 @@ public class Poll implements Serializable {
     }
 
     public boolean isOwner(User user) {
-        return owner.getId().equals(user.getId());
+        return user != null && owner.getId().equals(user.getId());
     }
 
     public boolean isAccessible(User user) {
-        return state != PollState.CLOSED && !owner.equals(user);
-    }
-
-    public boolean isClosable(User user) {
-        return state != PollState.CLOSED && owner.equals(user);
+        return user != null && state != PollState.CLOSED && !owner.equals(user);
     }
 
     public boolean isClosed() {
