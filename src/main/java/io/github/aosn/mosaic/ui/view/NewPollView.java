@@ -3,7 +3,7 @@
  */
 package io.github.aosn.mosaic.ui.view;
 
-import com.vaadin.data.validator.DateRangeValidator;
+import com.vaadin.data.validator.StringLengthValidator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.shared.ui.datefield.Resolution;
@@ -19,20 +19,20 @@ import io.github.aosn.mosaic.domain.service.issue.IssueService;
 import io.github.aosn.mosaic.domain.service.notification.NotificationService;
 import io.github.aosn.mosaic.domain.service.poll.PollService;
 import io.github.aosn.mosaic.ui.MainUI;
+import io.github.aosn.mosaic.ui.view.component.IssueTable;
+import io.github.aosn.mosaic.ui.view.component.IssueTable.ColumnGroup;
 import io.github.aosn.mosaic.ui.view.component.LoginRequiredLabel;
 import io.github.aosn.mosaic.ui.view.layout.ContentPane;
-import io.github.aosn.mosaic.ui.view.layout.Header;
 import io.github.aosn.mosaic.ui.view.layout.ViewRoot;
-import io.github.aosn.mosaic.ui.view.table.IssueRow;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.i18n.I18N;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Front page.
@@ -68,53 +68,49 @@ public class NewPollView extends CustomComponent implements View {
         try {
             issues = issueService.getAll();
         } catch (RuntimeException e) {
-            ErrorView.show("Failed to obtain issues.", e);
+            ErrorView.show(i18n.get("common.error.issue.obtain.failed"), e);
             return;
         }
-        setCompositionRoot(new ViewRoot(new Header(i18n, userService), createPollLayout(issues)));
+        setCompositionRoot(new ViewRoot(i18n, userService, createPollLayout(issues)));
     }
 
     private Layout createPollLayout(List<GitHubIssue> issues) {
         ContentPane contentPane = new ContentPane();
 
-        List<IssueRow> rows = issues.stream().map(IssueRow::from).collect(Collectors.toList());
-        Table issuesTable = new Table("Select Issues", IssueRow.toContainer(rows));
-        issuesTable.setPageLength(0);
-        issuesTable.setColumnHeader("checkBox", "Select");
-        issuesTable.setColumnHeader("title", "Title");
-        issuesTable.setColumnHeader("category", "Part");
-        issuesTable.setColumnHeader("user", "User");
-        issuesTable.setVisibleColumns("checkBox", "title", "category", "user");
-        contentPane.addComponent(issuesTable);
+        List<IssueTable.Row> rows = issues.stream().map(IssueTable.Row::from).collect(Collectors.toList());
+        contentPane.addComponent(new IssueTable(i18n.get("new.caption.select"), ColumnGroup.NEW, rows, i18n));
 
         FormLayout form = new FormLayout();
-        form.setCaption("Poll information");
+        form.setCaption(i18n.get("new.caption.poll.info"));
         contentPane.addComponent(form);
 
-        TextField subject = new TextField("Subject");
+        TextField subject = new TextField(i18n.get("new.caption.subject"));
         subject.setRequired(true);
+        subject.addValidator(new StringLengthValidator("common.validator.text.length.over", 0, 255, false));
         subject.setWidth(100, Unit.PERCENTAGE);
         form.addComponent(subject);
 
-        DateField closeDate = new DateField("Close Date");
+        DateField closeDate = new DateField(i18n.get("new.caption.close.date"));
         Date now = new Date();
         closeDate.setRequired(true);
-        closeDate.addValidator(new DateRangeValidator("Out of range", now, null, Resolution.DAY));
+        closeDate.setRangeStart(now);
+        closeDate.setResolution(Resolution.DAY);
+        closeDate.setDateOutOfRangeMessage(i18n.get("common.validator.date.range.over"));
         closeDate.setValue(now);
         form.addComponent(closeDate);
 
-        ComboBox votesSelect = new ComboBox("votes / user");
+        ComboBox votesSelect = new ComboBox(i18n.get("new.caption.doubles"));
         votesSelect.setNullSelectionAllowed(false);
         votesSelect.setTextInputAllowed(false);
         votesSelect.setRequired(true);
-        votesSelect.addItems(Arrays.asList("1", "2", "3"));
-        votesSelect.setValue("2");
+        votesSelect.addItems(IntStream.rangeClosed(1, 3).mapToObj(String::valueOf).collect(Collectors.toList()));
+        votesSelect.setValue(String.valueOf(2));
         form.addComponent(votesSelect);
 
-        CheckBox notifyCheck = new CheckBox("Notify to Slack");
+        CheckBox notifyCheck = new CheckBox(i18n.get("common.caption.notify.slack"));
         notifyCheck.setValue(false);
         notifyCheck.setEnabled(false);
-        notifyCheck.setDescription("This function is not available yet.");
+        notifyCheck.setDescription(i18n.get("common.label.not.available"));
         contentPane.addComponent(notifyCheck);
 
         Button cancelButton = new Button(i18n.get("common.button.cancel"),
@@ -122,7 +118,7 @@ public class NewPollView extends CustomComponent implements View {
         Button submitButton = new Button(i18n.get("new.button.submit"), e -> {
             // Validation
             if (!subject.isValid() || !closeDate.isValid() || !votesSelect.isValid() || subject.isEmpty()) {
-                Notification.show("Please input all field.");
+                Notification.show(i18n.get("common.notification.input.required"));
                 return;
             }
 
@@ -138,23 +134,21 @@ public class NewPollView extends CustomComponent implements View {
             // User
             User user = userService.getUser();
             if (user == null) {
-                ErrorView.show("User not found.", null);
+                ErrorView.show(i18n.get("common.error.user.missing"), null);
                 return;
             }
 
             // Issues
             List<GitHubIssue> selected = rows.stream()
                     .filter(r -> r.getCheckBox().getValue())
-                    .map(IssueRow::getIssueEntity)
+                    .map(IssueTable.Row::getIssueEntity)
                     .collect(Collectors.toList());
             if (selected.size() < 2) {
-                Notification.show("Please select 2 or more issues.");
+                Notification.show(i18n.get("new.notification.select.more.2"));
                 return;
             }
-
-            // Selected - Doubles validation
             if (doubles > selected.size()) {
-                Notification.show("Votes per user is larger than number of books.");
+                Notification.show(i18n.get("new.notification.doubles.larger"));
             }
 
             // Submit
@@ -180,10 +174,10 @@ public class NewPollView extends CustomComponent implements View {
                 if (notifyCheck.getValue()) {
                     notificationService.notifyCreatePoll(poll);
                 }
-                Notification.show("Your poll has been created.", Notification.Type.TRAY_NOTIFICATION);
+                Notification.show(i18n.get("new.notification.poll.created"), Notification.Type.TRAY_NOTIFICATION);
                 getUI().getNavigator().navigateTo(FrontView.VIEW_NAME);
             } catch (RuntimeException ex) {
-                ErrorView.show("Failed to create poll.", ex);
+                ErrorView.show(i18n.get("new.error.poll.create.failed"), ex);
             }
         });
         HorizontalLayout buttonArea = new HorizontalLayout(cancelButton, submitButton);
@@ -191,6 +185,7 @@ public class NewPollView extends CustomComponent implements View {
         contentPane.addComponent(buttonArea);
         if (!userService.isLoggedIn()) {
             submitButton.setEnabled(false);
+            submitButton.setDescription(i18n.get("common.caption.login.required"));
             contentPane.addComponent(new LoginRequiredLabel(i18n));
         }
 

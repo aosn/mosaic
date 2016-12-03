@@ -3,8 +3,6 @@
  */
 package io.github.aosn.mosaic.domain.service.poll;
 
-import io.github.aosn.mosaic.domain.model.auth.User;
-import io.github.aosn.mosaic.domain.model.poll.Book;
 import io.github.aosn.mosaic.domain.model.poll.Poll;
 import io.github.aosn.mosaic.domain.model.poll.Vote;
 import io.github.aosn.mosaic.domain.repository.poll.PollRepository;
@@ -13,13 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.atomic.LongAdder;
+import java.util.Date;
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -97,38 +93,8 @@ public class PollService {
         log.info("BEGIN close: " + poll);
         poll.setState(Poll.PollState.CLOSED);
         poll.setEnd(new Date());
-        poll.setWinBook(judgeWinner(poll));
+        poll.setWinBook(poll.judgeWinner());
         pollRepository.saveAndFlush(poll);
         log.info("END close: " + poll);
-    }
-
-    public boolean checkOpenPollAccess(Poll poll, User user) {
-        return poll.getState() != Poll.PollState.CLOSED && !poll.getOwner().equals(user);
-    }
-
-    public boolean checkUserClosable(Poll poll, User user) {
-        return poll.getState() != Poll.PollState.CLOSED && poll.getOwner().equals(user);
-    }
-
-    public Book judgeWinner(Poll poll) {
-        Map<Book, Integer> votes = new HashMap<>();
-        AtomicInteger max = new AtomicInteger(0);
-        poll.getVotes().stream().collect(Collectors.groupingBy(Vote::getBook)).forEach((k, v) -> {
-            votes.put(k, v.size());
-            max.set(Math.max(max.get(), v.size()));
-        });
-        // duplicate check
-        LongAdder maxCount = new LongAdder();
-        AtomicReference<Book> winner = new AtomicReference<>();
-        votes.forEach((k, v) -> {
-            if (v == max.get()) {
-                winner.set(k);
-                maxCount.increment();
-            }
-        });
-        if (maxCount.sum() != 1) {
-            return null; // duplicate
-        }
-        return winner.get();
     }
 }

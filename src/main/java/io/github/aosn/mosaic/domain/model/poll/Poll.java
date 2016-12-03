@@ -15,7 +15,13 @@ import org.hibernate.annotations.NotFoundAction;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.LongAdder;
+import java.util.stream.Collectors;
 
 /**
  * Poll entity.
@@ -68,6 +74,7 @@ public class Poll implements Serializable {
     @Setter
     private List<Book> books;
 
+    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     @JoinColumn
     @OneToMany(cascade = CascadeType.ALL)
     @LazyCollection(LazyCollectionOption.FALSE)
@@ -80,6 +87,40 @@ public class Poll implements Serializable {
     @Setter
     @Nullable
     private Book winBook;
+
+    public Book judgeWinner() {
+        Map<Book, Integer> votesMap = new HashMap<>();
+        AtomicInteger max = new AtomicInteger(0);
+        votes.stream().collect(Collectors.groupingBy(Vote::getBook)).forEach((k, v) -> {
+            votesMap.put(k, v.size());
+            max.set(Math.max(max.get(), v.size()));
+        });
+        // duplicate check
+        LongAdder maxCount = new LongAdder();
+        AtomicReference<Book> winner = new AtomicReference<>();
+        votesMap.forEach((k, v) -> {
+            if (v == max.get()) {
+                winner.set(k);
+                maxCount.increment();
+            }
+        });
+        if (maxCount.sum() != 1) {
+            return null; // duplicate
+        }
+        return winner.get();
+    }
+
+    public boolean isOwner(User user) {
+        return owner.getId().equals(user.getId());
+    }
+
+    public boolean isAccessible(User user) {
+        return state != Poll.PollState.CLOSED && !owner.equals(user);
+    }
+
+    public boolean isClosable(User user) {
+        return state != Poll.PollState.CLOSED && owner.equals(user);
+    }
 
     public enum PollState {
         PRE_OPEN,

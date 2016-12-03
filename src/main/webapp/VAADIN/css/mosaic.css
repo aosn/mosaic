@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2016 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ */
+
 .title {
     font-size: 150%;
     font-weight: bold;
@@ -13,6 +17,11 @@
 
 .login-bar {
     margin: 0 5px;
+}
+
+.copyright {
+    font-size: 75%;
+    padding-top: 15px;
 }
 
 .polls-table {

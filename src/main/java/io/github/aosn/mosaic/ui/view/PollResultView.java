@@ -17,12 +17,12 @@ import io.github.aosn.mosaic.domain.service.notification.NotificationService;
 import io.github.aosn.mosaic.domain.service.poll.PollService;
 import io.github.aosn.mosaic.ui.MainUI;
 import io.github.aosn.mosaic.ui.view.component.HeadingLabel;
+import io.github.aosn.mosaic.ui.view.component.IssueTable;
+import io.github.aosn.mosaic.ui.view.component.IssueTable.ColumnGroup;
+import io.github.aosn.mosaic.ui.view.component.PollTable;
+import io.github.aosn.mosaic.ui.view.component.VoteTable;
 import io.github.aosn.mosaic.ui.view.layout.ContentPane;
-import io.github.aosn.mosaic.ui.view.layout.Header;
 import io.github.aosn.mosaic.ui.view.layout.ViewRoot;
-import io.github.aosn.mosaic.ui.view.table.IssueRow;
-import io.github.aosn.mosaic.ui.view.table.PollRow;
-import io.github.aosn.mosaic.ui.view.table.VoteRow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.i18n.I18N;
 
@@ -65,7 +65,7 @@ public class PollResultView extends CustomComponent implements View {
     public void enter(ViewChangeListener.ViewChangeEvent event) {
         // Parse parameter
         if (Strings.isNullOrEmpty(event.getParameters())) {
-            ErrorView.show("Parameter missing.", null);
+            ErrorView.show(i18n.get("common.error.parameter.missing"), null);
             return;
         }
         long pollId;
@@ -74,113 +74,95 @@ public class PollResultView extends CustomComponent implements View {
                     .mapToLong(Long::parseLong)
                     .findFirst().orElseThrow(NoSuchElementException::new);
         } catch (RuntimeException e) {
-            ErrorView.show("Parameter missing.", e);
+            ErrorView.show(i18n.get("common.error.parameter.missing"), e);
             return;
         }
 
         // Search DB
-        Poll poll;
-        try {
-            poll = issueService.resolveBooks(pollService.get(pollId));
-        } catch (IssueService.IssueAccessException e) {
-            ErrorView.show("API Error", e);
-            return;
-        } catch (RuntimeException e) {
-            ErrorView.show("DB Error", e);
+        Poll poll = ErrorView.showIfExceptionThrows(() -> issueService.resolveBooks(pollService.get(pollId)));
+        if (poll == null) {
             return;
         }
 
         // Access check
-        if (pollService.checkOpenPollAccess(poll, userService.getUser())) {
-            ErrorView.show("You can not display this result yet.", null);
+        if (poll.isAccessible(userService.getUser())) {
+            ErrorView.show(i18n.get("result.error.access.forbidden"), null);
             return;
         }
 
-        setCompositionRoot(new ViewRoot(new Header(i18n, userService), createResultLayout(poll)));
+        setCompositionRoot(new ViewRoot(i18n, userService, createResultLayout(poll)));
     }
 
     private Layout createResultLayout(Poll poll) {
         ContentPane contentPane = new ContentPane();
 
-        contentPane.addComponent(new HeadingLabel("Poll result of " + poll.getSubject()));
+        contentPane.addComponent(new HeadingLabel(i18n.get("result.label.subject.prefix") + " " +
+                poll.getSubject()));
 
         FormLayout aboutForm = new FormLayout();
 
         Label ownerLabel = new Label(poll.getOwner().getName());
-        ownerLabel.setCaption("Started by");
+        ownerLabel.setCaption(i18n.get("result.caption.poll.owner"));
         aboutForm.addComponent(ownerLabel);
 
-        String begin = poll.getBegin() == null ? "?" : PollRow.DATE_FORMAT.format(poll.getBegin());
-        String end = poll.getEnd() == null ? "?" : PollRow.DATE_FORMAT.format(poll.getEnd());
+        String begin = poll.getBegin() == null ? "?" : PollTable.Row.DATE_FORMAT.format(poll.getBegin());
+        String end = poll.getEnd() == null ? "?" : PollTable.Row.DATE_FORMAT.format(poll.getEnd());
         Label termLabel = new Label(begin + " - " + end);
-        termLabel.setCaption("Term");
+        termLabel.setCaption(i18n.get("result.caption.poll.term"));
         aboutForm.addComponent(termLabel);
 
         List<String> users = poll.getVotes().stream()
                 .map(v -> v.getUser().getName()).distinct().collect(Collectors.toList());
         Label votesPerUserLabel = new Label(users.size() +
                 " (" + users.stream().collect(Collectors.joining(" ")) + ")");
-        votesPerUserLabel.setCaption("Voters");
+        votesPerUserLabel.setCaption(i18n.get("result.caption.poll.voters"));
         aboutForm.addComponent(votesPerUserLabel);
 
         if (poll.getState() == Poll.PollState.CLOSED) {
             Book winBook = poll.getWinBook();
-            Label winnerLabel = new Label(winBook == null ? "(tie)" : winBook.getGitHubIssue().getTitle());
-            winnerLabel.setCaption("Winner");
+            Label winnerLabel = new Label(winBook == null ? i18n.get("result.label.poll.winner.tie") :
+                    winBook.getGitHubIssue().getTitle());
+            winnerLabel.setCaption(i18n.get("result.caption.poll.winner"));
             aboutForm.addComponent(winnerLabel);
         }
 
         contentPane.addComponent(aboutForm);
 
-        List<IssueRow> rows = poll.getBooks().stream()
-                .map(IssueRow::from)
-                .collect(Collectors.toList());
-        Table issuesTable = new Table("List of books", IssueRow.toContainer(rows));
-        issuesTable.setPageLength(0);
-        issuesTable.setColumnHeader("title", "Title");
-        issuesTable.setColumnHeader("category", "Part");
-        issuesTable.setColumnHeader("votesWithIcon", "Votes");
-        issuesTable.setColumnHeader("votes", "Count");
-        issuesTable.setVisibleColumns("title", "category", "votesWithIcon", "votes");
-        issuesTable.setSortContainerPropertyId("votes");
-        issuesTable.setSortAscending(false);
-        contentPane.addComponent(issuesTable);
+        List<IssueTable.Row> rows = poll.getBooks().stream().map(IssueTable.Row::from).collect(Collectors.toList());
+        contentPane.addComponent(new IssueTable(i18n.get("result.caption.book.list"), ColumnGroup.CLOSED, rows,
+                i18n));
 
         Button backButton = new Button(i18n.get("common.button.back"),
                 e -> getUI().getPage().setLocation(MainUI.PATH));
         contentPane.addComponent(backButton);
         contentPane.setComponentAlignment(backButton, Alignment.MIDDLE_CENTER);
 
-        if (pollService.checkUserClosable(poll, userService.getUser())) {
-            contentPane.addComponent(new HeadingLabel("Owner operation"));
+        if (poll.isClosable(userService.getUser())) {
+            contentPane.addComponent(new HeadingLabel(i18n.get("result.label.owner.operation")));
 
-            Book winner = pollService.judgeWinner(poll);
-            contentPane.addComponent(new Label("Current winner: " +
-                    (winner == null ? "(tie)" : winner.getGitHubIssue().getTitle())));
+            Book winner = poll.judgeWinner();
+            contentPane.addComponent(new Label(i18n.get("result.label.poll.winner.current") + ": " +
+                    (winner == null ? i18n.get("result.label.poll.winner.tie") :
+                            winner.getGitHubIssue().getTitle())));
 
-            CheckBox notifyCheck = new CheckBox("Notify to Slack");
+            CheckBox notifyCheck = new CheckBox(i18n.get("common.caption.notify.slack"));
             notifyCheck.setValue(false);
             notifyCheck.setEnabled(false);
             contentPane.addComponent(notifyCheck);
 
-            Button closeButton = new Button("Close", e -> {
+            Button closeButton = new Button(i18n.get("result.button.poll.close"), e -> {
                 pollService.close(poll);
                 if (notifyCheck.getValue()) {
                     notificationService.notifyClosePoll(poll);
                 }
-                Notification.show("Your poll has been closed.", Notification.Type.TRAY_NOTIFICATION);
+                Notification.show(i18n.get("result.notification.poll.closed"),
+                        Notification.Type.TRAY_NOTIFICATION);
                 getUI().getNavigator().navigateTo(FrontView.VIEW_NAME);
             });
             contentPane.addComponent(closeButton);
 
-            Table votesTable = new Table("All votes", VoteRow.toContainer(poll.getVotes().stream()
-                    .map(VoteRow::from).collect(Collectors.toList())));
-            votesTable.setPageLength(0);
-            votesTable.setColumnHeader("user", "User");
-            votesTable.setColumnHeader("time", "Timestamp");
-            votesTable.setColumnHeader("book", "Book");
-            votesTable.setVisibleColumns("user", "time", "book");
-            contentPane.addComponent(votesTable);
+            contentPane.addComponent(new VoteTable(i18n.get("result.caption.votes"), poll.getVotes().stream()
+                    .map(VoteTable.Row::from).collect(Collectors.toList()), i18n));
         }
 
         return contentPane;

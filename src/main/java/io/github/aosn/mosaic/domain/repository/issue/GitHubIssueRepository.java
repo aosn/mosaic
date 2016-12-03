@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 public class GitHubIssueRepository {
 
     private static final String RESOURCE_PATH = "https://api.github.com/repos/:owner/:repo/issues";
+    private static final String NEW_ISSUE_PAGE = "https://github.com/:owner/:repo/issues/new";
     private final RestTemplate restTemplate;
     private String url;
 
@@ -74,6 +75,10 @@ public class GitHubIssueRepository {
             throw new RuntimeException("GitHub error: " + entity.getStatusCodeValue());
         }
         return Arrays.asList(entity.getBody());
+    }
+
+    public String getNewIssueUrl() {
+        return NEW_ISSUE_PAGE.replace(":owner", organization).replace(":repo", repository);
     }
 
     public enum State {

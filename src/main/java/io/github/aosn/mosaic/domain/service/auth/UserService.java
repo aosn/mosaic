@@ -5,6 +5,7 @@ package io.github.aosn.mosaic.domain.service.auth;
 
 import io.github.aosn.mosaic.domain.model.auth.User;
 import io.github.aosn.mosaic.domain.repository.auth.UserRepository;
+import io.github.aosn.mosaic.domain.repository.issue.GitHubIssueRepository;
 import io.github.aosn.mosaic.domain.repository.ui.SessionRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -28,11 +29,14 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final SessionRepository sessionRepository;
+    private final GitHubIssueRepository issueRepository;
 
     @Autowired
-    public UserService(UserRepository userRepository, SessionRepository sessionRepository) {
+    public UserService(UserRepository userRepository, SessionRepository sessionRepository,
+                       GitHubIssueRepository issueRepository) {
         this.userRepository = userRepository;
         this.sessionRepository = sessionRepository;
+        this.issueRepository = issueRepository;
     }
 
     public void recordLogin(Principal principal, User.Source source) {
@@ -81,5 +85,14 @@ public class UserService {
             log.error("getUser failed.", e);
             return null;
         }
+    }
+
+    /**
+     * Get the new issue url.
+     *
+     * @return url
+     */
+    public String getNewIssueUrl() {
+        return issueRepository.getNewIssueUrl();
     }
 }

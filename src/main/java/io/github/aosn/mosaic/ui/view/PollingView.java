@@ -18,11 +18,10 @@ import io.github.aosn.mosaic.domain.service.issue.IssueService;
 import io.github.aosn.mosaic.domain.service.poll.PollService;
 import io.github.aosn.mosaic.ui.MainUI;
 import io.github.aosn.mosaic.ui.view.component.HeadingLabel;
+import io.github.aosn.mosaic.ui.view.component.IssueTable;
 import io.github.aosn.mosaic.ui.view.component.LoginRequiredLabel;
 import io.github.aosn.mosaic.ui.view.layout.ContentPane;
-import io.github.aosn.mosaic.ui.view.layout.Header;
 import io.github.aosn.mosaic.ui.view.layout.ViewRoot;
-import io.github.aosn.mosaic.ui.view.table.IssueRow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.i18n.I18N;
 
@@ -62,59 +61,50 @@ public class PollingView extends CustomComponent implements View {
     public void enter(ViewChangeListener.ViewChangeEvent event) {
         Long pollId = (Long) VaadinSession.getCurrent().getAttribute(ATTR_POLL_ID);
         if (pollId == null) {
-            ErrorView.show("Parameter missing.", null);
+            ErrorView.show(i18n.get("common.error.parameter.missing"), null);
             return;
         }
-        Poll poll;
-        try {
-            poll = issueService.resolveBooks(pollService.get(pollId));
-        } catch (IssueService.IssueAccessException e) {
-            ErrorView.show("API Error", e);
-            return;
-        } catch (RuntimeException e) {
-            ErrorView.show("DB Error", e);
+
+        // Search DB
+        Poll poll = ErrorView.showIfExceptionThrows(() -> issueService.resolveBooks(pollService.get(pollId)));
+        if (poll == null) {
             return;
         }
 
         // Check status
         if (poll.getState() != Poll.PollState.OPEN) {
-            ErrorView.show("This poll was closed.", null);
+            ErrorView.show(i18n.get("polling.error.closed"), null);
             return;
         }
 
         // Check already voted
         if (poll.getVotes().stream().anyMatch(v -> v.getUser().equals(userService.getUser()))) {
-            ErrorView.show("You have already voted.", null);
+            ErrorView.show(i18n.get("polling.error.voted"), null);
             return;
         }
 
-        setCompositionRoot(new ViewRoot(new Header(i18n, userService), createPollingLayout(poll)));
+        setCompositionRoot(new ViewRoot(i18n, userService, createPollingLayout(poll)));
     }
 
     private Layout createPollingLayout(Poll poll) {
         ContentPane contentPane = new ContentPane();
 
-        contentPane.addComponent(new HeadingLabel("Poll of " + poll.getSubject()));
+        contentPane.addComponent(new HeadingLabel(i18n.get("polling.label.subject.prefix") + " " +
+                poll.getSubject()));
         int doubles = poll.getDoubles();
         String doublesCaption;
         String tableCaption;
         if (poll.getDoubles() == 1) {
-            doublesCaption = i18n.get("polling.caption.doubles.1").replace("%d", Integer.toString(doubles));
+            doublesCaption = i18n.get("polling.label.doubles.1").replace("%d", Integer.toString(doubles));
             tableCaption = i18n.get("polling.caption.books.1");
         } else {
-            doublesCaption = i18n.get("polling.caption.doubles.n").replace("%d", Integer.toString(doubles));
+            doublesCaption = i18n.get("polling.label.doubles.n").replace("%d", Integer.toString(doubles));
             tableCaption = i18n.get("polling.caption.books.n");
         }
         contentPane.addComponent(new Label(doublesCaption));
 
-        List<IssueRow> rows = poll.getBooks().stream().map(IssueRow::from).collect(Collectors.toList());
-        Table issuesTable = new Table(tableCaption, IssueRow.toContainer(rows));
-        issuesTable.setPageLength(0);
-        issuesTable.setColumnHeader("checkBox", "Select");
-        issuesTable.setColumnHeader("title", "Title");
-        issuesTable.setColumnHeader("category", "Part");
-        issuesTable.setVisibleColumns("checkBox", "title", "category");
-        contentPane.addComponent(issuesTable);
+        List<IssueTable.Row> rows = poll.getBooks().stream().map(IssueTable.Row::from).collect(Collectors.toList());
+        contentPane.addComponent(new IssueTable(tableCaption, IssueTable.ColumnGroup.OPEN, rows, i18n));
 
         Button cancelButton = new Button(i18n.get("common.button.cancel"),
                 e -> getUI().getNavigator().navigateTo(FrontView.VIEW_NAME));
@@ -122,23 +112,25 @@ public class PollingView extends CustomComponent implements View {
         submitButton.addClickListener(e -> {
             // Selection
             List<Book> selected = rows.stream()
-                    .filter(r -> r.getCheckBox().getValue()).map(IssueRow::getBookEntity)
+                    .filter(r -> r.getCheckBox().getValue()).map(IssueTable.Row::getBookEntity)
                     .collect(Collectors.toList());
 
             // Validation
             if (selected.size() < doubles) {
                 int under = doubles - selected.size();
-                Notification.show("Please select more " + under + " book" + (under == 1 ? "." : "s."));
+                Notification.show((under == 1 ? i18n.get("polling.notification.books.under.1") :
+                        i18n.get("polling.notification.books.under.n")).replace("%d", Integer.toString(under)));
                 return;
             } else if (selected.size() > doubles) {
                 int over = selected.size() - doubles;
-                Notification.show("Please remove more " + over + " book" + (over == 1 ? "." : "s."));
+                Notification.show((over == 1 ? i18n.get("polling.notification.books.over.1") :
+                        i18n.get("polling.notification.books.over.n")).replace("%d", Integer.toString(over)));
                 return;
             }
 
             // Check
             if (poll.getVotes().stream().anyMatch(v -> v.getUser().equals(userService.getUser()))) {
-                ErrorView.show("You have already voted.", null);
+                ErrorView.show(i18n.get("polling.error.voted"), null);
                 return;
             }
 
@@ -151,10 +143,11 @@ public class PollingView extends CustomComponent implements View {
                     .build()).collect(Collectors.toList());
             try {
                 pollService.submit(poll, votes);
-                Notification.show("Your vote has been submitted.", Notification.Type.TRAY_NOTIFICATION);
+                Notification.show(i18n.get("polling.notification.vote.submitted"),
+                        Notification.Type.TRAY_NOTIFICATION);
                 getUI().getNavigator().navigateTo(FrontView.VIEW_NAME);
             } catch (RuntimeException ex) {
-                ErrorView.show("Failed to submit vote(s).", ex);
+                ErrorView.show(i18n.get("polling.error.vote.failed"), ex);
             }
         });
         HorizontalLayout buttonArea = new HorizontalLayout(cancelButton, submitButton);

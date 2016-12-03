@@ -6,6 +6,7 @@ package io.github.aosn.mosaic.ui.view;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.*;
 import io.github.aosn.mosaic.MosaicApplication;
@@ -13,10 +14,9 @@ import io.github.aosn.mosaic.domain.model.poll.Poll;
 import io.github.aosn.mosaic.domain.service.auth.UserService;
 import io.github.aosn.mosaic.domain.service.poll.PollService;
 import io.github.aosn.mosaic.ui.MainUI;
+import io.github.aosn.mosaic.ui.view.component.PollTable;
 import io.github.aosn.mosaic.ui.view.layout.ContentPane;
-import io.github.aosn.mosaic.ui.view.layout.Header;
 import io.github.aosn.mosaic.ui.view.layout.ViewRoot;
-import io.github.aosn.mosaic.ui.view.table.PollRow;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.i18n.I18N;
@@ -25,6 +25,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static io.github.aosn.mosaic.ui.view.component.PollTable.ColumnGroup.*;
 
 /**
  * Front page.
@@ -51,97 +53,58 @@ public class FrontView extends CustomComponent implements View {
 
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent event) {
-        setCompositionRoot(new ViewRoot(new Header(i18n, userService), createFrontLayout()));
+        setCompositionRoot(new ViewRoot(i18n, userService, createFrontLayout()));
     }
 
     private Layout createFrontLayout() {
         ContentPane contentPane = new ContentPane();
 
         // Retrieve poll data
-        List<PollRow> open = null;
-        List<PollRow> closed = null;
+        List<PollTable.Row> open, closed;
         try {
-            Map<Poll.PollState, List<PollRow>> openAndClosed = pollService.getAll()
-                    .map(PollRow::from)
+            Map<Poll.PollState, List<PollTable.Row>> openAndClosed = pollService.getAll()
+                    .map(p -> PollTable.Row.from(p, i18n))
                     .collect(Collectors.groupingBy(p -> p.getEntity().getState()));
-            open = openAndClosed.get(Poll.PollState.OPEN);
-            closed = openAndClosed.get(Poll.PollState.CLOSED);
+            open = openAndClosed.getOrDefault(Poll.PollState.OPEN, Collections.emptyList());
+            closed = openAndClosed.getOrDefault(Poll.PollState.CLOSED, Collections.emptyList());
         } catch (RuntimeException e) {
             log.error("getOpeningPolls: ", e);
-        }
-        if (open == null) {
             open = Collections.emptyList();
-        }
-        if (closed == null) {
             closed = Collections.emptyList();
         }
+
+        // Opening Polls
         if (open.isEmpty()) {
-            Label label = new Label("No opening polls.");
+            Label label = new Label(FontAwesome.INFO_CIRCLE.getHtml() + " " +
+                    i18n.get("front.label.poll.open.empty"), ContentMode.HTML);
             contentPane.addComponent(label);
             contentPane.setComponentAlignment(label, Alignment.MIDDLE_CENTER);
         } else {
-            // Opening Polls
-            Table openingPollsTable = new Table("Opening polls", PollRow.toContainer(open));
-            openingPollsTable.setColumnReorderingAllowed(false);
-            openingPollsTable.setSortEnabled(false);
-            openingPollsTable.setSortContainerPropertyId("begin");
-            openingPollsTable.setSortAscending(false);
-            openingPollsTable.setPageLength(0);
-            openingPollsTable.setStyleName("polls-table");
-            openingPollsTable.setColumnHeader("subject", "Subject");
-            openingPollsTable.setColumnHeader("begin", "Begin");
-            openingPollsTable.setColumnHeader("votes", "Votes");
-            openingPollsTable.setColumnHeader("voteButton", "Vote");
-            openingPollsTable.setVisibleColumns("subject", "begin", "votes", "voteButton");
-            contentPane.addComponent(openingPollsTable);
+            contentPane.addComponent(new PollTable(i18n.get("front.caption.poll.open"), OPENING, open, i18n));
         }
 
+        // Closed Polls
         if (closed.isEmpty()) {
-            Label label = new Label("No closed polls.");
+            Label label = new Label(FontAwesome.INFO_CIRCLE.getHtml() + " " +
+                    i18n.get("front.label.poll.closed.empty"), ContentMode.HTML);
             contentPane.addComponent(label);
             contentPane.setComponentAlignment(label, Alignment.MIDDLE_CENTER);
         } else {
-            // Closed Polls
-            Table closedPollsTable = new Table("Closed polls", PollRow.toContainer(closed));
-            closedPollsTable.setColumnReorderingAllowed(false);
-            closedPollsTable.setSortEnabled(false);
-            closedPollsTable.setSortContainerPropertyId("begin");
-            closedPollsTable.setSortAscending(false);
-            closedPollsTable.setPageLength(0);
-            closedPollsTable.setStyleName("polls-table");
-            closedPollsTable.setColumnHeader("subject", "Subject");
-            closedPollsTable.setColumnHeader("begin", "Begin");
-            closedPollsTable.setColumnHeader("votes", "Votes");
-            closedPollsTable.setColumnHeader("resultButton", "Result");
-            closedPollsTable.setVisibleColumns("subject", "begin", "votes", "resultButton");
-            contentPane.addComponent(closedPollsTable);
+            contentPane.addComponent(new PollTable(i18n.get("front.caption.poll.closed"), CLOSED, closed, i18n));
         }
 
-        // New poll
+        // New poll button
         Button newPollButton = new Button(i18n.get("front.button.poll.new"),
                 e -> getUI().getNavigator().navigateTo(NewPollView.VIEW_NAME));
         newPollButton.setIcon(FontAwesome.BULLHORN);
         contentPane.addComponent(newPollButton);
 
         // Owners
-        List<PollRow> owners = open.stream()
-                .filter(r -> r.getEntity().getOwner().equals(userService.getUser()))
+        List<PollTable.Row> owners = open.stream()
+                .filter(r -> r.getEntity().isOwner(userService.getUser()))
                 .collect(Collectors.toList());
         if (!owners.isEmpty()) {
-            Table ownersTable = new Table("Owner polls", PollRow.toContainer(open));
-            ownersTable.setColumnReorderingAllowed(false);
-            ownersTable.setSortEnabled(false);
-            ownersTable.setSortContainerPropertyId("begin");
-            ownersTable.setSortAscending(false);
-            ownersTable.setPageLength(0);
-            ownersTable.setStyleName("polls-table");
-            ownersTable.setColumnHeader("subject", "Subject");
-            ownersTable.setColumnHeader("begin", "Begin");
-            ownersTable.setColumnHeader("end", "End");
-            ownersTable.setColumnHeader("votes", "Votes");
-            ownersTable.setColumnHeader("ownerButton", "Review");
-            ownersTable.setVisibleColumns("subject", "begin", "votes", "ownerButton");
-            contentPane.addComponent(ownersTable);
+            contentPane.addComponent(new PollTable(i18n.get("front.caption.poll.owner"), OWNER, open, i18n));
         }
 
         return contentPane;
