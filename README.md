@@ -42,13 +42,13 @@ Mosaic using full-stack Java frameworks that provides SQL-free, HTML-free and Ja
 
 ## How to Run
 
-### local
+### Run locally
 
 ```bash
 ./gradlew bootRun
 ```
 
-### production
+### Run as service
 
 ```bash
 ./gradlew bootRepackage
@@ -58,22 +58,17 @@ sudo service mosaic start
 ```
 
 NOTE: You need to create `application-production.yml` and systemd configuration.
+See our [Wiki](https://github.com/aosn/mosaic/wiki) for more information.
 
-/etc/systemd/system/mosaic.service
+### Run at Cloud Foundry
 
+```bash
+./gradlew bootRepackage
+cf push
 ```
-[Unit]
-Description=AOSN Mosaic
-After=syslog.target
 
-[Service]
-User=mikan
-ExecStart=/usr/bin/java -Dspring.profiles.active=production -jar /opt/mosaic/mosaic.war
-SuccessExitStatus=143
-
-[Install]
-WantedBy=multi-user.target
-```
+NOTE: You need to create `application-cloud.yml` and check [manifest.yml](manifest.yml) attributes.
+See our [Wiki](https://github.com/aosn/mosaic/wiki) for more information.
 
 ## Author
 
