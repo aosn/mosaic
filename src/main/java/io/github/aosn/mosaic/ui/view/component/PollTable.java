@@ -10,6 +10,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.UI;
 import io.github.aosn.mosaic.MosaicApplication;
+import io.github.aosn.mosaic.domain.model.auth.User;
 import io.github.aosn.mosaic.domain.model.poll.Poll;
 import io.github.aosn.mosaic.ui.view.PollResultView;
 import io.github.aosn.mosaic.ui.view.PollingView;
@@ -36,10 +37,10 @@ public class PollTable extends Table {
     /**
      * Constructs a table.
      *
-     * @param caption caption
+     * @param caption     caption
      * @param columnGroup visible columnGroup
-     * @param rows    row collection
-     * @param i18n    message source
+     * @param rows        row collection
+     * @param i18n        message source
      */
     public PollTable(String caption, ColumnGroup columnGroup, List<Row> rows, I18N i18n) {
         super(caption, new BeanItemContainer<>(Row.class, rows));
@@ -92,15 +93,22 @@ public class PollTable extends Table {
         private final Button resultButton;
         private final Button ownerButton;
 
-        public static Row from(Poll entity, I18N i18n) {
+        public static Row from(Poll entity, User user, I18N i18n) {
             Long pollId = entity.getId();
 
-            // Start button
-            Button voteButton = new Button(i18n.get("common.button.poll.start"), FontAwesome.THUMBS_UP);
-            voteButton.addClickListener(e -> {
-                VaadinSession.getCurrent().setAttribute(PollingView.ATTR_POLL_ID, pollId);
-                UI.getCurrent().getNavigator().navigateTo(PollingView.VIEW_NAME);
-            });
+            // Start button or progress button
+            Button voteOrProgressButton;
+            if (entity.isVoted(user)) {
+                voteOrProgressButton = new Button(i18n.get("common.button.poll.progress"), FontAwesome.BAR_CHART);
+                voteOrProgressButton.addClickListener(e ->
+                        UI.getCurrent().getNavigator().navigateTo(PollResultView.VIEW_NAME + "/" + pollId));
+            } else {
+                voteOrProgressButton = new Button(i18n.get("common.button.poll.start"), FontAwesome.THUMBS_UP);
+                voteOrProgressButton.addClickListener(e -> {
+                    VaadinSession.getCurrent().setAttribute(PollingView.ATTR_POLL_ID, pollId);
+                    UI.getCurrent().getNavigator().navigateTo(PollingView.VIEW_NAME);
+                });
+            }
 
             // Result button
             Button resultButton = new Button(i18n.get("front.button.poll.result"), FontAwesome.BAR_CHART);
@@ -123,7 +131,7 @@ public class PollTable extends Table {
                     .begin(entity.getBegin() != null ? DATE_FORMAT.format(entity.getBegin()) : "")
                     .end(entity.getEnd() != null ? DATE_FORMAT.format(entity.getEnd()) : "")
                     .votes(votes)
-                    .voteButton(voteButton)
+                    .voteButton(voteOrProgressButton)
                     .resultButton(resultButton)
                     .ownerButton(ownerButton)
                     .build();

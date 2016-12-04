@@ -5,6 +5,7 @@ package io.github.aosn.mosaic.ui.view.component;
 
 import com.vaadin.ui.Label;
 import io.github.aosn.mosaic.MosaicApplication;
+import io.github.aosn.mosaic.ui.view.style.Style;
 
 /**
  * @author mikan
@@ -16,6 +17,6 @@ public class HeadingLabel extends Label {
 
     public HeadingLabel(String title) {
         setValue(title);
-        setStyleName("heading");
+        setStyleName(Style.HEADING.className());
     }
 }

@@ -63,7 +63,7 @@ public class FrontView extends CustomComponent implements View {
         List<PollTable.Row> open, closed;
         try {
             Map<Poll.PollState, List<PollTable.Row>> openAndClosed = pollService.getAll()
-                    .map(p -> PollTable.Row.from(p, i18n))
+                    .map(p -> PollTable.Row.from(p, userService.getUser(), i18n))
                     .collect(Collectors.groupingBy(p -> p.getEntity().getState()));
             open = openAndClosed.getOrDefault(Poll.PollState.OPEN, Collections.emptyList());
             closed = openAndClosed.getOrDefault(Poll.PollState.CLOSED, Collections.emptyList());

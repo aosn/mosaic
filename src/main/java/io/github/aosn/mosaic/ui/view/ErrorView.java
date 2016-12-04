@@ -85,6 +85,10 @@ public class ErrorView extends CustomComponent implements View {
         String message = (String) session.getAttribute(ATTR_ERROR_MESSAGE);
         Throwable throwable = (Throwable) session.getAttribute(ATTR_ERROR_THROWABLE);
 
+        // Clear session attribute
+        session.setAttribute(ATTR_ERROR_MESSAGE, null);
+        session.setAttribute(ATTR_ERROR_THROWABLE, null);
+
         // ERROR label
         Label errorLabel = new Label("ERROR");
         errorLabel.setStyleName(Style.ERROR_LABEL.className());
@@ -97,6 +101,9 @@ public class ErrorView extends CustomComponent implements View {
         if (throwable != null) {
             contentPane.addComponent(new Label(throwable.getClass().getSimpleName() + ": " + throwable.getMessage()));
             log.error("Received error: " + throwable.getMessage(), throwable);
+        }
+        if (message == null && throwable == null) {
+            contentPane.addComponent(new Label(i18n.get("common.error.unexpected")));
         }
 
         // Back button

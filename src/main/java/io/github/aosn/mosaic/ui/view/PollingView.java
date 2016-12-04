@@ -72,13 +72,13 @@ public class PollingView extends CustomComponent implements View {
         }
 
         // Check status
-        if (poll.getState() != Poll.PollState.OPEN) {
+        if (poll.isClosed()) {
             ErrorView.show(i18n.get("polling.error.closed"), null);
             return;
         }
 
         // Check already voted
-        if (poll.getVotes().stream().anyMatch(v -> v.getUser().equals(userService.getUser()))) {
+        if (poll.isVoted(userService.getUser())) {
             ErrorView.show(i18n.get("polling.error.voted"), null);
             return;
         }

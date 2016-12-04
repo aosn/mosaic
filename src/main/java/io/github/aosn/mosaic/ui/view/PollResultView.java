@@ -85,7 +85,7 @@ public class PollResultView extends CustomComponent implements View {
         }
 
         // Access check
-        if (poll.isAccessible(userService.getUser())) {
+        if (!poll.isResultAccessible(userService.getUser())) {
             ErrorView.show(i18n.get("result.error.access.forbidden"), null);
             return;
         }

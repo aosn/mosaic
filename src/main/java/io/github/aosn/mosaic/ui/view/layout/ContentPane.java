@@ -3,6 +3,7 @@ package io.github.aosn.mosaic.ui.view.layout;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.VerticalLayout;
 import io.github.aosn.mosaic.MosaicApplication;
+import io.github.aosn.mosaic.ui.view.style.Style;
 
 /**
  * @author mikan
@@ -15,6 +16,6 @@ public class ContentPane extends VerticalLayout {
     public ContentPane() {
         setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
         setSpacing(true);
-        setStyleName("content-pane");
+        setStyleName(Style.CONTENT_PANE.className());
     }
 }
