@@ -84,6 +84,7 @@ public class PollingView extends CustomComponent implements View {
             return;
         }
 
+        getUI().getPage().setTitle(i18n.get("header.label.title"));
         setCompositionRoot(new ViewRoot(i18n, userService, createPollingLayout(poll)));
     }
 

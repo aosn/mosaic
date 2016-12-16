@@ -53,6 +53,7 @@ public class FrontView extends CustomComponent implements View {
 
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent event) {
+        getUI().getPage().setTitle(i18n.get("header.label.title"));
         setCompositionRoot(new ViewRoot(i18n, userService, createFrontLayout()));
     }
 

@@ -72,6 +72,7 @@ public class NewPollView extends CustomComponent implements View {
             ErrorView.show(i18n.get("common.error.issue.obtain.failed"), e);
             return;
         }
+        getUI().getPage().setTitle(i18n.get("header.label.title"));
         setCompositionRoot(new ViewRoot(i18n, userService, createPollLayout(issues)));
     }
 
