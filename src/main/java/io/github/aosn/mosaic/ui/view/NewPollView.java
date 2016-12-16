@@ -9,6 +9,7 @@ import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.*;
+import com.vaadin.ui.Notification.Type;
 import io.github.aosn.mosaic.MosaicApplication;
 import io.github.aosn.mosaic.domain.model.auth.User;
 import io.github.aosn.mosaic.domain.model.issue.GitHubIssue;
@@ -118,7 +119,7 @@ public class NewPollView extends CustomComponent implements View {
         Button submitButton = new Button(i18n.get("new.button.submit"), e -> {
             // Validation
             if (!subject.isValid() || !closeDate.isValid() || !votesSelect.isValid() || subject.isEmpty()) {
-                Notification.show(i18n.get("common.notification.input.required"));
+                Notification.show(i18n.get("common.notification.input.required"), Type.WARNING_MESSAGE);
                 return;
             }
 
@@ -144,11 +145,11 @@ public class NewPollView extends CustomComponent implements View {
                     .map(IssueTable.Row::getIssueEntity)
                     .collect(Collectors.toList());
             if (selected.size() < 2) {
-                Notification.show(i18n.get("new.notification.select.more.2"));
+                Notification.show(i18n.get("new.notification.select.more.2"), Type.WARNING_MESSAGE);
                 return;
             }
             if (doubles > selected.size()) {
-                Notification.show(i18n.get("new.notification.doubles.larger"));
+                Notification.show(i18n.get("new.notification.doubles.larger"), Type.WARNING_MESSAGE);
             }
 
             // Submit
@@ -174,7 +175,7 @@ public class NewPollView extends CustomComponent implements View {
                 if (notifyCheck.getValue()) {
                     notificationService.notifyCreatePoll(poll);
                 }
-                Notification.show(i18n.get("new.notification.poll.created"), Notification.Type.TRAY_NOTIFICATION);
+                Notification.show(i18n.get("new.notification.poll.created"), Type.TRAY_NOTIFICATION);
                 getUI().getNavigator().navigateTo(FrontView.VIEW_NAME);
             } catch (RuntimeException ex) {
                 ErrorView.show(i18n.get("new.error.poll.create.failed"), ex);

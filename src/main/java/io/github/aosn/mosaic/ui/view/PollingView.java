@@ -9,6 +9,7 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.*;
+import com.vaadin.ui.Notification.Type;
 import io.github.aosn.mosaic.MosaicApplication;
 import io.github.aosn.mosaic.domain.model.poll.Book;
 import io.github.aosn.mosaic.domain.model.poll.Poll;
@@ -119,12 +120,14 @@ public class PollingView extends CustomComponent implements View {
             if (selected.size() < doubles) {
                 int under = doubles - selected.size();
                 Notification.show((under == 1 ? i18n.get("polling.notification.books.under.1") :
-                        i18n.get("polling.notification.books.under.n")).replace("%d", Integer.toString(under)));
+                        i18n.get("polling.notification.books.under.n"))
+                        .replace("%d", Integer.toString(under)), Type.WARNING_MESSAGE);
                 return;
             } else if (selected.size() > doubles) {
                 int over = selected.size() - doubles;
                 Notification.show((over == 1 ? i18n.get("polling.notification.books.over.1") :
-                        i18n.get("polling.notification.books.over.n")).replace("%d", Integer.toString(over)));
+                        i18n.get("polling.notification.books.over.n"))
+                        .replace("%d", Integer.toString(over)), Type.WARNING_MESSAGE);
                 return;
             }
 
@@ -144,7 +147,7 @@ public class PollingView extends CustomComponent implements View {
             try {
                 pollService.submit(poll, votes);
                 Notification.show(i18n.get("polling.notification.vote.submitted"),
-                        Notification.Type.TRAY_NOTIFICATION);
+                        Type.TRAY_NOTIFICATION);
                 getUI().getNavigator().navigateTo(FrontView.VIEW_NAME);
             } catch (RuntimeException ex) {
                 ErrorView.show(i18n.get("polling.error.vote.failed"), ex);
