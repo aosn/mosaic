@@ -29,7 +29,11 @@ Demo:
 ### Server
 
 * Java SE Development Kit 8
-* MySQL 5.6
+
+#### Tested databases
+
+* H2
+* MySQL 5.5, 5.6
 
 ## Frameworks & Libraries
 

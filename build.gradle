@@ -1,6 +1,8 @@
 buildscript {
     ext {
         springBootVersion = '1.4.1.RELEASE'
+        vaadinVersion = '7.7.6'
+        vaadinSpringBootVersion = '1.1.1'
         checkerFrameworkVersion = '2.1.5'
     }
     repositories {
@@ -11,9 +13,11 @@ buildscript {
     }
 }
 
-apply plugin: 'java'
 apply plugin: 'spring-boot'
 apply plugin: 'war'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 war {
     baseName = 'mosaic'
@@ -21,8 +25,9 @@ war {
     archiveName = baseName + "." + extension
 }
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+springBoot {
+    executable = true
+}
 
 repositories {
     mavenCentral()
@@ -35,8 +40,8 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-security')
     compile('org.springframework.security.oauth:spring-security-oauth2')
     // Vaadin
-    compile('com.vaadin:vaadin-spring-boot-starter:1.0.2')
-    compile('com.vaadin:vaadin-themes:7.7.5')
+    compile("com.vaadin:vaadin-spring-boot-starter:${vaadinSpringBootVersion}")
+    compile("com.vaadin:vaadin-themes:${vaadinVersion}")
     compile('org.vaadin.spring.addons:vaadin-spring-addon-i18n:0.0.7.RELEASE')
     // Utilities
     compile('org.projectlombok:lombok')
@@ -53,10 +58,6 @@ dependencies {
 
 dependencyManagement {
     imports {
-        mavenBom "com.vaadin:vaadin-bom:7.7.5"
+        mavenBom "com.vaadin:vaadin-bom:${vaadinVersion}"
     }
-}
-
-springBoot {
-    executable = true
 }
