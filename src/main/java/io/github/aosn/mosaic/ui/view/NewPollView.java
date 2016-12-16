@@ -66,7 +66,7 @@ public class NewPollView extends CustomComponent implements View {
     public void enter(ViewChangeListener.ViewChangeEvent event) {
         List<GitHubIssue> issues;
         try {
-            issues = issueService.getAll();
+            issues = issueService.getOpenIssues();
         } catch (RuntimeException e) {
             ErrorView.show(i18n.get("common.error.issue.obtain.failed"), e);
             return;

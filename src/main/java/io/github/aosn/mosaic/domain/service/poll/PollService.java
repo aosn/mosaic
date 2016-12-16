@@ -8,6 +8,7 @@ import io.github.aosn.mosaic.domain.model.poll.Vote;
 import io.github.aosn.mosaic.domain.repository.poll.PollRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -19,6 +20,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
 
 /**
+ * Provides {@link Poll} entity operations.
+ *
  * @author mikan
  * @since 0.1
  */
@@ -38,7 +41,7 @@ public class PollService {
      * Get all entities.
      *
      * @return {@link Stream} of entities
-     * @throws RuntimeException if database error occurred
+     * @throws DataAccessException if the database error occurred
      */
     public Stream<Poll> getAll() {
         return pollRepository.findAll().stream();
@@ -50,7 +53,7 @@ public class PollService {
      * @param pollId poll id
      * @return entity
      * @throws NoSuchElementException if requested poll is not found
-     * @throws RuntimeException       if database error occurred
+     * @throws DataAccessException    if the database error occurred
      */
     public Poll get(Long pollId) {
         Poll poll = pollRepository.findOne(pollId);
@@ -60,6 +63,13 @@ public class PollService {
         return poll;
     }
 
+    /**
+     * Submit votes.
+     *
+     * @param poll  poll
+     * @param votes {@link List} of {@link Vote}s
+     * @throws DataAccessException if the database error occurred
+     */
     @Transactional
     public void submit(Poll poll, List<Vote> votes) {
         log.info("BEGIN submit: " + votes);
@@ -79,7 +89,7 @@ public class PollService {
      * Create a poll.
      *
      * @param poll entity
-     * @throws RuntimeException if database error occurred
+     * @throws DataAccessException if the database error occurred
      */
     @Transactional
     public void create(Poll poll) {
@@ -88,6 +98,12 @@ public class PollService {
         log.info("END create: " + poll);
     }
 
+    /**
+     * Close a poll.
+     *
+     * @param poll poll
+     * @throws DataAccessException if the database error occurred
+     */
     @Transactional
     public void close(Poll poll) {
         log.info("BEGIN close: " + poll);

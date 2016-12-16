@@ -37,13 +37,23 @@ public class IssueService {
         this.gitHubIssueRepository = gitHubIssueRepository;
     }
 
+    public List<GitHubIssue> getAll() {
+        try {
+            return gitHubIssueRepository.getAll(null).stream().filter(i -> Stream.of(i.getLabels())
+                    .anyMatch(l -> l.getName().equals(labelA) || l.getName().equals(labelB)))
+                    .collect(Collectors.toList());
+        } catch (RuntimeException e) {
+            throw new IssueAccessException("Failed to obtain GitHub issues.", e);
+        }
+    }
+
     /**
      * Get all pollable issues from GitHub.
      *
      * @return {@link List} of GitHub issues
      * @throws IssueAccessException if GitHub API returns error
      */
-    public List<GitHubIssue> getAll() {
+    public List<GitHubIssue> getOpenIssues() {
         try {
             return gitHubIssueRepository.getAll(State.OPEN).stream().filter(i -> Stream.of(i.getLabels())
                     .anyMatch(l -> l.getName().equals(labelA) || l.getName().equals(labelB)))
@@ -61,7 +71,7 @@ public class IssueService {
      * @throws NoSuchElementException if cannot resolved
      */
     public Poll resolveBooks(Poll poll) {
-        List<GitHubIssue> issues = gitHubIssueRepository.getAll(null);
+        List<GitHubIssue> issues = gitHubIssueRepository.getAll(State.ALL);
         poll.getBooks().forEach(b -> {
             b.setGitHubIssue(issues.stream()
                     .filter(i -> i.getId().equals(b.getIssue()))

@@ -9,8 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.PostConstruct;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -23,10 +25,16 @@ import java.util.stream.Collectors;
 @Slf4j
 public class GitHubIssueRepository {
 
-    private static final String RESOURCE_PATH = "https://api.github.com/repos/:owner/:repo/issues";
-    private static final String NEW_ISSUE_PAGE = "https://github.com/:owner/:repo/issues/new";
+    private static final String PARAM_OWNER = "owner";
+    private static final String PARAM_REPO = "repo";
+    private static final String PARAM_STATE = "state";
+    private static final String PARAM_LABELS = "labels";
+    private static final String RESOURCE_PATH = "https://api.github.com/repos/{" + PARAM_OWNER + "}/{" +
+            PARAM_REPO + "}/issues?state={" + PARAM_STATE + "}";
+    private static final String QUERY_LABEL = "&?labels={" + PARAM_LABELS + "}";
+    private static final String NEW_ISSUE_PAGE = "https://github.com/{" + PARAM_OWNER + "}/{" +
+            PARAM_REPO + "}/issues/new";
     private final RestTemplate restTemplate;
-    private String url;
 
     @Value("${mosaic.issue.organization}")
     private String organization;
@@ -39,16 +47,18 @@ public class GitHubIssueRepository {
         this.restTemplate = restTemplate;
     }
 
-    @PostConstruct
-    private void init() {
-        url = RESOURCE_PATH.replace(":owner", organization).replace(":repo", repository);
-    }
-
+    /**
+     * Get all issues.
+     *
+     * @param state {@link State} for filter issue state, or {@code null} unfiltered
+     * @return {@link List} of {@link GitHubIssue}s
+     */
     public List<GitHubIssue> getAll(@Nullable State state) {
-        log.debug("getAll: url=" + url + ", state=" + state);
-        Map<String, String> params = state != null ?
-                Collections.singletonMap("state", state.stateValue) : Collections.emptyMap();
-        ResponseEntity<GitHubIssue[]> entity = restTemplate.getForEntity(url, GitHubIssue[].class, params);
+        Map<String, String> params = new HashMap<>(3);
+        params.put(PARAM_OWNER, organization);
+        params.put(PARAM_REPO, repository);
+        params.put(PARAM_STATE, state == null ? State.ALL.stateValue : state.stateValue);
+        ResponseEntity<GitHubIssue[]> entity = restTemplate.getForEntity(RESOURCE_PATH, GitHubIssue[].class, params);
         if (!entity.getStatusCode().is2xxSuccessful()) {
             log.error("GitHub error: " + entity.getStatusCodeValue());
             throw new RuntimeException("GitHub error: " + entity.getStatusCodeValue());
@@ -56,20 +66,27 @@ public class GitHubIssueRepository {
         return Arrays.asList(entity.getBody());
     }
 
+    /**
+     * Get issues by given labels and state.
+     *
+     * @param labels {@link List} of labels
+     * @param state  {@link State} for filter issue state, or {@code null} unfiltered
+     * @return {@link List} of {@link GitHubIssue}s
+     */
     public List<GitHubIssue> getByLabels(List<String> labels, @Nullable State state) {
-        log.debug("getByLabel: url=" + url + ", labels=" + labels + ", state=" + state);
         if (labels == null) {
             throw new NullPointerException("label is null.");
         }
         if (labels.isEmpty()) {
             throw new IllegalArgumentException("label is empty.");
         }
-        Map<String, String> params = new HashMap<>();
-        params.put("labels", labels.stream().collect(Collectors.joining(",")));
-        if (state != null) {
-            params.put("state", state.stateValue);
-        }
-        ResponseEntity<GitHubIssue[]> entity = restTemplate.getForEntity(url, GitHubIssue[].class, params);
+        Map<String, String> params = new HashMap<>(4);
+        params.put(PARAM_OWNER, organization);
+        params.put(PARAM_REPO, repository);
+        params.put(PARAM_LABELS, labels.stream().collect(Collectors.joining(",")));
+        params.put(PARAM_STATE, state == null ? State.ALL.stateValue : state.stateValue);
+        ResponseEntity<GitHubIssue[]> entity = restTemplate.getForEntity(RESOURCE_PATH + QUERY_LABEL,
+                GitHubIssue[].class, params);
         if (!entity.getStatusCode().is2xxSuccessful()) {
             log.error("GitHub error: " + entity.getStatusCodeValue());
             throw new RuntimeException("GitHub error: " + entity.getStatusCodeValue());
@@ -78,12 +95,14 @@ public class GitHubIssueRepository {
     }
 
     public String getNewIssueUrl() {
-        return NEW_ISSUE_PAGE.replace(":owner", organization).replace(":repo", repository);
+        return NEW_ISSUE_PAGE.replace("{" + PARAM_OWNER + "}", organization)
+                .replace("{" + PARAM_REPO + "}", repository);
     }
 
     public enum State {
         OPEN("open"),
-        CLOSED("closed");
+        CLOSED("closed"),
+        ALL("all");
 
         private final String stateValue;
 
