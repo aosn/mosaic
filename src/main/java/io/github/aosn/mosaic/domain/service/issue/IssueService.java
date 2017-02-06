@@ -1,10 +1,12 @@
 /*
- * Copyright (C) 2016 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.domain.service.issue;
 
+import com.google.common.base.Strings;
 import io.github.aosn.mosaic.MosaicApplication;
 import io.github.aosn.mosaic.domain.model.issue.GitHubIssue;
+import io.github.aosn.mosaic.domain.model.issue.GitHubLabel;
 import io.github.aosn.mosaic.domain.model.poll.Poll;
 import io.github.aosn.mosaic.domain.repository.issue.GitHubIssueRepository;
 import io.github.aosn.mosaic.domain.repository.issue.GitHubIssueRepository.State;
@@ -24,13 +26,11 @@ import java.util.stream.Stream;
 @Service
 public class IssueService {
 
+    private static final String PATTERN = "%s"; // label filter pattern
     private final GitHubIssueRepository gitHubIssueRepository;
 
-    @Value("${mosaic.issue.label-a}")
-    private String labelA;
-
-    @Value("${mosaic.issue.label-b}")
-    private String labelB;
+    @Value("${mosaic.issue.filter}")
+    private String labelFilter;
 
     @Autowired
     public IssueService(GitHubIssueRepository gitHubIssueRepository) {
@@ -39,8 +39,9 @@ public class IssueService {
 
     public List<GitHubIssue> getAll() {
         try {
-            return gitHubIssueRepository.getAll(null).stream().filter(i -> Stream.of(i.getLabels())
-                    .anyMatch(l -> l.getName().equals(labelA) || l.getName().equals(labelB)))
+            return gitHubIssueRepository.getAll(null).stream()
+                    .filter(i -> Stream.of(i.getLabels())
+                            .anyMatch(this::isIssueLabel))
                     .collect(Collectors.toList());
         } catch (RuntimeException e) {
             throw new IssueAccessException("Failed to obtain GitHub issues.", e);
@@ -55,8 +56,9 @@ public class IssueService {
      */
     public List<GitHubIssue> getOpenIssues() {
         try {
-            return gitHubIssueRepository.getAll(State.OPEN).stream().filter(i -> Stream.of(i.getLabels())
-                    .anyMatch(l -> l.getName().equals(labelA) || l.getName().equals(labelB)))
+            return gitHubIssueRepository.getAll(State.OPEN).stream()
+                    .filter(i -> Stream.of(i.getLabels())
+                            .anyMatch(this::isIssueLabel))
                     .collect(Collectors.toList());
         } catch (RuntimeException e) {
             throw new IssueAccessException("Failed to obtain GitHub issues.", e);
@@ -80,6 +82,14 @@ public class IssueService {
                     .filter(p -> b.equals(p.getBook())).count()));
         });
         return poll;
+    }
+
+    public boolean isIssueLabel(GitHubLabel label) {
+        return !Strings.isNullOrEmpty(label.getName()) && label.getName().contains(labelFilter.replace(PATTERN, ""));
+    }
+
+    public String trimPartLabel(String label) {
+        return label.replace(labelFilter.replace(PATTERN, ""), "");
     }
 
     public static class IssueAccessException extends RuntimeException {

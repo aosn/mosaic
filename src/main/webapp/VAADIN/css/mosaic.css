@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 
 .title {
@@ -48,4 +48,13 @@
 .error-label {
     color: red;
     font-weight: bold;
+}
+
+.issue-label {
+    border-radius: 0.3em;
+    padding: 0 0.5em;
+}
+
+td.v-table-cell-content {
+    max-width: 350px;
 }

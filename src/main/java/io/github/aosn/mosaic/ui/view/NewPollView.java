@@ -1,15 +1,16 @@
 /*
- * Copyright (C) 2016 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.ui.view;
 
 import com.vaadin.data.validator.StringLengthValidator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.*;
-import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.themes.ValoTheme;
 import io.github.aosn.mosaic.MosaicApplication;
 import io.github.aosn.mosaic.domain.model.auth.User;
 import io.github.aosn.mosaic.domain.model.issue.GitHubIssue;
@@ -25,6 +26,7 @@ import io.github.aosn.mosaic.ui.view.component.IssueTable.ColumnGroup;
 import io.github.aosn.mosaic.ui.view.component.LoginRequiredLabel;
 import io.github.aosn.mosaic.ui.view.layout.ContentPane;
 import io.github.aosn.mosaic.ui.view.layout.ViewRoot;
+import io.github.aosn.mosaic.ui.view.style.Notifications;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.i18n.I18N;
@@ -79,7 +81,9 @@ public class NewPollView extends CustomComponent implements View {
     private Layout createPollLayout(List<GitHubIssue> issues) {
         ContentPane contentPane = new ContentPane();
 
-        List<IssueTable.Row> rows = issues.stream().map(IssueTable.Row::from).collect(Collectors.toList());
+        List<IssueTable.Row> rows = issues.stream()
+                .map(r -> IssueTable.Row.from(r, issueService::isIssueLabel, issueService::trimPartLabel))
+                .collect(Collectors.toList());
         contentPane.addComponent(new IssueTable(i18n.get("new.caption.select"), ColumnGroup.NEW, rows, i18n));
 
         FormLayout form = new FormLayout();
@@ -120,7 +124,7 @@ public class NewPollView extends CustomComponent implements View {
         Button submitButton = new Button(i18n.get("new.button.submit"), e -> {
             // Validation
             if (!subject.isValid() || !closeDate.isValid() || !votesSelect.isValid() || subject.isEmpty()) {
-                Notification.show(i18n.get("common.notification.input.required"), Type.WARNING_MESSAGE);
+                Notifications.showWarning(i18n.get("common.notification.input.required"));
                 return;
             }
 
@@ -146,11 +150,11 @@ public class NewPollView extends CustomComponent implements View {
                     .map(IssueTable.Row::getIssueEntity)
                     .collect(Collectors.toList());
             if (selected.size() < 2) {
-                Notification.show(i18n.get("new.notification.select.more.2"), Type.WARNING_MESSAGE);
+                Notifications.showWarning(i18n.get("new.notification.select.more.2"));
                 return;
             }
             if (doubles > selected.size()) {
-                Notification.show(i18n.get("new.notification.doubles.larger"), Type.WARNING_MESSAGE);
+                Notifications.showWarning(i18n.get("new.notification.doubles.larger"));
             }
 
             // Submit
@@ -176,12 +180,14 @@ public class NewPollView extends CustomComponent implements View {
                 if (notifyCheck.getValue()) {
                     notificationService.notifyCreatePoll(poll);
                 }
-                Notification.show(i18n.get("new.notification.poll.created"), Type.TRAY_NOTIFICATION);
+                Notifications.showNormal(i18n.get("new.notification.poll.created"));
                 getUI().getNavigator().navigateTo(FrontView.VIEW_NAME);
             } catch (RuntimeException ex) {
                 ErrorView.show(i18n.get("new.error.poll.create.failed"), ex);
             }
         });
+        submitButton.setIcon(FontAwesome.BULLHORN);
+        submitButton.setStyleName(ValoTheme.BUTTON_PRIMARY);
         HorizontalLayout buttonArea = new HorizontalLayout(cancelButton, submitButton);
         buttonArea.setSpacing(true);
         contentPane.addComponent(buttonArea);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.ui.view;
 
@@ -8,6 +8,7 @@ import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.*;
+import com.vaadin.ui.themes.ValoTheme;
 import io.github.aosn.mosaic.MosaicApplication;
 import io.github.aosn.mosaic.domain.model.poll.Book;
 import io.github.aosn.mosaic.domain.model.poll.Poll;
@@ -23,6 +24,7 @@ import io.github.aosn.mosaic.ui.view.component.PollTable;
 import io.github.aosn.mosaic.ui.view.component.VoteTable;
 import io.github.aosn.mosaic.ui.view.layout.ContentPane;
 import io.github.aosn.mosaic.ui.view.layout.ViewRoot;
+import io.github.aosn.mosaic.ui.view.style.Notifications;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.i18n.I18N;
 
@@ -129,7 +131,9 @@ public class PollResultView extends CustomComponent implements View {
 
         contentPane.addComponent(aboutForm);
 
-        List<IssueTable.Row> rows = poll.getBooks().stream().map(IssueTable.Row::from).collect(Collectors.toList());
+        List<IssueTable.Row> rows = poll.getBooks().stream()
+                .map(r -> IssueTable.Row.from(r, issueService::isIssueLabel, issueService::trimPartLabel))
+                .collect(Collectors.toList());
         contentPane.addComponent(new IssueTable(i18n.get("result.caption.book.list"), ColumnGroup.CLOSED, rows,
                 i18n));
 
@@ -156,10 +160,10 @@ public class PollResultView extends CustomComponent implements View {
                 if (notifyCheck.getValue()) {
                     notificationService.notifyClosePoll(poll);
                 }
-                Notification.show(i18n.get("result.notification.poll.closed"),
-                        Notification.Type.TRAY_NOTIFICATION);
+                Notifications.showNormal(i18n.get("result.notification.poll.closed"));
                 getUI().getNavigator().navigateTo(FrontView.VIEW_NAME);
             });
+            closeButton.setStyleName(ValoTheme.BUTTON_DANGER);
             contentPane.addComponent(closeButton);
             if (poll.isClosed()) {
                 closeButton.setEnabled(false);
