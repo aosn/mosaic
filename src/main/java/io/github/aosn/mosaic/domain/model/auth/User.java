@@ -46,9 +46,6 @@ public class User implements Serializable {
     @Setter
     private Date lastLogin;
 
-    @Transient
-    private String iconUrl;
-
     @Override
     public boolean equals(Object other) {
         if (this == other) {
