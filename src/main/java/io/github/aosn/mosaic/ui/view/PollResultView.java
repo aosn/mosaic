@@ -10,8 +10,10 @@ import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 import io.github.aosn.mosaic.MosaicApplication;
+import io.github.aosn.mosaic.domain.model.auth.User;
 import io.github.aosn.mosaic.domain.model.poll.Book;
 import io.github.aosn.mosaic.domain.model.poll.Poll;
+import io.github.aosn.mosaic.domain.model.poll.Vote;
 import io.github.aosn.mosaic.domain.service.auth.UserService;
 import io.github.aosn.mosaic.domain.service.issue.IssueService;
 import io.github.aosn.mosaic.domain.service.notification.NotificationService;
@@ -20,8 +22,10 @@ import io.github.aosn.mosaic.ui.MainUI;
 import io.github.aosn.mosaic.ui.view.component.*;
 import io.github.aosn.mosaic.ui.view.component.IssueTable.ColumnGroup;
 import io.github.aosn.mosaic.ui.view.layout.ContentPane;
+import io.github.aosn.mosaic.ui.view.layout.IconAndName;
 import io.github.aosn.mosaic.ui.view.layout.ViewRoot;
 import io.github.aosn.mosaic.ui.view.style.Notifications;
+import io.github.aosn.mosaic.ui.view.style.Style;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.i18n.I18N;
 
@@ -100,8 +104,10 @@ public class PollResultView extends CustomComponent implements View {
                 poll.getSubject()));
 
         FormLayout aboutForm = new FormLayout();
+        aboutForm.setMargin(false);
+        contentPane.addComponent(aboutForm);
 
-        Label ownerLabel = new Label(poll.getOwner().getName());
+        IconAndName ownerLabel = new IconAndName(poll.getOwner());
         ownerLabel.setCaption(i18n.get("result.caption.poll.owner"));
         aboutForm.addComponent(ownerLabel);
 
@@ -111,12 +117,17 @@ public class PollResultView extends CustomComponent implements View {
         termLabel.setCaption(i18n.get("result.caption.poll.term"));
         aboutForm.addComponent(termLabel);
 
-        List<String> users = poll.getVotes().stream()
-                .map(v -> v.getUser().getName()).distinct().collect(Collectors.toList());
-        Label votesPerUserLabel = new Label(users.size() +
-                " (" + users.stream().collect(Collectors.joining(" ")) + ")");
-        votesPerUserLabel.setCaption(i18n.get("result.caption.poll.voters"));
+        List<User> users = poll.getVotes().stream().map(Vote::getUser).distinct().collect(Collectors.toList());
+        Label votesPerUserLabel = new Label(String.valueOf(users.size()));
+        votesPerUserLabel.setCaption(i18n.get("result.caption.poll.voters.n"));
         aboutForm.addComponent(votesPerUserLabel);
+
+        HorizontalLayout voters = new HorizontalLayout();
+        voters.setSpacing(true);
+        voters.setStyleName(Style.ICON_AND_NAME.className());
+        voters.setCaption(i18n.get("result.caption.poll.voters.list"));
+        users.forEach(u -> voters.addComponent(new IconAndName(u)));
+        aboutForm.addComponent(voters);
 
         if (poll.getState() == Poll.PollState.CLOSED) {
             Book winBook = poll.getWinBook();
@@ -125,8 +136,6 @@ public class PollResultView extends CustomComponent implements View {
             winnerLabel.setCaption(i18n.get("result.caption.poll.winner"));
             aboutForm.addComponent(winnerLabel);
         }
-
-        contentPane.addComponent(aboutForm);
 
         List<IssueTable.Row> rows = poll.getBooks().stream()
                 .map(r -> IssueTable.Row.from(r, issueService::isIssueLabel, issueService::trimPartLabel))

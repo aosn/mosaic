@@ -87,6 +87,7 @@ public class NewPollView extends CustomComponent implements View {
         contentPane.addComponent(new IssueTable(i18n.get("new.caption.select"), ColumnGroup.NEW, rows, i18n));
 
         FormLayout form = new FormLayout();
+        form.setMargin(false);
         form.setCaption(i18n.get("new.caption.poll.info"));
         contentPane.addComponent(form);
 

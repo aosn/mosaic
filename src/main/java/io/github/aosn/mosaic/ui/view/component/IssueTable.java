@@ -127,7 +127,8 @@ public class IssueTable extends Table {
             UnaryOperator<String> t = labelTrimmer == null ? l -> l : labelTrimmer;
             String label = Stream.of(labels)
                     .filter(f)
-                    .map(l -> "<span class=\"issue-label\" style=\"color:white;background:#" + l.getColor() + ";\">" +
+                    .map(l -> "<span class=\"" + Style.ISSUE_LABEL.className() +
+                            "\" style=\"color:white;background:#" + l.getColor() + ";\">" +
                             t.apply(l.getName()) + "</span>")
                     .collect(Collectors.joining());
             return new Label(label, ContentMode.HTML);

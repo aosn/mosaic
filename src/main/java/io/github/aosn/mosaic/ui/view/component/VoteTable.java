@@ -27,6 +27,7 @@ public class VoteTable extends Table {
     public VoteTable(String caption, List<Row> rows, I18N i18n) {
         super(caption, new BeanItemContainer<>(Row.class, rows));
         setSortContainerPropertyId("time");
+        setSortAscending(false);
         setPageLength(0);
         setColumnHeader("user", i18n.get("result.column.user"));
         setColumnHeader("time", i18n.get("result.column.timestamp"));

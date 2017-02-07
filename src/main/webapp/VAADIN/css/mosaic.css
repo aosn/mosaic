@@ -45,6 +45,16 @@
     text-decoration: underline;
 }
 
+.user-icon {
+    width: 1.5em;
+    height: 1.5em;
+    border-radius: 3px;
+}
+
+.icon-and-name .v-spacing {
+    width: 3px !important;
+}
+
 .error-label {
     color: red;
     font-weight: bold;

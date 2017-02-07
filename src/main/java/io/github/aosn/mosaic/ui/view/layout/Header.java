@@ -1,11 +1,10 @@
 /*
- * Copyright (C) 2016 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.ui.view.layout;
 
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FontAwesome;
-import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import io.github.aosn.mosaic.MosaicApplication;
 import io.github.aosn.mosaic.config.SecurityConfig;
@@ -34,29 +33,27 @@ class Header extends VerticalLayout {
         addComponent(logo);
 
         // Login Bar
-        Label welcomeLabel = new Label();
         HorizontalLayout loginBar;
-
         if (userService.isLoggedIn()) {
-            welcomeLabel.setValue(FontAwesome.USER.getHtml() + " " + userService.getName());
-            welcomeLabel.setContentMode(ContentMode.HTML);
             String newIssueUrl = userService.getNewIssueUrl(); // UserService isn't serializable
             Button newIssueButton = new Button(i18n.get("header.button.propose"),
                     e -> getUI().getPage().setLocation(newIssueUrl));
             newIssueButton.setIcon(FontAwesome.LIGHTBULB_O);
             Button logoutButton = new Button(i18n.get("header.button.logout"),
                     e -> getUI().getPage().setLocation(UserController.LOGOUT_PATH));
-            loginBar = new HorizontalLayout(welcomeLabel, newIssueButton, logoutButton);
+            IconAndName iconAndName = new IconAndName(userService.getUser());
+            loginBar = new HorizontalLayout(iconAndName, newIssueButton, logoutButton);
+            loginBar.setComponentAlignment(iconAndName, Alignment.MIDDLE_CENTER);
         } else {
-            welcomeLabel.setValue(i18n.get("header.label.login"));
+            Label welcomeLabel = new Label(i18n.get("header.label.login"));
             Button loginButton = new Button(i18n.get("header.button.login.github"),
                     e -> getUI().getPage().setLocation(SecurityConfig.LOGIN_PATH_GITHUB));
             loginButton.setIcon(FontAwesome.GITHUB);
             loginBar = new HorizontalLayout(welcomeLabel, loginButton);
+            loginBar.setComponentAlignment(welcomeLabel, Alignment.MIDDLE_CENTER);
         }
         loginBar.setSpacing(true);
         loginBar.setStyleName(Style.LOGIN_BAR.className());
-        loginBar.setComponentAlignment(welcomeLabel, Alignment.MIDDLE_CENTER);
         addComponent(loginBar);
         setComponentAlignment(loginBar, Alignment.MIDDLE_RIGHT);
     }

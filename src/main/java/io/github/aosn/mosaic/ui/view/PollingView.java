@@ -21,7 +21,9 @@ import io.github.aosn.mosaic.ui.MainUI;
 import io.github.aosn.mosaic.ui.view.component.HeadingLabel;
 import io.github.aosn.mosaic.ui.view.component.IssueTable;
 import io.github.aosn.mosaic.ui.view.component.LoginRequiredLabel;
+import io.github.aosn.mosaic.ui.view.component.PollTable;
 import io.github.aosn.mosaic.ui.view.layout.ContentPane;
+import io.github.aosn.mosaic.ui.view.layout.IconAndName;
 import io.github.aosn.mosaic.ui.view.layout.ViewRoot;
 import io.github.aosn.mosaic.ui.view.style.Notifications;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,6 +96,21 @@ public class PollingView extends CustomComponent implements View {
 
         contentPane.addComponent(new HeadingLabel(i18n.get("polling.label.subject.prefix") + " " +
                 poll.getSubject()));
+
+        FormLayout aboutForm = new FormLayout();
+        aboutForm.setMargin(false);
+        contentPane.addComponent(aboutForm);
+
+        IconAndName ownerLabel = new IconAndName(poll.getOwner());
+        ownerLabel.setCaption(i18n.get("result.caption.poll.owner"));
+        aboutForm.addComponent(ownerLabel);
+
+        String begin = poll.getBegin() == null ? "?" : PollTable.Row.DATE_FORMAT.format(poll.getBegin());
+        String end = poll.getEnd() == null ? "?" : PollTable.Row.DATE_FORMAT.format(poll.getEnd());
+        Label termLabel = new Label(begin + " - " + end);
+        termLabel.setCaption(i18n.get("result.caption.poll.term"));
+        aboutForm.addComponent(termLabel);
+
         int doubles = poll.getDoubles();
         String doublesCaption;
         String tableCaption;
