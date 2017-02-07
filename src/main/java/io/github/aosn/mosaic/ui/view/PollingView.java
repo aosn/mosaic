@@ -9,6 +9,7 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.*;
+import com.vaadin.ui.themes.ValoTheme;
 import io.github.aosn.mosaic.MosaicApplication;
 import io.github.aosn.mosaic.domain.model.poll.Book;
 import io.github.aosn.mosaic.domain.model.poll.Poll;
@@ -113,6 +114,7 @@ public class PollingView extends CustomComponent implements View {
         Button cancelButton = new Button(i18n.get("common.button.cancel"),
                 e -> getUI().getNavigator().navigateTo(FrontView.VIEW_NAME));
         Button submitButton = new Button(i18n.get("polling.button.submit"), FontAwesome.THUMBS_UP);
+        submitButton.setStyleName(ValoTheme.BUTTON_PRIMARY);
         submitButton.addClickListener(e -> {
             // Selection
             List<Book> selected = rows.stream()

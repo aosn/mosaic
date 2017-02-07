@@ -17,11 +17,8 @@ import io.github.aosn.mosaic.domain.service.issue.IssueService;
 import io.github.aosn.mosaic.domain.service.notification.NotificationService;
 import io.github.aosn.mosaic.domain.service.poll.PollService;
 import io.github.aosn.mosaic.ui.MainUI;
-import io.github.aosn.mosaic.ui.view.component.HeadingLabel;
-import io.github.aosn.mosaic.ui.view.component.IssueTable;
+import io.github.aosn.mosaic.ui.view.component.*;
 import io.github.aosn.mosaic.ui.view.component.IssueTable.ColumnGroup;
-import io.github.aosn.mosaic.ui.view.component.PollTable;
-import io.github.aosn.mosaic.ui.view.component.VoteTable;
 import io.github.aosn.mosaic.ui.view.layout.ContentPane;
 import io.github.aosn.mosaic.ui.view.layout.ViewRoot;
 import io.github.aosn.mosaic.ui.view.style.Notifications;
@@ -146,23 +143,26 @@ public class PollResultView extends CustomComponent implements View {
             contentPane.addComponent(new HeadingLabel(i18n.get("result.label.owner.operation")));
 
             Book winner = poll.judgeWinner();
-            contentPane.addComponent(new Label(i18n.get("result.label.poll.winner.current") + ": " +
-                    (winner == null ? i18n.get("result.label.poll.winner.tie") :
-                            winner.getGitHubIssue().getTitle())));
+            String winnerName = winner == null ? i18n.get("result.label.poll.winner.tie") :
+                    winner.getGitHubIssue().getTitle();
+            contentPane.addComponent(new Label(i18n.get("result.label.poll.winner.current") + ": " + winnerName));
 
             CheckBox notifyCheck = new CheckBox(i18n.get("common.caption.notify.slack"));
             notifyCheck.setValue(false);
             notifyCheck.setEnabled(false);
             contentPane.addComponent(notifyCheck);
 
-            Button closeButton = new Button(i18n.get("result.button.poll.close"), e -> {
-                pollService.close(poll);
-                if (notifyCheck.getValue()) {
-                    notificationService.notifyClosePoll(poll);
-                }
-                Notifications.showNormal(i18n.get("result.notification.poll.closed"));
-                getUI().getNavigator().navigateTo(FrontView.VIEW_NAME);
-            });
+            String confirmMessage = i18n.get("result.label.confirm.close") + "<br/>" +
+                    i18n.get("result.label.poll.winner.current") + ": " + winnerName;
+            Button closeButton = new Button(i18n.get("result.button.poll.close"),
+                    e -> UI.getCurrent().addWindow(new ConfirmWindow(confirmMessage, i18n, ok -> {
+                        pollService.close(poll);
+                        if (notifyCheck.getValue()) {
+                            notificationService.notifyClosePoll(poll);
+                        }
+                        Notifications.showNormal(i18n.get("result.notification.poll.closed"));
+                        getUI().getNavigator().navigateTo(FrontView.VIEW_NAME);
+                    })));
             closeButton.setStyleName(ValoTheme.BUTTON_DANGER);
             contentPane.addComponent(closeButton);
             if (poll.isClosed()) {
