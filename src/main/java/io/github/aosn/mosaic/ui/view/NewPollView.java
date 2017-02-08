@@ -21,6 +21,7 @@ import io.github.aosn.mosaic.domain.service.issue.IssueService;
 import io.github.aosn.mosaic.domain.service.notification.NotificationService;
 import io.github.aosn.mosaic.domain.service.poll.PollService;
 import io.github.aosn.mosaic.ui.MainUI;
+import io.github.aosn.mosaic.ui.view.component.BulkSelector;
 import io.github.aosn.mosaic.ui.view.component.IssueTable;
 import io.github.aosn.mosaic.ui.view.component.IssueTable.ColumnGroup;
 import io.github.aosn.mosaic.ui.view.component.LoginRequiredLabel;
@@ -85,6 +86,7 @@ public class NewPollView extends CustomComponent implements View {
                 .map(r -> IssueTable.Row.from(r, issueService::isIssueLabel, issueService::trimPartLabel))
                 .collect(Collectors.toList());
         contentPane.addComponent(new IssueTable(i18n.get("new.caption.select"), ColumnGroup.NEW, rows, i18n));
+        contentPane.addComponent(new BulkSelector(i18n, rows));
 
         FormLayout form = new FormLayout();
         form.setMargin(false);
@@ -95,6 +97,7 @@ public class NewPollView extends CustomComponent implements View {
         subject.setRequired(true);
         subject.addValidator(new StringLengthValidator("common.validator.text.length.over", 0, 255, false));
         subject.setWidth(100, Unit.PERCENTAGE);
+        subject.setInputPrompt(i18n.get("new.placeholder.subject"));
         form.addComponent(subject);
 
         DateField closeDate = new DateField(i18n.get("new.caption.close.date"));
