@@ -122,9 +122,8 @@ public class PollResultView extends CustomComponent implements View {
         votesPerUserLabel.setCaption(i18n.get("result.caption.poll.voters.n"));
         aboutForm.addComponent(votesPerUserLabel);
 
-        HorizontalLayout voters = new HorizontalLayout();
-        voters.setSpacing(true);
-        voters.setStyleName(Style.ICON_AND_NAME.className());
+        CssLayout voters = new CssLayout();
+        voters.setStyleName(Style.USER_COLLECTION.className());
         voters.setCaption(i18n.get("result.caption.poll.voters.list"));
         users.forEach(u -> voters.addComponent(new IconAndName(u)));
         aboutForm.addComponent(voters);

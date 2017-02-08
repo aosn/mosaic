@@ -2,6 +2,8 @@
  * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 
+/* Mosaic definitions */
+
 .title {
     font-size: 150%;
     font-weight: bold;
@@ -51,6 +53,10 @@
     border-radius: 3px;
 }
 
+.user-collection .icon-and-name {
+    padding: 5px;
+}
+
 .icon-and-name .v-spacing {
     width: 3px !important;
 }
@@ -64,6 +70,8 @@
     border-radius: 0.3em;
     padding: 0 0.5em;
 }
+
+/* Vaadin overrides */
 
 td.v-table-cell-content {
     max-width: 350px;

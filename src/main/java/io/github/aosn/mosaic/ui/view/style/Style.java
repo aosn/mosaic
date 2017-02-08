@@ -20,13 +20,16 @@ public enum Style {
     HEADING,
     LINK,
     USER_ICON,
+    USER_COLLECTION,
     ICON_AND_NAME,
     ERROR_LABEL,
     ISSUE_LABEL;
     private final String className;
 
     Style() {
-        this.className = name().toLowerCase().replaceAll("_", "-");
+        // Convert Java to CSS naming convention.
+        // e.g. TITLE -> title, CONTENT_PANE -> content-pane
+        className = name().toLowerCase().replaceAll("_", "-");
     }
 
     /**
