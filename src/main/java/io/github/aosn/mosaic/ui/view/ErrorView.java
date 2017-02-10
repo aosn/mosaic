@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.ui.view;
 
@@ -11,6 +11,7 @@ import com.vaadin.ui.*;
 import io.github.aosn.mosaic.MosaicApplication;
 import io.github.aosn.mosaic.domain.service.auth.UserService;
 import io.github.aosn.mosaic.domain.service.issue.IssueService;
+import io.github.aosn.mosaic.domain.service.poll.PollService;
 import io.github.aosn.mosaic.ui.MainUI;
 import io.github.aosn.mosaic.ui.view.layout.ContentPane;
 import io.github.aosn.mosaic.ui.view.layout.ViewRoot;
@@ -38,11 +39,13 @@ public class ErrorView extends CustomComponent implements View {
     private static final String ATTR_ERROR_THROWABLE = "mosaic.ui.error.throwable";
     private transient final I18N i18n;
     private transient final UserService userService;
+    private transient final PollService pollService;
 
     @Autowired
-    public ErrorView(I18N i18n, UserService userService) {
+    public ErrorView(I18N i18n, UserService userService, PollService pollService) {
         this.i18n = i18n;
         this.userService = userService;
+        this.pollService = pollService;
     }
 
     static void show(String message, Throwable throwable) {
@@ -75,7 +78,7 @@ public class ErrorView extends CustomComponent implements View {
 
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent event) {
-        setCompositionRoot(new ViewRoot(i18n, userService, createErrorLayout()));
+        setCompositionRoot(new ViewRoot(i18n, userService, pollService.getDefaultGroup(), createErrorLayout()));
     }
 
     private Layout createErrorLayout() {

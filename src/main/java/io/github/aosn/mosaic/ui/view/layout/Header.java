@@ -9,6 +9,7 @@ import com.vaadin.ui.*;
 import io.github.aosn.mosaic.MosaicApplication;
 import io.github.aosn.mosaic.config.SecurityConfig;
 import io.github.aosn.mosaic.controller.UserController;
+import io.github.aosn.mosaic.domain.model.poll.Group;
 import io.github.aosn.mosaic.domain.service.auth.UserService;
 import io.github.aosn.mosaic.ui.MainUI;
 import io.github.aosn.mosaic.ui.view.style.Style;
@@ -24,7 +25,7 @@ class Header extends VerticalLayout {
 
     private static final long serialVersionUID = MosaicApplication.MOSAIC_SERIAL_VERSION_UID;
 
-    Header(I18N i18n, UserService userService) {
+    Header(I18N i18n, UserService userService, Group group) {
         setSpacing(true);
 
         // Logo
@@ -35,7 +36,7 @@ class Header extends VerticalLayout {
         // Login Bar
         HorizontalLayout loginBar;
         if (userService.isLoggedIn()) {
-            String newIssueUrl = userService.getNewIssueUrl(); // UserService isn't serializable
+            String newIssueUrl = userService.getNewIssueUrl(group); // UserService isn't serializable
             Button newIssueButton = new Button(i18n.get("header.button.propose"),
                     e -> getUI().getPage().setLocation(newIssueUrl));
             newIssueButton.setIcon(FontAwesome.LIGHTBULB_O);

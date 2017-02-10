@@ -66,7 +66,7 @@ public class User implements Serializable {
     }
 
     public String getIconUrl() {
-        return String.format(source.iconUrlPattern, name);
+        return source.getIconUrl(name);
     }
 
     @Override
@@ -82,6 +82,10 @@ public class User implements Serializable {
         Source(String profileUrlPattern, String iconUrlPattern) {
             this.profileUrlPattern = profileUrlPattern;
             this.iconUrlPattern = iconUrlPattern;
+        }
+
+        public String getIconUrl(String name) {
+            return String.format(iconUrlPattern, name);
         }
     }
 }

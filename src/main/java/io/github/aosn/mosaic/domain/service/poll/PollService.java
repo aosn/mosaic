@@ -3,14 +3,18 @@
  */
 package io.github.aosn.mosaic.domain.service.poll;
 
+import io.github.aosn.mosaic.domain.model.poll.Group;
 import io.github.aosn.mosaic.domain.model.poll.Poll;
 import io.github.aosn.mosaic.domain.model.poll.Vote;
+import io.github.aosn.mosaic.domain.repository.poll.GroupRepository;
 import io.github.aosn.mosaic.domain.repository.poll.PollRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
@@ -31,10 +35,48 @@ public class PollService {
 
     private static final Lock LOCK = new ReentrantLock();
     private final PollRepository pollRepository;
+    private final GroupRepository groupRepository;
+
+    @Value("${mosaic.issue.organization}")
+    private String defaultOrganization;
+
+    @Value("${mosaic.issue.repository}")
+    private String defaultRepository;
+
+    @Value("${mosaic.issue.filter}")
+    private String defaultLabelFilter;
 
     @Autowired
-    public PollService(PollRepository pollRepository) {
+    public PollService(PollRepository pollRepository, GroupRepository groupRepository) {
         this.pollRepository = pollRepository;
+        this.groupRepository = groupRepository;
+    }
+
+    @PostConstruct
+    private void init() {
+        // insert default record at first time
+        List<Group> allInDataSource = groupRepository.findAll();
+        Group group = new Group(defaultOrganization, defaultRepository, defaultLabelFilter, null);
+        if (allInDataSource.isEmpty()) {
+            log.info("Inserting default group: " + group);
+            groupRepository.saveAndFlush(group);
+            pollRepository.findAll().stream().filter(p -> p.getGroup() == null).forEach(p -> {
+                p.setGroup(group);
+                pollRepository.save(p);
+            });
+            pollRepository.flush();
+            return;
+        }
+        // check default value modification
+        Group defaultGroup = allInDataSource.stream()
+                .filter(g -> g.getOwner() == null) // null for default
+                .findFirst().orElseThrow(IllegalStateException::new);
+        if (!group.equals(defaultGroup)) {
+            // update record
+            log.info("Updating default group:\nfrom\t" + defaultGroup + "\nto\t" + group);
+            defaultGroup.replace(group);
+            groupRepository.saveAndFlush(defaultGroup);
+        }
     }
 
     /**
@@ -112,5 +154,43 @@ public class PollService {
         poll.setWinBook(poll.judgeWinner());
         pollRepository.saveAndFlush(poll);
         log.info("END close: " + poll);
+    }
+
+    /**
+     * Get all groups or singleton list that contains default group.
+     *
+     * @return list of group
+     * @throws DataAccessException   if the database error occurred
+     * @throws IllegalStateException if default entry is missing
+     */
+    public List<Group> getAllGroup() {
+        List<Group> groups = groupRepository.findAll();
+        if (groups.isEmpty()) {
+            throw new IllegalStateException("Missing default entry");
+        }
+        return groups;
+    }
+
+    /**
+     * Get default group.
+     *
+     * @return default group
+     * @throws DataAccessException   if the database error occurred
+     * @throws IllegalStateException if default entry is missing
+     */
+    public Group getDefaultGroup() {
+        Group group = groupRepository.findOne(new Group.GroupKey(defaultOrganization, defaultRepository));
+        if (group == null) {
+            throw new IllegalStateException("Missing default entry");
+        }
+        return group;
+    }
+
+    public void addGroup(Group group) {
+        if (groupRepository.findAll().stream().anyMatch(g -> g.equals(group))) {
+            throw new IllegalArgumentException("Group already registered");
+        }
+        groupRepository.saveAndFlush(group);
+        log.info("Group added: " + group);
     }
 }

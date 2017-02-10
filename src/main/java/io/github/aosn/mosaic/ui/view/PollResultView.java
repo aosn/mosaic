@@ -94,7 +94,7 @@ public class PollResultView extends CustomComponent implements View {
         }
 
         getUI().getPage().setTitle(i18n.get("header.label.title"));
-        setCompositionRoot(new ViewRoot(i18n, userService, createResultLayout(poll)));
+        setCompositionRoot(new ViewRoot(i18n, userService, poll.getGroup(), createResultLayout(poll)));
     }
 
     private Layout createResultLayout(Poll poll) {
@@ -137,7 +137,9 @@ public class PollResultView extends CustomComponent implements View {
         }
 
         List<IssueTable.Row> rows = poll.getBooks().stream()
-                .map(r -> IssueTable.Row.from(r, issueService::isIssueLabel, issueService::trimPartLabel))
+                .map(r -> IssueTable.Row.from(r,
+                        l -> issueService.isIssueLabel(l, poll.getGroup()),
+                        l -> issueService.trimPartLabel(l, poll.getGroup())))
                 .collect(Collectors.toList());
         contentPane.addComponent(new IssueTable(i18n.get("result.caption.book.list"), ColumnGroup.CLOSED, rows,
                 i18n));

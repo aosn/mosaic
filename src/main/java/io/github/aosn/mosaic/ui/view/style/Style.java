@@ -21,6 +21,7 @@ public enum Style {
     LINK,
     USER_ICON,
     USER_COLLECTION,
+    GROUP_SELECT,
     ICON_AND_NAME,
     ERROR_LABEL,
     ISSUE_LABEL;

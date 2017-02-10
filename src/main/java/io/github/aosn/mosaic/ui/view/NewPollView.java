@@ -7,6 +7,7 @@ import com.vaadin.data.validator.StringLengthValidator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.*;
@@ -15,6 +16,7 @@ import io.github.aosn.mosaic.MosaicApplication;
 import io.github.aosn.mosaic.domain.model.auth.User;
 import io.github.aosn.mosaic.domain.model.issue.GitHubIssue;
 import io.github.aosn.mosaic.domain.model.poll.Book;
+import io.github.aosn.mosaic.domain.model.poll.Group;
 import io.github.aosn.mosaic.domain.model.poll.Poll;
 import io.github.aosn.mosaic.domain.service.auth.UserService;
 import io.github.aosn.mosaic.domain.service.issue.IssueService;
@@ -22,6 +24,7 @@ import io.github.aosn.mosaic.domain.service.notification.NotificationService;
 import io.github.aosn.mosaic.domain.service.poll.PollService;
 import io.github.aosn.mosaic.ui.MainUI;
 import io.github.aosn.mosaic.ui.view.component.BulkSelector;
+import io.github.aosn.mosaic.ui.view.component.GroupComboBox;
 import io.github.aosn.mosaic.ui.view.component.IssueTable;
 import io.github.aosn.mosaic.ui.view.component.IssueTable.ColumnGroup;
 import io.github.aosn.mosaic.ui.view.component.LoginRequiredLabel;
@@ -50,11 +53,13 @@ public class NewPollView extends CustomComponent implements View {
 
     static final String VIEW_NAME = "new";
     private static final long serialVersionUID = MosaicApplication.MOSAIC_SERIAL_VERSION_UID;
+    private static final String PARAM_GROUP_INDEX = "mosaic.new.group.index";
     private transient final I18N i18n;
     private transient final UserService userService;
     private transient final IssueService issueService;
     private transient final PollService pollService;
     private transient final NotificationService notificationService;
+    private int selectingGroupIndex = 0;
 
     @Autowired
     public NewPollView(I18N i18n, UserService userService, IssueService issueService, PollService pollService,
@@ -68,22 +73,43 @@ public class NewPollView extends CustomComponent implements View {
 
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent event) {
+        Integer groupIndex = (Integer) VaadinSession.getCurrent().getAttribute(PARAM_GROUP_INDEX);
+        selectingGroupIndex = groupIndex == null ? 0 : groupIndex;
+        List<Group> groups;
+        try {
+            groups = pollService.getAllGroup();
+        } catch (RuntimeException e) {
+            ErrorView.show(i18n.get("common.error.unexpected"), e);
+            return;
+        }
         List<GitHubIssue> issues;
         try {
-            issues = issueService.getOpenIssues();
+            issues = issueService.getOpenIssues(groups.get(selectingGroupIndex));
         } catch (RuntimeException e) {
             ErrorView.show(i18n.get("common.error.issue.obtain.failed"), e);
             return;
         }
         getUI().getPage().setTitle(i18n.get("header.label.title"));
-        setCompositionRoot(new ViewRoot(i18n, userService, createPollLayout(issues)));
+        setCompositionRoot(new ViewRoot(i18n, userService, groups.get(selectingGroupIndex),
+                createPollLayout(groups, issues)));
     }
 
-    private Layout createPollLayout(List<GitHubIssue> issues) {
+    private Layout createPollLayout(List<Group> groups, List<GitHubIssue> issues) {
         ContentPane contentPane = new ContentPane();
 
+        GroupComboBox groupComboBox = new GroupComboBox(i18n.get("new.caption.group"), groups, selectingGroupIndex);
+        groupComboBox.addValueChangeListener(e -> {
+            VaadinSession.getCurrent().setAttribute(PARAM_GROUP_INDEX, groupComboBox.getSelectIndex());
+            UI.getCurrent().getPage().reload();
+        });
+        FormLayout groupWrapper = new FormLayout(groupComboBox);
+        groupWrapper.setMargin(false);
+        contentPane.addComponent(groupWrapper);
+
         List<IssueTable.Row> rows = issues.stream()
-                .map(r -> IssueTable.Row.from(r, issueService::isIssueLabel, issueService::trimPartLabel))
+                .map(r -> IssueTable.Row.from(r,
+                        l -> issueService.isIssueLabel(l, groups.get(selectingGroupIndex)),
+                        l -> issueService.trimPartLabel(l, groups.get(selectingGroupIndex))))
                 .collect(Collectors.toList());
         contentPane.addComponent(new IssueTable(i18n.get("new.caption.select"), ColumnGroup.NEW, rows, i18n));
         contentPane.addComponent(new BulkSelector(i18n, rows));
@@ -179,6 +205,7 @@ public class NewPollView extends CustomComponent implements View {
                         .doubles(doubles)
                         .books(books)
                         .votes(Collections.emptyList())
+                        .group(groups.get(selectingGroupIndex))
                         .build();
                 pollService.create(poll);
                 if (notifyCheck.getValue()) {
