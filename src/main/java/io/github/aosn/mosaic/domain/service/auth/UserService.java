@@ -4,6 +4,7 @@
 package io.github.aosn.mosaic.domain.service.auth;
 
 import io.github.aosn.mosaic.domain.model.auth.User;
+import io.github.aosn.mosaic.domain.model.poll.Group;
 import io.github.aosn.mosaic.domain.repository.auth.UserRepository;
 import io.github.aosn.mosaic.domain.repository.issue.GitHubIssueRepository;
 import io.github.aosn.mosaic.domain.repository.ui.SessionRepository;
@@ -90,9 +91,10 @@ public class UserService {
     /**
      * Get the new issue url.
      *
+     * @param group group
      * @return url
      */
-    public String getNewIssueUrl() {
-        return issueRepository.getNewIssueUrl();
+    public String getNewIssueUrl(Group group) {
+        return issueRepository.getNewIssueUrl(group);
     }
 }

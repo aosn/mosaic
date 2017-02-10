@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.ui.view;
 
@@ -54,7 +54,7 @@ public class FrontView extends CustomComponent implements View {
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent event) {
         getUI().getPage().setTitle(i18n.get("header.label.title"));
-        setCompositionRoot(new ViewRoot(i18n, userService, createFrontLayout()));
+        setCompositionRoot(new ViewRoot(i18n, userService, pollService.getDefaultGroup(), createFrontLayout()));
     }
 
     private Layout createFrontLayout() {

@@ -61,12 +61,31 @@ public class User implements Serializable {
         return id.equals(otherUser.getId());
     }
 
+    public String getProfileUrl() {
+        return String.format(source.profileUrlPattern, name);
+    }
+
+    public String getIconUrl() {
+        return source.getIconUrl(name);
+    }
+
     @Override
     public int hashCode() {
         return Objects.hashCode(id);
     }
 
     public enum Source {
-        GITHUB
+        GITHUB("https://github.com/%s", "https://github.com/%s.png?size=40");
+        private final String profileUrlPattern;
+        private final String iconUrlPattern;
+
+        Source(String profileUrlPattern, String iconUrlPattern) {
+            this.profileUrlPattern = profileUrlPattern;
+            this.iconUrlPattern = iconUrlPattern;
+        }
+
+        public String getIconUrl(String name) {
+            return String.format(iconUrlPattern, name);
+        }
     }
 }

@@ -1,33 +1,19 @@
 buildscript {
     ext {
-        springBootVersion = '1.4.2.RELEASE'
         vaadinVersion = '7.7.6'
         vaadinSpringBootVersion = '1.1.1'
         checkerFrameworkVersion = '2.1.5'
     }
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-    }
 }
 
-apply plugin: 'spring-boot'
-apply plugin: 'war'
+plugins {
+    id 'com.gradle.build-scan' version '1.5'
+    id 'org.springframework.boot' version '1.4.4.RELEASE'
+    id 'war'
+}
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
-
-war {
-    baseName = 'mosaic'
-    version = '0.2'
-    archiveName = baseName + "." + extension
-}
-
-springBoot {
-    executable = true
-}
 
 repositories {
     mavenCentral()
@@ -60,4 +46,19 @@ dependencyManagement {
     imports {
         mavenBom "com.vaadin:vaadin-bom:${vaadinVersion}"
     }
+}
+
+war {
+    baseName = 'mosaic'
+    version = '0.2'
+    archiveName = baseName + "." + extension
+}
+
+springBoot {
+    executable = true
+}
+
+buildScan {
+    licenseAgreementUrl = 'https://gradle.com/terms-of-service'
+    licenseAgree = 'yes'
 }

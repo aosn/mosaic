@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.ui.view;
 
@@ -9,7 +9,7 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.*;
-import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.themes.ValoTheme;
 import io.github.aosn.mosaic.MosaicApplication;
 import io.github.aosn.mosaic.domain.model.poll.Book;
 import io.github.aosn.mosaic.domain.model.poll.Poll;
@@ -21,8 +21,11 @@ import io.github.aosn.mosaic.ui.MainUI;
 import io.github.aosn.mosaic.ui.view.component.HeadingLabel;
 import io.github.aosn.mosaic.ui.view.component.IssueTable;
 import io.github.aosn.mosaic.ui.view.component.LoginRequiredLabel;
+import io.github.aosn.mosaic.ui.view.component.PollTable;
 import io.github.aosn.mosaic.ui.view.layout.ContentPane;
+import io.github.aosn.mosaic.ui.view.layout.IconAndName;
 import io.github.aosn.mosaic.ui.view.layout.ViewRoot;
+import io.github.aosn.mosaic.ui.view.style.Notifications;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.i18n.I18N;
 
@@ -85,7 +88,7 @@ public class PollingView extends CustomComponent implements View {
         }
 
         getUI().getPage().setTitle(i18n.get("header.label.title"));
-        setCompositionRoot(new ViewRoot(i18n, userService, createPollingLayout(poll)));
+        setCompositionRoot(new ViewRoot(i18n, userService, poll.getGroup(), createPollingLayout(poll)));
     }
 
     private Layout createPollingLayout(Poll poll) {
@@ -93,6 +96,21 @@ public class PollingView extends CustomComponent implements View {
 
         contentPane.addComponent(new HeadingLabel(i18n.get("polling.label.subject.prefix") + " " +
                 poll.getSubject()));
+
+        FormLayout aboutForm = new FormLayout();
+        aboutForm.setMargin(false);
+        contentPane.addComponent(aboutForm);
+
+        IconAndName ownerLabel = new IconAndName(poll.getOwner());
+        ownerLabel.setCaption(i18n.get("result.caption.poll.owner"));
+        aboutForm.addComponent(ownerLabel);
+
+        String begin = poll.getBegin() == null ? "?" : PollTable.Row.DATE_FORMAT.format(poll.getBegin());
+        String end = poll.getEnd() == null ? "?" : PollTable.Row.DATE_FORMAT.format(poll.getEnd());
+        Label termLabel = new Label(begin + " - " + end);
+        termLabel.setCaption(i18n.get("result.caption.poll.term"));
+        aboutForm.addComponent(termLabel);
+
         int doubles = poll.getDoubles();
         String doublesCaption;
         String tableCaption;
@@ -105,12 +123,17 @@ public class PollingView extends CustomComponent implements View {
         }
         contentPane.addComponent(new Label(doublesCaption));
 
-        List<IssueTable.Row> rows = poll.getBooks().stream().map(IssueTable.Row::from).collect(Collectors.toList());
+        List<IssueTable.Row> rows = poll.getBooks().stream()
+                .map(r -> IssueTable.Row.from(r,
+                        l -> issueService.isIssueLabel(l, poll.getGroup()),
+                        l -> issueService.trimPartLabel(l, poll.getGroup())))
+                .collect(Collectors.toList());
         contentPane.addComponent(new IssueTable(tableCaption, IssueTable.ColumnGroup.OPEN, rows, i18n));
 
         Button cancelButton = new Button(i18n.get("common.button.cancel"),
                 e -> getUI().getNavigator().navigateTo(FrontView.VIEW_NAME));
         Button submitButton = new Button(i18n.get("polling.button.submit"), FontAwesome.THUMBS_UP);
+        submitButton.setStyleName(ValoTheme.BUTTON_PRIMARY);
         submitButton.addClickListener(e -> {
             // Selection
             List<Book> selected = rows.stream()
@@ -120,15 +143,13 @@ public class PollingView extends CustomComponent implements View {
             // Validation
             if (selected.size() < doubles) {
                 int under = doubles - selected.size();
-                Notification.show((under == 1 ? i18n.get("polling.notification.books.under.1") :
-                        i18n.get("polling.notification.books.under.n"))
-                        .replace("%d", Integer.toString(under)), Type.WARNING_MESSAGE);
+                Notifications.showWarning((under == 1 ? i18n.get("polling.notification.books.under.1") :
+                        i18n.get("polling.notification.books.under.n")).replace("%d", Integer.toString(under)));
                 return;
             } else if (selected.size() > doubles) {
                 int over = selected.size() - doubles;
-                Notification.show((over == 1 ? i18n.get("polling.notification.books.over.1") :
-                        i18n.get("polling.notification.books.over.n"))
-                        .replace("%d", Integer.toString(over)), Type.WARNING_MESSAGE);
+                Notifications.showWarning((over == 1 ? i18n.get("polling.notification.books.over.1") :
+                        i18n.get("polling.notification.books.over.n")).replace("%d", Integer.toString(over)));
                 return;
             }
 
@@ -147,8 +168,7 @@ public class PollingView extends CustomComponent implements View {
                     .build()).collect(Collectors.toList());
             try {
                 pollService.submit(poll, votes);
-                Notification.show(i18n.get("polling.notification.vote.submitted"),
-                        Type.TRAY_NOTIFICATION);
+                Notifications.showNormal(i18n.get("polling.notification.vote.submitted"));
                 getUI().getNavigator().navigateTo(FrontView.VIEW_NAME);
             } catch (RuntimeException ex) {
                 ErrorView.show(i18n.get("polling.error.vote.failed"), ex);

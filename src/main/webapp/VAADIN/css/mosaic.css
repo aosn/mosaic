@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2016 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
+
+/* Mosaic definitions */
 
 .title {
     font-size: 150%;
@@ -45,7 +47,42 @@
     text-decoration: underline;
 }
 
+.user-icon {
+    width: 1.5em;
+    height: 1.5em;
+    border-radius: 3px;
+}
+
+.user-collection .icon-and-name {
+    padding: 5px;
+}
+
+.icon-and-name .v-spacing {
+    width: 3px !important;
+}
+
+.group-select {
+    min-width: 250px;
+}
+
+.group-select img {
+    border-radius: 0.3em;
+    width: 1.5em;
+    height: 1.5em;
+}
+
 .error-label {
     color: red;
     font-weight: bold;
+}
+
+.issue-label {
+    border-radius: 0.3em;
+    padding: 0 0.5em;
+}
+
+/* Vaadin overrides */
+
+td.v-table-cell-content {
+    max-width: 350px;
 }

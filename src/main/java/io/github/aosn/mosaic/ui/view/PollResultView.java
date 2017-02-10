@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.ui.view;
 
@@ -8,21 +8,24 @@ import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.*;
+import com.vaadin.ui.themes.ValoTheme;
 import io.github.aosn.mosaic.MosaicApplication;
+import io.github.aosn.mosaic.domain.model.auth.User;
 import io.github.aosn.mosaic.domain.model.poll.Book;
 import io.github.aosn.mosaic.domain.model.poll.Poll;
+import io.github.aosn.mosaic.domain.model.poll.Vote;
 import io.github.aosn.mosaic.domain.service.auth.UserService;
 import io.github.aosn.mosaic.domain.service.issue.IssueService;
 import io.github.aosn.mosaic.domain.service.notification.NotificationService;
 import io.github.aosn.mosaic.domain.service.poll.PollService;
 import io.github.aosn.mosaic.ui.MainUI;
-import io.github.aosn.mosaic.ui.view.component.HeadingLabel;
-import io.github.aosn.mosaic.ui.view.component.IssueTable;
+import io.github.aosn.mosaic.ui.view.component.*;
 import io.github.aosn.mosaic.ui.view.component.IssueTable.ColumnGroup;
-import io.github.aosn.mosaic.ui.view.component.PollTable;
-import io.github.aosn.mosaic.ui.view.component.VoteTable;
 import io.github.aosn.mosaic.ui.view.layout.ContentPane;
+import io.github.aosn.mosaic.ui.view.layout.IconAndName;
 import io.github.aosn.mosaic.ui.view.layout.ViewRoot;
+import io.github.aosn.mosaic.ui.view.style.Notifications;
+import io.github.aosn.mosaic.ui.view.style.Style;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.i18n.I18N;
 
@@ -91,7 +94,7 @@ public class PollResultView extends CustomComponent implements View {
         }
 
         getUI().getPage().setTitle(i18n.get("header.label.title"));
-        setCompositionRoot(new ViewRoot(i18n, userService, createResultLayout(poll)));
+        setCompositionRoot(new ViewRoot(i18n, userService, poll.getGroup(), createResultLayout(poll)));
     }
 
     private Layout createResultLayout(Poll poll) {
@@ -101,8 +104,10 @@ public class PollResultView extends CustomComponent implements View {
                 poll.getSubject()));
 
         FormLayout aboutForm = new FormLayout();
+        aboutForm.setMargin(false);
+        contentPane.addComponent(aboutForm);
 
-        Label ownerLabel = new Label(poll.getOwner().getName());
+        IconAndName ownerLabel = new IconAndName(poll.getOwner());
         ownerLabel.setCaption(i18n.get("result.caption.poll.owner"));
         aboutForm.addComponent(ownerLabel);
 
@@ -112,12 +117,16 @@ public class PollResultView extends CustomComponent implements View {
         termLabel.setCaption(i18n.get("result.caption.poll.term"));
         aboutForm.addComponent(termLabel);
 
-        List<String> users = poll.getVotes().stream()
-                .map(v -> v.getUser().getName()).distinct().collect(Collectors.toList());
-        Label votesPerUserLabel = new Label(users.size() +
-                " (" + users.stream().collect(Collectors.joining(" ")) + ")");
-        votesPerUserLabel.setCaption(i18n.get("result.caption.poll.voters"));
+        List<User> users = poll.getVotes().stream().map(Vote::getUser).distinct().collect(Collectors.toList());
+        Label votesPerUserLabel = new Label(String.valueOf(users.size()));
+        votesPerUserLabel.setCaption(i18n.get("result.caption.poll.voters.n"));
         aboutForm.addComponent(votesPerUserLabel);
+
+        CssLayout voters = new CssLayout();
+        voters.setStyleName(Style.USER_COLLECTION.className());
+        voters.setCaption(i18n.get("result.caption.poll.voters.list"));
+        users.forEach(u -> voters.addComponent(new IconAndName(u)));
+        aboutForm.addComponent(voters);
 
         if (poll.getState() == Poll.PollState.CLOSED) {
             Book winBook = poll.getWinBook();
@@ -127,9 +136,11 @@ public class PollResultView extends CustomComponent implements View {
             aboutForm.addComponent(winnerLabel);
         }
 
-        contentPane.addComponent(aboutForm);
-
-        List<IssueTable.Row> rows = poll.getBooks().stream().map(IssueTable.Row::from).collect(Collectors.toList());
+        List<IssueTable.Row> rows = poll.getBooks().stream()
+                .map(r -> IssueTable.Row.from(r,
+                        l -> issueService.isIssueLabel(l, poll.getGroup()),
+                        l -> issueService.trimPartLabel(l, poll.getGroup())))
+                .collect(Collectors.toList());
         contentPane.addComponent(new IssueTable(i18n.get("result.caption.book.list"), ColumnGroup.CLOSED, rows,
                 i18n));
 
@@ -142,24 +153,27 @@ public class PollResultView extends CustomComponent implements View {
             contentPane.addComponent(new HeadingLabel(i18n.get("result.label.owner.operation")));
 
             Book winner = poll.judgeWinner();
-            contentPane.addComponent(new Label(i18n.get("result.label.poll.winner.current") + ": " +
-                    (winner == null ? i18n.get("result.label.poll.winner.tie") :
-                            winner.getGitHubIssue().getTitle())));
+            String winnerName = winner == null ? i18n.get("result.label.poll.winner.tie") :
+                    winner.getGitHubIssue().getTitle();
+            contentPane.addComponent(new Label(i18n.get("result.label.poll.winner.current") + ": " + winnerName));
 
             CheckBox notifyCheck = new CheckBox(i18n.get("common.caption.notify.slack"));
             notifyCheck.setValue(false);
             notifyCheck.setEnabled(false);
             contentPane.addComponent(notifyCheck);
 
-            Button closeButton = new Button(i18n.get("result.button.poll.close"), e -> {
-                pollService.close(poll);
-                if (notifyCheck.getValue()) {
-                    notificationService.notifyClosePoll(poll);
-                }
-                Notification.show(i18n.get("result.notification.poll.closed"),
-                        Notification.Type.TRAY_NOTIFICATION);
-                getUI().getNavigator().navigateTo(FrontView.VIEW_NAME);
-            });
+            String confirmMessage = i18n.get("result.label.confirm.close") + "<br/>" +
+                    i18n.get("result.label.poll.winner.current") + ": " + winnerName;
+            Button closeButton = new Button(i18n.get("result.button.poll.close"),
+                    e -> UI.getCurrent().addWindow(new ConfirmWindow(confirmMessage, i18n, ok -> {
+                        pollService.close(poll);
+                        if (notifyCheck.getValue()) {
+                            notificationService.notifyClosePoll(poll);
+                        }
+                        Notifications.showNormal(i18n.get("result.notification.poll.closed"));
+                        getUI().getNavigator().navigateTo(FrontView.VIEW_NAME);
+                    })));
+            closeButton.setStyleName(ValoTheme.BUTTON_DANGER);
             contentPane.addComponent(closeButton);
             if (poll.isClosed()) {
                 closeButton.setEnabled(false);

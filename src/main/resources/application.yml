@@ -35,8 +35,7 @@ mosaic:
   issue:
     organization: aosn
     repository: aosn.github.io
-    label-a: Aパート提案
-    label-b: Bパート提案
+    filter: "%sパート提案"
 
 # Demo application token
 github:

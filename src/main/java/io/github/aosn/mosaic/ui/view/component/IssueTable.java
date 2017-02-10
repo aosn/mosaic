@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.ui.view.component;
 
@@ -21,8 +21,9 @@ import org.pegdown.PegDownProcessor;
 import org.vaadin.spring.i18n.I18N;
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -81,7 +82,8 @@ public class IssueTable extends Table {
         private final int votes;
         private final Label votesWithIcon;
 
-        public static Row from(Book entity) {
+        public static Row from(Book entity, @Nullable Predicate<GitHubLabel> partFilter,
+                               @Nullable UnaryOperator<String> labelTrimmer) {
             String titleText = "#" + entity.getId() + " " + entity.getGitHubIssue().getTitle();
             Label title = new Label(createAnchor(entity.getUrl(), titleText), ContentMode.HTML);
             title.setStyleName(Style.LINK.className());
@@ -91,7 +93,7 @@ public class IssueTable extends Table {
                     .issueEntity(entity.getGitHubIssue())
                     .checkBox(new CheckBox())
                     .title(title)
-                    .category(createCategory(entity.getGitHubIssue().getLabels()))
+                    .category(createCategory(entity.getGitHubIssue().getLabels(), partFilter, labelTrimmer))
                     .user(new Label(entity.getGitHubIssue().getUser().getName()))
                     .votes(entity.getVotes())
                     .votesWithIcon(new Label(IntStream.range(0, entity.getVotes())
@@ -100,7 +102,8 @@ public class IssueTable extends Table {
                     .build();
         }
 
-        public static Row from(GitHubIssue entity) {
+        public static Row from(GitHubIssue entity, @Nullable Predicate<GitHubLabel> partFilter,
+                               @Nullable UnaryOperator<String> labelTrimmer) {
             String titleText = "#" + entity.getId() + " " + entity.getTitle();
             Label title = new Label(createAnchor(entity.getUrl(), titleText), ContentMode.HTML);
             title.setStyleName(Style.LINK.className());
@@ -109,38 +112,26 @@ public class IssueTable extends Table {
                     .issueEntity(entity)
                     .checkBox(new CheckBox())
                     .title(title)
-                    .category(createCategory(entity.getLabels()))
+                    .category(createCategory(entity.getLabels(), partFilter, labelTrimmer))
                     .user(new Label(entity.getUser().getName()))
                     .build();
-        }
-
-        public static BeanItemContainer<Row> toContainer(List<Row> rows) {
-            if (rows == null) {
-                rows = Collections.emptyList();
-            }
-            return new BeanItemContainer<>(Row.class, rows);
         }
 
         private static String createAnchor(String url, String title) {
             return "<a href=\"" + url + "\" target=\"_blank\">" + title + "</a>";
         }
 
-        private static Label createCategory(GitHubLabel[] labels) {
+        private static Label createCategory(GitHubLabel[] labels, @Nullable Predicate<GitHubLabel> partFilter,
+                                            @Nullable UnaryOperator<String> labelTrimmer) {
+            Predicate<GitHubLabel> f = partFilter == null ? l -> true : partFilter;
+            UnaryOperator<String> t = labelTrimmer == null ? l -> l : labelTrimmer;
             String label = Stream.of(labels)
-                    .map(l -> "<span style=\"color:white;background:#" + l.getColor() +
-                            ";border-radius:0.3em;padding: 0 0.5em;\">" + trimPartLabel(l.getName()) + "</span>")
+                    .filter(f)
+                    .map(l -> "<span class=\"" + Style.ISSUE_LABEL.className() +
+                            "\" style=\"color:white;background:#" + l.getColor() + ";\">" +
+                            t.apply(l.getName()) + "</span>")
                     .collect(Collectors.joining());
             return new Label(label, ContentMode.HTML);
-        }
-
-        private static String trimPartLabel(String label) {
-            if (label.contains("A")) {
-                return "A";
-            }
-            if (label.contains("B")) {
-                return "B";
-            }
-            return label;
         }
 
         private static String markdownToHtml(String markdown) {

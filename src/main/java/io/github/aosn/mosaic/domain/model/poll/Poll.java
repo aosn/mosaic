@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.domain.model.poll;
 
@@ -87,6 +87,18 @@ public class Poll implements Serializable {
     @Setter
     @Nullable
     private Book winBook;
+
+    /**
+     * Poll group (issue repository).
+     *
+     * @since 0.2
+     */
+    @JoinColumns({@JoinColumn(name = "organization"), @JoinColumn(name = "repository")})
+    @ManyToOne
+    @NotFound(action = NotFoundAction.IGNORE)
+    @Setter
+    @Nullable
+    private Group group;
 
     public Book judgeWinner() {
         Map<Book, Integer> votesMap = new HashMap<>();

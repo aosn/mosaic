@@ -1,10 +1,13 @@
+/*
+ * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ */
 package io.github.aosn.mosaic.domain.repository.issue;
 
 import io.github.aosn.mosaic.domain.model.issue.GitHubIssue;
+import io.github.aosn.mosaic.domain.model.poll.Group;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.RestTemplate;
@@ -36,12 +39,6 @@ public class GitHubIssueRepository {
             PARAM_REPO + "}/issues/new";
     private final RestTemplate restTemplate;
 
-    @Value("${mosaic.issue.organization}")
-    private String organization;
-
-    @Value("${mosaic.issue.repository}")
-    private String repository;
-
     @Autowired
     public GitHubIssueRepository(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
@@ -53,10 +50,10 @@ public class GitHubIssueRepository {
      * @param state {@link State} for filter issue state, or {@code null} unfiltered
      * @return {@link List} of {@link GitHubIssue}s
      */
-    public List<GitHubIssue> getAll(@Nullable State state) {
+    public List<GitHubIssue> getAll(Group group, @Nullable State state) {
         Map<String, String> params = new HashMap<>(3);
-        params.put(PARAM_OWNER, organization);
-        params.put(PARAM_REPO, repository);
+        params.put(PARAM_OWNER, group.getOrganization());
+        params.put(PARAM_REPO, group.getRepository());
         params.put(PARAM_STATE, state == null ? State.ALL.stateValue : state.stateValue);
         ResponseEntity<GitHubIssue[]> entity = restTemplate.getForEntity(RESOURCE_PATH, GitHubIssue[].class, params);
         if (!entity.getStatusCode().is2xxSuccessful()) {
@@ -73,7 +70,7 @@ public class GitHubIssueRepository {
      * @param state  {@link State} for filter issue state, or {@code null} unfiltered
      * @return {@link List} of {@link GitHubIssue}s
      */
-    public List<GitHubIssue> getByLabels(List<String> labels, @Nullable State state) {
+    public List<GitHubIssue> getByLabels(Group group, List<String> labels, @Nullable State state) {
         if (labels == null) {
             throw new NullPointerException("label is null.");
         }
@@ -81,8 +78,8 @@ public class GitHubIssueRepository {
             throw new IllegalArgumentException("label is empty.");
         }
         Map<String, String> params = new HashMap<>(4);
-        params.put(PARAM_OWNER, organization);
-        params.put(PARAM_REPO, repository);
+        params.put(PARAM_OWNER, group.getOrganization());
+        params.put(PARAM_REPO, group.getRepository());
         params.put(PARAM_LABELS, labels.stream().collect(Collectors.joining(",")));
         params.put(PARAM_STATE, state == null ? State.ALL.stateValue : state.stateValue);
         ResponseEntity<GitHubIssue[]> entity = restTemplate.getForEntity(RESOURCE_PATH + QUERY_LABEL,
@@ -94,9 +91,9 @@ public class GitHubIssueRepository {
         return Arrays.asList(entity.getBody());
     }
 
-    public String getNewIssueUrl() {
-        return NEW_ISSUE_PAGE.replace("{" + PARAM_OWNER + "}", organization)
-                .replace("{" + PARAM_REPO + "}", repository);
+    public String getNewIssueUrl(Group group) {
+        return NEW_ISSUE_PAGE.replace("{" + PARAM_OWNER + "}", group.getOrganization())
+                .replace("{" + PARAM_REPO + "}", group.getRepository());
     }
 
     public enum State {

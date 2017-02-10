@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.ui.view.component;
 
@@ -14,7 +14,6 @@ import org.vaadin.spring.i18n.I18N;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -27,6 +26,8 @@ public class VoteTable extends Table {
 
     public VoteTable(String caption, List<Row> rows, I18N i18n) {
         super(caption, new BeanItemContainer<>(Row.class, rows));
+        setSortContainerPropertyId("time");
+        setSortAscending(false);
         setPageLength(0);
         setColumnHeader("user", i18n.get("result.column.user"));
         setColumnHeader("time", i18n.get("result.column.timestamp"));
@@ -56,13 +57,6 @@ public class VoteTable extends Table {
                     .time(DATE_FORMAT.format(entity.getDate()))
                     .book(entity.getBook().getGitHubIssue().getTitle())
                     .build();
-        }
-
-        public static BeanItemContainer<Row> toContainer(List<Row> rows) {
-            if (rows == null) {
-                rows = Collections.emptyList();
-            }
-            return new BeanItemContainer<>(Row.class, rows);
         }
     }
 }
