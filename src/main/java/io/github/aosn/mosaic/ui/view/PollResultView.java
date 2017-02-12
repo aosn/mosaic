@@ -13,7 +13,6 @@ import io.github.aosn.mosaic.MosaicApplication;
 import io.github.aosn.mosaic.domain.model.auth.User;
 import io.github.aosn.mosaic.domain.model.poll.Book;
 import io.github.aosn.mosaic.domain.model.poll.Poll;
-import io.github.aosn.mosaic.domain.model.poll.Vote;
 import io.github.aosn.mosaic.domain.service.auth.UserService;
 import io.github.aosn.mosaic.domain.service.issue.IssueService;
 import io.github.aosn.mosaic.domain.service.notification.NotificationService;
@@ -117,7 +116,7 @@ public class PollResultView extends CustomComponent implements View {
         termLabel.setCaption(i18n.get("result.caption.poll.term"));
         aboutForm.addComponent(termLabel);
 
-        List<User> users = poll.getVotes().stream().map(Vote::getUser).distinct().collect(Collectors.toList());
+        List<User> users = poll.getVoters();
         Label votesPerUserLabel = new Label(String.valueOf(users.size()));
         votesPerUserLabel.setCaption(i18n.get("result.caption.poll.voters.n"));
         aboutForm.addComponent(votesPerUserLabel);
@@ -128,12 +127,20 @@ public class PollResultView extends CustomComponent implements View {
         users.forEach(u -> voters.addComponent(new IconAndName(u)));
         aboutForm.addComponent(voters);
 
+        // Show winner when poll was closed
         if (poll.getState() == Poll.PollState.CLOSED) {
-            Book winBook = poll.getWinBook();
-            Label winnerLabel = new Label(winBook == null ? i18n.get("result.label.poll.winner.tie") :
-                    winBook.getGitHubIssue().getTitle());
+            Book winner = poll.getWinBook();
+            Label winnerLabel = new Label(winner == null ? i18n.get("result.label.poll.winner.tie") :
+                    winner.getGitHubIssue().getTitle());
             winnerLabel.setCaption(i18n.get("result.caption.poll.winner"));
             aboutForm.addComponent(winnerLabel);
+
+            // Calculate popularity rate
+            if (winner != null) {
+                Label popularityRateLabel = new Label(poll.calcPopularityRate(winner).toString());
+                popularityRateLabel.setCaption(i18n.get("result.caption.popularity"));
+                aboutForm.addComponent(popularityRateLabel);
+            }
         }
 
         List<IssueTable.Row> rows = poll.getBooks().stream()
@@ -149,13 +156,26 @@ public class PollResultView extends CustomComponent implements View {
         contentPane.addComponent(backButton);
         contentPane.setComponentAlignment(backButton, Alignment.MIDDLE_CENTER);
 
+        // Owner's view
         if (poll.isOwner(userService.getUser())) {
             contentPane.addComponent(new HeadingLabel(i18n.get("result.label.owner.operation")));
+
+            FormLayout summaryForm = new FormLayout();
+            summaryForm.setMargin(false);
+            contentPane.addComponent(summaryForm);
 
             Book winner = poll.judgeWinner();
             String winnerName = winner == null ? i18n.get("result.label.poll.winner.tie") :
                     winner.getGitHubIssue().getTitle();
-            contentPane.addComponent(new Label(i18n.get("result.label.poll.winner.current") + ": " + winnerName));
+            Label winnerLabel = new Label(winnerName);
+            winnerLabel.setCaption(i18n.get("result.label.poll.winner.current"));
+            summaryForm.addComponent(winnerLabel);
+
+            if (winner != null) {
+                Label popularityRateLabel = new Label(poll.calcPopularityRate(winner).toString());
+                popularityRateLabel.setCaption(i18n.get("result.caption.popularity"));
+                summaryForm.addComponent(popularityRateLabel);
+            }
 
             CheckBox notifyCheck = new CheckBox(i18n.get("common.caption.notify.slack"));
             notifyCheck.setValue(false);

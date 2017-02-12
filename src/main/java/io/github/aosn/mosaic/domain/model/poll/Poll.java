@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
 public class Poll implements Serializable {
 
     private static final long serialVersionUID = MosaicApplication.MOSAIC_SERIAL_VERSION_UID;
@@ -74,7 +75,6 @@ public class Poll implements Serializable {
     @Setter
     private List<Book> books;
 
-    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     @JoinColumn
     @OneToMany(cascade = CascadeType.ALL)
     @LazyCollection(LazyCollectionOption.FALSE)
@@ -138,9 +138,45 @@ public class Poll implements Serializable {
         return state == PollState.CLOSED;
     }
 
+    public List<User> getVoters() {
+        return votes.stream().map(Vote::getUser).distinct().collect(Collectors.toList());
+    }
+
+    /**
+     * Calculate the popularity rate by book.
+     *
+     * @param book book for rate
+     * @return popularity rate, or zero if no votes in this poll
+     */
+    public PopularityRate calcPopularityRate(Book book) {
+        if (book == null || !books.contains(book)) {
+            return new PopularityRate(0, 0);
+        }
+        return new PopularityRate(book.getVotes(), getVoters().size());
+    }
+
     public enum PollState {
-        PRE_OPEN,
+        @SuppressWarnings("unused")PRE_OPEN, // currently unused yet
         OPEN,
         CLOSED
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class PopularityRate {
+        private final int votes;
+        private final int voters;
+
+        double getRate() {
+            if (votes == 0) {
+                return 0;
+            }
+            return (double) votes / voters;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%.1f%% (%d/%d)", getRate() * 100, votes, voters);
+        }
     }
 }

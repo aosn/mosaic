@@ -50,7 +50,7 @@ dependencyManagement {
 
 war {
     baseName = 'mosaic'
-    version = '0.2'
+    version = '0.3'
     archiveName = baseName + "." + extension
 }
 

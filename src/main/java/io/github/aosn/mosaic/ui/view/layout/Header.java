@@ -6,6 +6,7 @@ package io.github.aosn.mosaic.ui.view.layout;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.*;
+import com.vaadin.ui.themes.ValoTheme;
 import io.github.aosn.mosaic.MosaicApplication;
 import io.github.aosn.mosaic.config.SecurityConfig;
 import io.github.aosn.mosaic.controller.UserController;
@@ -50,6 +51,7 @@ class Header extends VerticalLayout {
             Button loginButton = new Button(i18n.get("header.button.login.github"),
                     e -> getUI().getPage().setLocation(SecurityConfig.LOGIN_PATH_GITHUB));
             loginButton.setIcon(FontAwesome.GITHUB);
+            loginButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
             loginBar = new HorizontalLayout(welcomeLabel, loginButton);
             loginBar.setComponentAlignment(welcomeLabel, Alignment.MIDDLE_CENTER);
         }

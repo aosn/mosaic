@@ -84,7 +84,7 @@ public class IssueTable extends Table {
 
         public static Row from(Book entity, @Nullable Predicate<GitHubLabel> partFilter,
                                @Nullable UnaryOperator<String> labelTrimmer) {
-            String titleText = "#" + entity.getId() + " " + entity.getGitHubIssue().getTitle();
+            String titleText = "#" + entity.getGitHubIssue().getId() + " " + entity.getGitHubIssue().getTitle();
             Label title = new Label(createAnchor(entity.getUrl(), titleText), ContentMode.HTML);
             title.setStyleName(Style.LINK.className());
             title.setDescription(markdownToHtml(entity.getGitHubIssue().getBody()));

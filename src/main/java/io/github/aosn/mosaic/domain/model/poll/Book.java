@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.domain.model.poll;
 
@@ -42,6 +42,12 @@ public class Book implements Serializable {
     @Setter
     private GitHubIssue gitHubIssue;
 
+    /**
+     * Cached number of votes.
+     * This field is excluded from database table.
+     *
+     * @see io.github.aosn.mosaic.domain.service.issue.IssueService#resolveBooks(Poll)
+     */
     @Transient
     @Setter
     private int votes;
