@@ -1,7 +1,7 @@
 ---
 applications:
 - name: aosn-mosaic
-  memory: 256M
+  memory: 384M
   instances: 1
   path: build/libs/mosaic.war
   env:
