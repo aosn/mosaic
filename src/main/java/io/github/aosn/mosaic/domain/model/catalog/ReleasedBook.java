@@ -25,7 +25,6 @@ public interface ReleasedBook extends Serializable {
 
     int getPageCount();
 
-    @Nullable
     String getPublishedDate();
 
     @Nullable

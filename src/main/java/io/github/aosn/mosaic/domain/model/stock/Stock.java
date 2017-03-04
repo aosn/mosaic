@@ -3,6 +3,7 @@
  */
 package io.github.aosn.mosaic.domain.model.stock;
 
+import com.google.common.base.Strings;
 import io.github.aosn.mosaic.domain.model.auth.User;
 import lombok.*;
 import org.apache.commons.validator.routines.ISBNValidator;
@@ -39,7 +40,7 @@ public class Stock {
      * ISBN13.
      * <p>ISBN10 codes are must to convert to ISBN13.</p>
      *
-     * @see #setIsbn(String)
+     * @see #normalizeIsbn(String)
      */
     @Column(nullable = false, length = 13)
     @Getter
@@ -53,7 +54,7 @@ public class Stock {
      * Percentage of the reading progress.
      * <p>The value range is 0 to 100. Generally, it uses as {@link Progress} with following rule.</p>
      * <ul>
-     * <li>{@link Progress#BOUGHT} - 0</li>
+     * <li>{@link Progress#NOT_STARTED} - 0</li>
      * <li>{@link Progress#IN_PROGRESS} - 1~99</li>
      * <li>{@link Progress#COMPLETED} - 100</li>
      * </ul>
@@ -61,46 +62,57 @@ public class Stock {
      * @see Progress
      */
     @Column(nullable = false)
-    @Getter
     private int progress;
 
     @Column
     @Enumerated(EnumType.ORDINAL)
+    @Getter
     private ObtainType obtainType;
 
     @Column
     @Temporal(TemporalType.DATE)
     @Nullable
+    @Getter
     private Date obtainDate;
 
     @Column
     @Temporal(TemporalType.DATE)
     @Nullable
+    @Getter
     private Date completedDate;
 
     @Column
     @Enumerated(value = EnumType.ORDINAL)
+    @Getter
     private MediaType mediaType;
 
     @Column(length = 128)
+    @Getter
     private String boughtPlace;
 
     @Column
     @Convert(converter = BlogStringConverter.class)
+    @Getter
     private String shortText;
 
     @Column
     @Convert(converter = BlogStringConverter.class)
+    @Getter
     private String longText;
 
     @Column(nullable = false, length = 200)
+    @Getter
     private String bookName;
 
-    @Column(length = 10)
-    @Nullable
-    private String publishDate; // yyyy-mm-dd or yyyy-mm
+    /**
+     * @see #isValidPublishedDate(String)
+     */
+    @Column(nullable = false, length = 10)
+    @Getter
+    private String publishDate;
 
     @Column(nullable = false)
+    @Getter
     private int pages;
 
     @Column(length = 200)
@@ -119,15 +131,14 @@ public class Stock {
     private Date updatedTime;
 
     /**
-     * Set ISBN.
+     * Checks value for acceptable published date.
      *
-     * @param isbn ISBN13 or ISBN10
-     * @throws NullPointerException     if {@code isbn} is {@code null}
-     * @throws IllegalArgumentException if {@code isbn} is invalid
-     * @see #normalizeIsbn(String)
+     * @param value accepts yyyy-mm-dd, yyyy-mm, or yyyy
+     * @return {@link true} for valid, {@link false} for invalid.
      */
-    public void setIsbn(String isbn) {
-        this.isbn = normalizeIsbn(isbn);
+    public static boolean isValidPublishedDate(String value) {
+        return !Strings.isNullOrEmpty(value) && (value.matches("\\d{4}") || value.matches("\\d{4}-\\d{2}") ||
+                value.matches("\\d{4}-\\d{2}-\\d{2}"));
     }
 
     /**
@@ -157,6 +168,17 @@ public class Stock {
         return trimmed;
     }
 
+    public Progress getProgress() {
+        switch (progress) {
+            case 0:
+                return Progress.NOT_STARTED;
+            case 100:
+                return Progress.COMPLETED;
+            default:
+                return Progress.IN_PROGRESS;
+        }
+    }
+
     public enum Visibility {
         PUBLIC,
         PRIVATE,
@@ -167,13 +189,23 @@ public class Stock {
         OTHER,
         BUY,
         RENT,
-        ASSUME,
+        ASSUME
     }
 
     public enum Progress {
-        BOUGHT,
-        IN_PROGRESS,
-        COMPLETED
+        NOT_STARTED(0),
+        IN_PROGRESS(50),
+        COMPLETED(100);
+
+        private final int actualValue;
+
+        Progress(int actualValue) {
+            this.actualValue = actualValue;
+        }
+
+        public int actualValue() {
+            return actualValue;
+        }
     }
 
     public enum MediaType {
@@ -188,7 +220,10 @@ public class Stock {
     public static class BlogStringConverter implements AttributeConverter<String, byte[]> {
 
         @Override
-        public byte[] convertToDatabaseColumn(String attribute) {
+        public byte[] convertToDatabaseColumn(@Nullable String attribute) {
+            if (attribute == null) {
+                attribute = "";
+            }
             return attribute.getBytes(StandardCharsets.UTF_8);
         }
 

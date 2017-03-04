@@ -14,7 +14,7 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.UI;
 import io.github.aosn.mosaic.MosaicApplication;
 import io.github.aosn.mosaic.domain.model.catalog.ReleasedBook;
-import io.github.aosn.mosaic.ui.view.AddToStockView;
+import io.github.aosn.mosaic.ui.view.AddBookView;
 import io.github.aosn.mosaic.ui.view.style.Notifications;
 import lombok.Builder;
 import lombok.Getter;
@@ -84,25 +84,25 @@ public class ReleasedBookTable extends Table {
      *
      * @author mikan
      * @see com.vaadin.data.util.BeanItemContainer
-     * @since 0.1
+     * @since 0.3
      */
     @Getter
     @Builder
     public static class Row implements Serializable {
 
         private static final long serialVersionUID = MosaicApplication.MOSAIC_SERIAL_VERSION_UID;
-        private transient ReleasedBook entity;
-        private Button selectButton;
-        private String title;
-        private String publishedDate;
-        private Image thumbnail;
+        private transient final ReleasedBook entity;
+        private final Button selectButton;
+        private final String title;
+        private final String publishedDate;
+        private final Image thumbnail;
 
         public static Row from(ReleasedBook entity) {
             Button selectButton = new Button();
-            selectButton.setIcon(FontAwesome.CHECK);
+            selectButton.setIcon(FontAwesome.HAND_O_RIGHT);
             selectButton.addClickListener(e -> {
-                VaadinSession.getCurrent().setAttribute(AddToStockView.ATTR_STOCK_ADD, entity);
-                UI.getCurrent().getNavigator().navigateTo(AddToStockView.VIEW_NAME);
+                VaadinSession.getCurrent().setAttribute(AddBookView.ATTR_BOOK_ADD, entity);
+                UI.getCurrent().getNavigator().navigateTo(AddBookView.VIEW_NAME);
             });
             Image thumbnail = null;
             if (!Strings.isNullOrEmpty(entity.getThumbnailUrl())) {

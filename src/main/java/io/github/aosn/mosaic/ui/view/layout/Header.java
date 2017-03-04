@@ -13,6 +13,7 @@ import io.github.aosn.mosaic.controller.UserController;
 import io.github.aosn.mosaic.domain.model.poll.Group;
 import io.github.aosn.mosaic.domain.service.auth.UserService;
 import io.github.aosn.mosaic.ui.MainUI;
+import io.github.aosn.mosaic.ui.view.BooksView;
 import io.github.aosn.mosaic.ui.view.style.Style;
 import org.vaadin.spring.i18n.I18N;
 
@@ -37,21 +38,37 @@ class Header extends VerticalLayout {
         // Login Bar
         HorizontalLayout loginBar;
         if (userService.isLoggedIn()) {
+            // Icon and name
+            IconAndName iconAndName = new IconAndName(userService.getUser());
+
+            // New issue button
             String newIssueUrl = userService.getNewIssueUrl(group); // UserService isn't serializable
             Button newIssueButton = new Button(i18n.get("header.button.propose"),
                     e -> getUI().getPage().setLocation(newIssueUrl));
             newIssueButton.setIcon(FontAwesome.LIGHTBULB_O);
+
+            // Books button
+            Button booksButton = new Button("My books", e -> getUI().getNavigator().navigateTo(BooksView.VIEW_NAME));
+            booksButton.setIcon(FontAwesome.BOOK);
+
+            // Logout button
             Button logoutButton = new Button(i18n.get("header.button.logout"),
                     e -> getUI().getPage().setLocation(UserController.LOGOUT_PATH));
-            IconAndName iconAndName = new IconAndName(userService.getUser());
-            loginBar = new HorizontalLayout(iconAndName, newIssueButton, logoutButton);
+
+            // Wrap
+            loginBar = new HorizontalLayout(iconAndName, newIssueButton, booksButton, logoutButton);
             loginBar.setComponentAlignment(iconAndName, Alignment.MIDDLE_CENTER);
         } else {
+            // Welcome label
             Label welcomeLabel = new Label(i18n.get("header.label.login"));
+
+            // Login button
             Button loginButton = new Button(i18n.get("header.button.login.github"),
                     e -> getUI().getPage().setLocation(SecurityConfig.LOGIN_PATH_GITHUB));
             loginButton.setIcon(FontAwesome.GITHUB);
             loginButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
+
+            // Wrap
             loginBar = new HorizontalLayout(welcomeLabel, loginButton);
             loginBar.setComponentAlignment(welcomeLabel, Alignment.MIDDLE_CENTER);
         }

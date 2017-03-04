@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Collections;
@@ -40,6 +41,8 @@ public class GoogleBookRepository {
      *
      * @param isbn ISBN
      * @return {@link List} of {@link GoogleBook} entities.
+     * @throws HttpClientErrorException if the http error occurred
+     * @throws RuntimeException if unexpected status returned
      */
     public List<GoogleBook> getByIsbn(String isbn) {
         log.debug("getByIsbn(" + isbn + ")");
@@ -58,6 +61,8 @@ public class GoogleBookRepository {
      *
      * @param keyword keyword
      * @return {@link List} of {@link GoogleBook} entities.
+     * @throws HttpClientErrorException if the http error occurred
+     * @throws RuntimeException if unexpected status returned
      */
     public List<GoogleBook> getByKeyword(String keyword) {
         log.debug("getByKeyword(" + keyword + ")");

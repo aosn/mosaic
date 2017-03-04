@@ -3,6 +3,9 @@
  */
 package io.github.aosn.mosaic.ui.view;
 
+import com.google.common.base.Strings;
+import com.vaadin.event.ShortcutAction;
+import com.vaadin.event.ShortcutListener;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.FontAwesome;
@@ -71,6 +74,10 @@ public class FindBookView extends CustomComponent implements View {
         searchResultTable.setVisible(false);
 
         Button searchButton = new Button("Search", e -> {
+            if (Strings.isNullOrEmpty(searchField.getValue())) {
+                Notifications.showWarning(i18n.get("common.notification.input.incomplete"));
+                return;
+            }
             List<ReleasedBook> searchResult;
             try {
                 String isbn = Stock.normalizeIsbn(searchField.getValue());
@@ -91,6 +98,17 @@ public class FindBookView extends CustomComponent implements View {
         });
         searchButton.setIcon(FontAwesome.SEARCH);
         contentPane.addComponent(searchButton);
+
+        // Enter to search
+        searchField.addShortcutListener(new ShortcutListener("Press enter to search",
+                ShortcutAction.KeyCode.ENTER, null) {
+            private static final long serialVersionUID = MosaicApplication.MOSAIC_SERIAL_VERSION_UID;
+
+            @Override
+            public void handleAction(Object sender, Object target) {
+                searchButton.click();
+            }
+        });
 
         contentPane.addComponent(searchResultTable);
 
