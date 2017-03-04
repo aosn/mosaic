@@ -190,7 +190,7 @@ public class PollResultView extends CustomComponent implements View {
                         if (notifyCheck.getValue()) {
                             notificationService.notifyClosePoll(poll);
                         }
-                        Notifications.showNormal(i18n.get("result.notification.poll.closed"));
+                        Notifications.showSuccess(i18n.get("result.notification.poll.closed"));
                         getUI().getNavigator().navigateTo(FrontView.VIEW_NAME);
                     })));
             closeButton.setStyleName(ValoTheme.BUTTON_DANGER);

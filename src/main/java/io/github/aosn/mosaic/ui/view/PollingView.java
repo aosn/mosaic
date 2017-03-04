@@ -168,7 +168,7 @@ public class PollingView extends CustomComponent implements View {
                     .build()).collect(Collectors.toList());
             try {
                 pollService.submit(poll, votes);
-                Notifications.showNormal(i18n.get("polling.notification.vote.submitted"));
+                Notifications.showSuccess(i18n.get("polling.notification.vote.submitted"));
                 getUI().getNavigator().navigateTo(FrontView.VIEW_NAME);
             } catch (RuntimeException ex) {
                 ErrorView.show(i18n.get("polling.error.vote.failed"), ex);

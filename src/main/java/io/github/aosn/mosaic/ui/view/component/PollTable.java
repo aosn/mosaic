@@ -13,6 +13,7 @@ import com.vaadin.ui.themes.ValoTheme;
 import io.github.aosn.mosaic.MosaicApplication;
 import io.github.aosn.mosaic.domain.model.auth.User;
 import io.github.aosn.mosaic.domain.model.poll.Poll;
+import io.github.aosn.mosaic.domain.model.poll.Vote;
 import io.github.aosn.mosaic.ui.view.PollResultView;
 import io.github.aosn.mosaic.ui.view.PollingView;
 import io.github.aosn.mosaic.ui.view.style.Style;
@@ -126,7 +127,7 @@ public class PollTable extends Table {
 
             // Votes count
             int votes = entity.getVotes() == null ? 0 : Math.toIntExact(entity.getVotes().stream()
-                    .map(v -> v.getUser().getId()).distinct().count());
+                    .map(Vote::getUser).distinct().count());
 
             // Build
             return Row.builder()
