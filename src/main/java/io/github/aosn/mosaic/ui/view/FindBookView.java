@@ -11,6 +11,7 @@ import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.*;
+import com.vaadin.ui.themes.ValoTheme;
 import io.github.aosn.mosaic.MosaicApplication;
 import io.github.aosn.mosaic.domain.model.catalog.ReleasedBook;
 import io.github.aosn.mosaic.domain.model.stock.Stock;
@@ -98,6 +99,7 @@ public class FindBookView extends CustomComponent implements View {
             searchResultTable.setVisible(true);
         });
         searchButton.setIcon(FontAwesome.SEARCH);
+        searchButton.setStyleName(ValoTheme.BUTTON_PRIMARY);
         contentPane.addComponent(searchButton);
 
         // Enter to search
