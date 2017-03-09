@@ -40,10 +40,10 @@ public class ReleasedBookTable extends Table {
         this.i18n = i18n;
         this.columnGroup = ColumnGroup.DEFAULT;
         setPageLength(0);
-        setColumnHeader("selectButton", "Sel.");
-        setColumnHeader("title", "Title");
-        setColumnHeader("publishedDate", "Published");
-        setColumnHeader("thumbnail", "Cover");
+        setColumnHeader("selectButton", i18n.get("new.column.select"));
+        setColumnHeader("title", i18n.get("book.column.title"));
+        setColumnHeader("publishedDate", i18n.get("book.column.published.date"));
+        setColumnHeader("thumbnail", i18n.get("book.column.cover"));
         setVisibleColumns((Object[]) columnGroup.columns);
     }
 
@@ -59,13 +59,13 @@ public class ReleasedBookTable extends Table {
         refreshRenderedCells();
         switch (source.size()) {
             case 0:
-                Notifications.showWarning("No books found.");
+                Notifications.showWarning(i18n.get("find-book.notification.found.0"));
                 break;
             case 1:
-                Notifications.showSuccess("Book found.");
+                Notifications.showSuccess(i18n.get("find-book.notification.found.1"));
                 break;
             default:
-                Notifications.showSuccess(source.size() + " books found.");
+                Notifications.showSuccess(String.format(i18n.get("find-book.notification.found.n"), source.size()));
                 break;
         }
     }

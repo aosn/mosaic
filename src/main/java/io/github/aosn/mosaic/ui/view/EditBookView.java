@@ -48,7 +48,7 @@ import java.util.Date;
 public class EditBookView extends CustomComponent implements View {
 
     public static final String VIEW_NAME = "edit-book";
-    public static final String ATTR_BOOK_EDIT = "mosaic.book.edit";
+    static final String ATTR_BOOK_EDIT = "mosaic.book.edit";
     private static final long serialVersionUID = MosaicApplication.MOSAIC_SERIAL_VERSION_UID;
     private transient final I18N i18n;
     private transient final UserService userService;
@@ -81,28 +81,27 @@ public class EditBookView extends CustomComponent implements View {
         ContentPane contentPane = new ContentPane();
 
         FormLayout form = new FormLayout();
-        form.setCaption("Book information");
         form.setMargin(false);
 
         Image thumbnail = new Image(book.getTitle(), new ExternalResource(book.getThumbnailOrPlaceholder()));
-        thumbnail.setCaption("Cover");
+        thumbnail.setCaption(i18n.get("book.column.cover"));
         form.addComponent(thumbnail);
 
         Label isbnLabel = new Label(book.getIsbn());
-        isbnLabel.setCaption("ISBN");
+        isbnLabel.setCaption(i18n.get("book.column.isbn"));
         form.addComponent(isbnLabel);
 
-        TextField titleField = new TextField("Title");
+        TextField titleField = new TextField(i18n.get("book.column.title"));
         titleField.setRequired(true);
         titleField.setValue(book.getTitle());
         titleField.setWidth(100, Unit.PERCENTAGE);
         titleField.addValidator(new StringLengthValidator("Text is too long", 0, 200, false));
         form.addComponent(titleField);
 
-        TextField publishedDate = new TextField("Published Date");
+        TextField publishedDate = new TextField(i18n.get("book.column.published.date"));
         publishedDate.setRequired(true);
         publishedDate.setValue(book.getPublishedDate());
-        publishedDate.addValidator(new AbstractStringValidator("Only allows yyyy-mm-dd, yyyy-mm or yyyy") {
+        publishedDate.addValidator(new AbstractStringValidator(i18n.get("edit-book.validator.published.date")) {
             private static final long serialVersionUID = MosaicApplication.MOSAIC_SERIAL_VERSION_UID;
 
             @Override
@@ -112,67 +111,70 @@ public class EditBookView extends CustomComponent implements View {
         });
         form.addComponent(publishedDate);
 
-        NumberField pagesField = new NumberField("Page count", book.getPageCount());
+        NumberField pagesField = new NumberField(i18n.get("book.column.page.count"), book.getPageCount());
         pagesField.addValidator(v -> {
             if (pagesField.getValueAsInt() < 0) {
-                throw new Validator.InvalidValueException("Out of range");
+                throw new Validator.InvalidValueException(i18n.get("common.validator.date.range.over"));
             }
         });
         form.addComponent(pagesField);
 
-        TextField commentField = new TextField("Comment", book.getShortText());
+        TextField commentField = new TextField(i18n.get("book.column.text.short"), book.getShortText());
         commentField.setWidth(100, Unit.PERCENTAGE);
         form.addComponent(commentField);
 
-        TextArea bookReviewTextArea = new TextArea("Book review", book.getLongText());
+        TextArea bookReviewTextArea = new TextArea(i18n.get("book.column.text.long"), book.getLongText());
         bookReviewTextArea.setWidth(100, Unit.PERCENTAGE);
-        bookReviewTextArea.setDescription("Markdown allowed");
+        bookReviewTextArea.setDescription(i18n.get("edit-book.description.text.long")); // markdown available
         form.addComponent(bookReviewTextArea);
 
-        ComboBox visibilityComboBox = new ComboBox("Visibility");
+        ComboBox visibilityComboBox = new ComboBox(i18n.get("book.column.visibility"));
         visibilityComboBox.setTextInputAllowed(false);
         visibilityComboBox.setNullSelectionAllowed(false);
         visibilityComboBox.addItems(Arrays.asList(Stock.Visibility.values()));
         visibilityComboBox.setValue(book.getVisibility());
         form.addComponent(visibilityComboBox);
 
-        ComboBox progressComboBox = new ComboBox("Progress");
+        ComboBox progressComboBox = new ComboBox(i18n.get("book.column.progress"));
         progressComboBox.setTextInputAllowed(false);
         progressComboBox.setNullSelectionAllowed(false);
         progressComboBox.addItems(Arrays.asList(Stock.Progress.values()));
         progressComboBox.setValue(book.getProgress());
         form.addComponent(progressComboBox);
 
-        ComboBox obtainTypeComboBox = new ComboBox("Obtain type");
+        ComboBox obtainTypeComboBox = new ComboBox(i18n.get("book.column.obtain.type"));
         obtainTypeComboBox.setTextInputAllowed(false);
         obtainTypeComboBox.setNullSelectionAllowed(false);
         obtainTypeComboBox.addItems(Arrays.asList(Stock.ObtainType.values()));
         obtainTypeComboBox.setValue(book.getObtainType());
         form.addComponent(obtainTypeComboBox);
 
-        DateField obtainDateField = new DateField("Obtain date", book.getObtainDate());
+        DateField obtainDateField = new DateField(i18n.get("book.column.obtain.date"), book.getObtainDate());
         form.addComponent(obtainDateField);
 
-        DateField completeDateField = new DateField("Complete date", book.getCompletedDate());
+        DateField completeDateField = new DateField(i18n.get("book.column.progress.date.completed"),
+                book.getCompletedDate());
         completeDateField.setRangeEnd(new Date());
         form.addComponent(completeDateField);
 
-        ComboBox mediaTypeComboBox = new ComboBox("Media type");
+        ComboBox mediaTypeComboBox = new ComboBox(i18n.get("book.column.media.type"));
         mediaTypeComboBox.setTextInputAllowed(false);
         mediaTypeComboBox.setNullSelectionAllowed(false);
         mediaTypeComboBox.addItems(Arrays.asList(Stock.MediaType.values()));
         mediaTypeComboBox.setValue(book.getMediaType());
         form.addComponent(mediaTypeComboBox);
 
-        TextField boughtPlaceField = new TextField("Bought place", book.getBoughtPlace());
-        boughtPlaceField.addValidator(new StringLengthValidator("Text is too long", 0, 128, true));
+        TextField boughtPlaceField = new TextField(i18n.get("book.column.bought.place"), book.getBoughtPlace());
+        boughtPlaceField.addValidator(
+                new StringLengthValidator(i18n.get("common.validator.text.length.over"), 0, 128, true));
         form.addComponent(boughtPlaceField);
 
         contentPane.addComponent(form);
 
-        Button cancelButton = new Button("Cancel", e -> getUI().getNavigator().navigateTo(FindBookView.VIEW_NAME));
+        Button cancelButton = new Button(i18n.get("common.button.cancel"),
+                e -> getUI().getNavigator().navigateTo(BookView.VIEW_NAME + "/" + book.getId()));
 
-        Button submitButton = new Button("Update book", e -> {
+        Button submitButton = new Button(i18n.get("edit-book.button.submit"), e -> {
             // Validate
             if (!titleField.isValid() || !publishedDate.isValid() || !pagesField.isValid() || !commentField.isValid() ||
                     !bookReviewTextArea.isValid() || !visibilityComboBox.isValid() || !progressComboBox.isValid() ||
@@ -200,12 +202,12 @@ public class EditBookView extends CustomComponent implements View {
                 book.setUpdatedTime(now);
                 stockService.update(book);
             } catch (RuntimeException ex) {
-                ErrorView.show("Failed to update book.", ex);
+                ErrorView.show(i18n.get("edit-book.error.update.failed"), ex);
                 return;
             }
 
             // Next
-            Notifications.showSuccess("Book updated");
+            Notifications.showSuccess(i18n.get("edit-book.notification.update.success"));
             session.setAttribute(ATTR_BOOK_EDIT, null); // clear session attribute
             getUI().getNavigator().navigateTo(BooksView.VIEW_NAME);
         });

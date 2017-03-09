@@ -48,7 +48,8 @@ class Header extends VerticalLayout {
             newIssueButton.setIcon(FontAwesome.LIGHTBULB_O);
 
             // Books button
-            Button booksButton = new Button("My books", e -> getUI().getNavigator().navigateTo(BooksView.VIEW_NAME));
+            Button booksButton = new Button(i18n.get("header.button.stocks"),
+                    e -> getUI().getNavigator().navigateTo(BooksView.VIEW_NAME));
             booksButton.setIcon(FontAwesome.BOOK);
 
             // Logout button

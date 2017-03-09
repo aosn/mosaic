@@ -62,10 +62,11 @@ public class BooksView extends CustomComponent implements View {
 
         List<Stock> stocks = stockService.getAll(userService.getUser());
 
-        Label titleLabel = new Label("My books");
+        Label titleLabel = new Label(i18n.get("books.label.title"));
         contentPane.addComponent(titleLabel);
 
-        Button addBookButton = new Button("Add book", e -> getUI().getNavigator().navigateTo(FindBookView.VIEW_NAME));
+        Button addBookButton = new Button(i18n.get("books.button.add"),
+                e -> getUI().getNavigator().navigateTo(FindBookView.VIEW_NAME));
         addBookButton.setIcon(FontAwesome.PLUS);
         addBookButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
         contentPane.addComponent(addBookButton);
@@ -73,7 +74,7 @@ public class BooksView extends CustomComponent implements View {
 
         if (stocks.isEmpty()) {
             Label label = new Label(FontAwesome.INFO_CIRCLE.getHtml() + " " +
-                    "Please add your books.", ContentMode.HTML);
+                    i18n.get("books.label.empty"), ContentMode.HTML);
             contentPane.addComponent(label);
             contentPane.setComponentAlignment(label, Alignment.MIDDLE_CENTER);
         } else {

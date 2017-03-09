@@ -63,17 +63,18 @@ public class FindBookView extends CustomComponent implements View {
         ContentPane contentPane = new ContentPane();
 
         FormLayout searchInputForm = new FormLayout();
-        searchInputForm.setCaption("Input ISBN or keyword");
+        searchInputForm.setCaption(i18n.get("find-book.label.title"));
         searchInputForm.setMargin(false);
         contentPane.addComponent(searchInputForm);
 
-        TextField searchField = new TextField("ISBN or keyword");
+        TextField searchField = new TextField(i18n.get("find-book.caption.search.input"));
+        searchField.setWidth(100, Unit.PERCENTAGE);
         searchInputForm.addComponent(searchField);
 
         ReleasedBookTable searchResultTable = new ReleasedBookTable(i18n);
         searchResultTable.setVisible(false);
 
-        Button searchButton = new Button("Search", e -> {
+        Button searchButton = new Button(i18n.get("find-book.button.search"), e -> {
             if (Strings.isNullOrEmpty(searchField.getValue())) {
                 Notifications.showWarning(i18n.get("common.notification.input.incomplete"));
                 return;
@@ -86,11 +87,11 @@ public class FindBookView extends CustomComponent implements View {
                 // Not a ISBN, search by name
                 searchResult = catalogService.searchByKeyword(searchField.getValue());
             } catch (NullPointerException ex) {
-                Notifications.showWarning("Please input form.");
+                Notifications.showWarning(i18n.get("common.notification.input.incomplete"));
                 return;
             }
             if (searchResult.isEmpty()) {
-                Notifications.showWarning("No match.");
+                Notifications.showWarning(i18n.get("find-book.notification.no.match"));
                 return;
             }
             searchResultTable.setDataSource(searchResult);
@@ -100,7 +101,7 @@ public class FindBookView extends CustomComponent implements View {
         contentPane.addComponent(searchButton);
 
         // Enter to search
-        searchField.addShortcutListener(new ShortcutListener("Press enter to search",
+        searchField.addShortcutListener(new ShortcutListener(i18n.get("find-book.caption.search.enter"),
                 ShortcutAction.KeyCode.ENTER, null) {
             private static final long serialVersionUID = MosaicApplication.MOSAIC_SERIAL_VERSION_UID;
 

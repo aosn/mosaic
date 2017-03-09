@@ -21,6 +21,7 @@ import io.github.aosn.mosaic.domain.service.stock.StockService;
 import io.github.aosn.mosaic.ui.MainUI;
 import io.github.aosn.mosaic.ui.view.component.ProgressLabel;
 import io.github.aosn.mosaic.ui.view.layout.ContentPane;
+import io.github.aosn.mosaic.ui.view.layout.IconAndName;
 import io.github.aosn.mosaic.ui.view.layout.ViewRoot;
 import io.github.aosn.mosaic.ui.view.layout.VisibilityIndicator;
 import lombok.extern.slf4j.Slf4j;
@@ -83,12 +84,12 @@ public class BookView extends CustomComponent implements View {
         // Lookup
         Stock stock = stockService.get(stockId);
         if (stock == null) {
-            ErrorView.show("No such book: " + stockId, null);
+            ErrorView.show(String.format(i18n.get("book.error.missing"), stockId), null);
             return;
         }
         // Access level
         if (!stock.isAccessible(userService.getUser())) {
-            ErrorView.show("Permission denied.", null);
+            ErrorView.show(i18n.get("book.error.permission.denied"), null);
             return;
         }
         getUI().getPage().setTitle(i18n.get("header.label.title"));
@@ -109,66 +110,84 @@ public class BookView extends CustomComponent implements View {
         form.setMargin(false);
         contentPane.addComponent(form);
 
+        if (!book.isMine(userService.getUser())) {
+            IconAndName owner = new IconAndName(book.getUser());
+            owner.setCaption(i18n.get("book.column.owner"));
+            form.addComponent(owner);
+        }
+
         Label title = new Label(book.getTitle());
-        title.setCaption("Title");
+        title.setCaption(i18n.get("book.column.title"));
         form.addComponent(title);
 
         Label isbn = new Label(book.getIsbn());
-        isbn.setCaption("isbn");
+        isbn.setCaption(i18n.get("book.column.isbn"));
         form.addComponent(isbn);
 
         Label pageCount = new Label(String.valueOf(book.getPageCount()));
-        pageCount.setCaption("Page count");
+        pageCount.setCaption(i18n.get("book.column.page.count"));
         form.addComponent(pageCount);
 
+        if (!Strings.isNullOrEmpty(book.getPublishedDate())) {
+            Label publishedDate = new Label(book.getPublishedDate());
+            publishedDate.setCaption(i18n.get("book.column.published.date"));
+            form.addComponent(publishedDate);
+        }
+
         HorizontalLayout progress = new HorizontalLayout(new ProgressLabel(book, i18n));
-        progress.setCaption("Progress");
+        progress.setCaption(i18n.get("book.column.progress"));
         form.addComponent(progress);
 
         if (book.getProgress() == Stock.Progress.COMPLETED && book.getCompletedDate() != null) {
             Label completedDate = new Label(DATE_FORMAT.format(book.getCompletedDate()));
-            completedDate.setCaption("Completed date");
+            completedDate.setCaption(i18n.get("book.column.progress.date.completed"));
             form.addComponent(completedDate);
         }
 
         Label obtainType = new Label(book.getObtainType().name());
-        obtainType.setCaption("Obtain type");
+        obtainType.setCaption(i18n.get("book.column.obtain.type"));
         form.addComponent(obtainType);
 
         if (book.getObtainDate() != null) {
             Label obtainDate = new Label(DATE_FORMAT.format(book.getObtainDate()));
-            obtainDate.setCaption("Obtain date");
+            obtainDate.setCaption(i18n.get("book.column.obtain.date"));
             form.addComponent(obtainDate);
         }
 
         if (!Strings.isNullOrEmpty(book.getBoughtPlace())) {
             Label boughtPlace = new Label(book.getBoughtPlace());
-            boughtPlace.setCaption("Bought place");
+            boughtPlace.setCaption(i18n.get("book.column.bought.place"));
             form.addComponent(boughtPlace);
         }
 
-        Label comment = new Label(book.getShortText());
-        comment.setCaption("Comment");
+        String commentContent = book.getShortText();
+        Label comment = new Label();
+        comment.setCaption(i18n.get("book.column.text.short"));
+        comment.setValue(Strings.isNullOrEmpty(commentContent) ?
+                i18n.get("book.label.text.short.empty") : commentContent);
         form.addComponent(comment);
 
         String reviewContent = book.getLongText();
         Label review = new Label("", ContentMode.HTML);
-        review.setCaption("Review");
-        if (reviewContent.isEmpty()) {
-            review.setValue("(No review)");
-        } else {
-            review.setValue(new PegDownProcessor().markdownToHtml(reviewContent));
-        }
+        review.setCaption(i18n.get("book.column.text.long"));
+        review.setValue(Strings.isNullOrEmpty(reviewContent) ?
+                i18n.get("book.label.text.long.empty") : new PegDownProcessor().markdownToHtml(reviewContent));
         form.addComponent(review);
 
         if (userService.isLoggedIn()) {
-            Button editButton = new Button("Edit", e -> {
+            Button backButton = new Button(i18n.get("books.label.title"),
+                    e -> getUI().getNavigator().navigateTo(BooksView.VIEW_NAME));
+
+            Button editButton = new Button(i18n.get("book.button.edit"), e -> {
                 VaadinSession.getCurrent().setAttribute(EditBookView.ATTR_BOOK_EDIT, book);
                 getUI().getNavigator().navigateTo(EditBookView.VIEW_NAME);
             });
             editButton.setIcon(FontAwesome.EDIT);
             editButton.setStyleName(ValoTheme.BUTTON_PRIMARY);
-            contentPane.addComponent(editButton);
+
+            HorizontalLayout buttonArea = new HorizontalLayout(backButton, editButton);
+            buttonArea.setSpacing(true);
+            contentPane.addComponent(buttonArea);
         }
 
         return contentPane;

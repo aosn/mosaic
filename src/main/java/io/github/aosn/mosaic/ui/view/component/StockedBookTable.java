@@ -28,8 +28,8 @@ public class StockedBookTable extends Table {
     public StockedBookTable(List<Row> rows, I18N i18n) {
         super(null, new BeanItemContainer<>(Row.class, rows));
         setPageLength(0);
-        setColumnHeader("title", "Title");
-        setColumnHeader("progress", "Progress");
+        setColumnHeader("title", i18n.get("book.column.title"));
+        setColumnHeader("progress", i18n.get("book.column.progress"));
         setVisibleColumns("title", "progress");
     }
 

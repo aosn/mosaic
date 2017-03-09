@@ -40,6 +40,7 @@ public class Stock implements ReleasedBook {
 
     @JoinColumn(nullable = false)
     @ManyToOne
+    @Getter
     private User user;
 
     /**
@@ -257,6 +258,10 @@ public class Stock implements ReleasedBook {
             default:
                 throw new UnsupportedOperationException("Unsupported visibility: " + accessor);
         }
+    }
+
+    public boolean isMine(User myself) {
+        return user.equals(myself);
     }
 
     public enum Visibility {

@@ -23,19 +23,19 @@ public class VisibilityIndicator extends HorizontalLayout {
         Label caption = new Label();
         switch (visibility) {
             case PUBLIC:
-                caption.setValue("Public");
+                caption.setValue(i18n.get("book.column.visibility.public"));
                 icon.setIcon(FontAwesome.GLOBE);
                 break;
             case ALL_USER:
-                caption.setValue("Internal");
+                caption.setValue(i18n.get("book.column.visibility.internal"));
                 icon.setIcon(FontAwesome.UNLOCK);
                 break;
             case PRIVATE:
-                caption.setValue("Private");
+                caption.setValue(i18n.get("book.column.visibility.private"));
                 icon.setIcon(FontAwesome.LOCK);
                 break;
             default: // currently unsupported
-                caption.setValue("Custom");
+                caption.setValue(i18n.get("book.column.visibility.custom"));
                 icon.setIcon(FontAwesome.COG);
                 break;
         }
