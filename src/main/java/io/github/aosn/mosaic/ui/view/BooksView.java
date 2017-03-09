@@ -62,6 +62,9 @@ public class BooksView extends CustomComponent implements View {
 
         List<Stock> stocks = stockService.getAll(userService.getUser());
 
+        Label titleLabel = new Label("My books");
+        contentPane.addComponent(titleLabel);
+
         Button addBookButton = new Button("Add book", e -> getUI().getNavigator().navigateTo(FindBookView.VIEW_NAME));
         addBookButton.setIcon(FontAwesome.PLUS);
         addBookButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);

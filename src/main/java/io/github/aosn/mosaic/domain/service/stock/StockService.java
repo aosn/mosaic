@@ -42,12 +42,41 @@ public class StockService {
     }
 
     /**
+     * Get a entry by id.
+     *
+     * @param id stock id
+     * @return {@link Stock} object, or null if not found
+     * @throws DataAccessException if the database error occurred
+     */
+    public Stock get(long id) {
+        return stockRepository.findOne(id);
+    }
+
+    /**
      * Add a stock.
      *
      * @param stock stock
-     * @throws DataAccessException if the database error occurred
+     * @throws IllegalArgumentException the book is already stocked
+     * @throws DataAccessException      if the database error occurred
      */
     public void add(Stock stock) {
+        if (stockRepository.findOne(stock.getId()) != null) {
+            throw new IllegalArgumentException("Book already stocked: " + stock.getId());
+        }
+        stockRepository.saveAndFlush(stock);
+    }
+
+    /**
+     * Update a stock.
+     *
+     * @param stock stock
+     * @throws IllegalArgumentException the book isn't stocked
+     * @throws DataAccessException      if the database error occurred
+     */
+    public void update(Stock stock) {
+        if (stockRepository.findOne(stock.getId()) == null) {
+            throw new IllegalArgumentException("No such book: " + stock.getId());
+        }
         stockRepository.saveAndFlush(stock);
     }
 }

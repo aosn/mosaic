@@ -24,7 +24,6 @@ import java.util.stream.Stream;
 public class GoogleBook implements ReleasedBook {
 
     private static final long serialVersionUID = MosaicApplication.MOSAIC_SERIAL_VERSION_UID;
-    private static final String NO_IMAGE_PATH = "/VAADIN/img/no-image.png";
 
     @JsonProperty
     private VolumeInfo volumeInfo;
@@ -78,8 +77,8 @@ public class GoogleBook implements ReleasedBook {
     }
 
     @Override
-    public String getThumbnailUrl() {
-        return volumeInfo.imageLinks == null ? NO_IMAGE_PATH : volumeInfo.imageLinks.thumbnail;
+    public @Nullable String getThumbnailUrl() {
+        return volumeInfo.imageLinks == null ? null : volumeInfo.imageLinks.thumbnail;
     }
 
     private static class VolumeInfo implements Serializable {

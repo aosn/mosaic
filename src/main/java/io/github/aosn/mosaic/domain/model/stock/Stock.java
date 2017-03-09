@@ -4,7 +4,9 @@
 package io.github.aosn.mosaic.domain.model.stock;
 
 import com.google.common.base.Strings;
+import io.github.aosn.mosaic.MosaicApplication;
 import io.github.aosn.mosaic.domain.model.auth.User;
+import io.github.aosn.mosaic.domain.model.catalog.ReleasedBook;
 import lombok.*;
 import org.apache.commons.validator.routines.ISBNValidator;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -12,6 +14,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import javax.persistence.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Defines the book stock.
@@ -25,11 +28,14 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Stock {
+public class Stock implements ReleasedBook {
+
+    private static final long serialVersionUID = MosaicApplication.MOSAIC_SERIAL_VERSION_UID;
 
     @Id
     @Column
     @GeneratedValue
+    @Getter
     private Long id;
 
     @JoinColumn(nullable = false)
@@ -48,6 +54,8 @@ public class Stock {
 
     @Column(nullable = false)
     @Enumerated(EnumType.ORDINAL)
+    @Getter
+    @Setter
     private Visibility visibility;
 
     /**
@@ -67,56 +75,70 @@ public class Stock {
     @Column
     @Enumerated(EnumType.ORDINAL)
     @Getter
+    @Setter
     private ObtainType obtainType;
 
     @Column
     @Temporal(TemporalType.DATE)
     @Nullable
     @Getter
+    @Setter
     private Date obtainDate;
 
     @Column
     @Temporal(TemporalType.DATE)
     @Nullable
     @Getter
+    @Setter
     private Date completedDate;
 
     @Column
     @Enumerated(value = EnumType.ORDINAL)
     @Getter
+    @Setter
     private MediaType mediaType;
 
     @Column(length = 128)
     @Getter
+    @Setter
     private String boughtPlace;
 
     @Column
     @Convert(converter = BlogStringConverter.class)
     @Getter
+    @Setter
     private String shortText;
 
     @Column
     @Convert(converter = BlogStringConverter.class)
     @Getter
+    @Setter
     private String longText;
 
     @Column(nullable = false, length = 200)
     @Getter
-    private String bookName;
+    @Setter
+    private String title;
+
+    @Column(length = 200)
+    @Nullable
+    @Getter
+    private String subtitle;
 
     /**
      * @see #isValidPublishedDate(String)
      */
     @Column(nullable = false, length = 10)
     @Getter
-    private String publishDate;
+    private String publishedDate;
 
     @Column(nullable = false)
     @Getter
-    private int pages;
+    private int pageCount;
 
     @Column(length = 200)
     @Nullable
+    @Getter
     private String thumbnailUrl;
 
     @Column(nullable = false)
@@ -176,6 +198,64 @@ public class Stock {
                 return Progress.COMPLETED;
             default:
                 return Progress.IN_PROGRESS;
+        }
+    }
+
+    public void setProgressPercentage(int percentage) {
+        if (percentage < 0 || percentage > 100) {
+            throw new IllegalArgumentException("percentage accepts 0~100");
+        }
+        progress = percentage;
+    }
+
+    public int getProgressPercentage() {
+        return progress;
+    }
+
+    public void setPublishedDate(String date) {
+        if (!isValidPublishedDate(date)) {
+            throw new IllegalArgumentException("Invalid date: " + date);
+        }
+        publishedDate = date;
+    }
+
+    public void setPageCount(int pageCount) {
+        if (pageCount < 0) {
+            throw new IllegalArgumentException("pageCount accepts 0 or over");
+        }
+        this.pageCount = pageCount;
+    }
+
+    @Override
+    public @Nullable String getPublisher() {
+        throw new UnsupportedOperationException("Publisher not available");
+    }
+
+    @Override
+    public List<String> getAuthors() {
+        throw new UnsupportedOperationException("Authors not available");
+    }
+
+    @Override
+    public @Nullable String getLanguage() {
+        throw new UnsupportedOperationException("Language not available");
+    }
+
+    @Override
+    public boolean isEBook() {
+        return mediaType != MediaType.PAPER;
+    }
+
+    public boolean isAccessible(@Nullable User accessor) {
+        switch (visibility) {
+            case PUBLIC:
+                return true;
+            case ALL_USER:
+                return accessor != null;
+            case PRIVATE:
+                return user.equals(accessor);
+            default:
+                throw new UnsupportedOperationException("Unsupported visibility: " + accessor);
         }
     }
 

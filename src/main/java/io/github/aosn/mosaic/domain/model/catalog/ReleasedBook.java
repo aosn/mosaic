@@ -3,6 +3,7 @@
  */
 package io.github.aosn.mosaic.domain.model.catalog;
 
+import io.github.aosn.mosaic.config.SecurityConfig;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.Serializable;
@@ -39,4 +40,9 @@ public interface ReleasedBook extends Serializable {
 
     @Nullable
     String getThumbnailUrl();
+
+    default String getThumbnailOrPlaceholder() {
+        String url = getThumbnailUrl();
+        return url == null ? SecurityConfig.V_PATH_PREFIX + SecurityConfig.NO_IMAGE_PATH : url;
+    }
 }

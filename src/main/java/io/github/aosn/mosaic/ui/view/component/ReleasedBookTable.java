@@ -104,11 +104,8 @@ public class ReleasedBookTable extends Table {
                 VaadinSession.getCurrent().setAttribute(AddBookView.ATTR_BOOK_ADD, entity);
                 UI.getCurrent().getNavigator().navigateTo(AddBookView.VIEW_NAME);
             });
-            Image thumbnail = null;
-            if (!Strings.isNullOrEmpty(entity.getThumbnailUrl())) {
-                thumbnail = new Image(entity.getTitle(), new ExternalResource(entity.getThumbnailUrl()));
-                thumbnail.setWidth(70, Unit.PIXELS);
-            }
+            Image thumbnail = new Image(entity.getTitle(), new ExternalResource(entity.getThumbnailOrPlaceholder()));
+            thumbnail.setWidth(70, Unit.PIXELS);
             return Row.builder()
                     .entity(entity)
                     .selectButton(selectButton)

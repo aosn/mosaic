@@ -15,7 +15,6 @@ import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 import io.github.aosn.mosaic.MosaicApplication;
-import io.github.aosn.mosaic.domain.model.catalog.ReleasedBook;
 import io.github.aosn.mosaic.domain.model.stock.Stock;
 import io.github.aosn.mosaic.domain.service.auth.UserService;
 import io.github.aosn.mosaic.domain.service.poll.PollService;
@@ -38,18 +37,18 @@ import java.util.Date;
  * <p>
  * <p>Required session parameter:</p>
  * <ul>
- * <li>{@link #ATTR_BOOK_ADD} - A {@link ReleasedBook} object</li>
+ * <li>{@link #ATTR_BOOK_EDIT} - A {@link Stock} object</li>
  * </ul>
  *
  * @author mikan
  * @since 0.3
  */
-@SpringView(name = AddBookView.VIEW_NAME, ui = MainUI.class)
+@SpringView(name = EditBookView.VIEW_NAME, ui = MainUI.class)
 @Slf4j
-public class AddBookView extends CustomComponent implements View {
+public class EditBookView extends CustomComponent implements View {
 
-    public static final String VIEW_NAME = "add-book";
-    public static final String ATTR_BOOK_ADD = "mosaic.book.add";
+    public static final String VIEW_NAME = "edit-book";
+    public static final String ATTR_BOOK_EDIT = "mosaic.book.edit";
     private static final long serialVersionUID = MosaicApplication.MOSAIC_SERIAL_VERSION_UID;
     private transient final I18N i18n;
     private transient final UserService userService;
@@ -58,7 +57,7 @@ public class AddBookView extends CustomComponent implements View {
     private final VaadinSession session;
 
     @Autowired
-    public AddBookView(I18N i18n, UserService userService, PollService pollService, StockService stockService) {
+    public EditBookView(I18N i18n, UserService userService, PollService pollService, StockService stockService) {
         this.i18n = i18n;
         this.userService = userService;
         this.pollService = pollService;
@@ -68,17 +67,17 @@ public class AddBookView extends CustomComponent implements View {
 
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent event) {
-        ReleasedBook releasedBook = (ReleasedBook) session.getAttribute(ATTR_BOOK_ADD);
-        if (releasedBook == null) {
+        Stock stock = (Stock) session.getAttribute(ATTR_BOOK_EDIT);
+        if (stock == null) {
             ErrorView.show(i18n.get("common.error.parameter.missing"), null);
             return;
         }
         getUI().getPage().setTitle(i18n.get("header.label.title"));
         setCompositionRoot(new ViewRoot(i18n, userService, pollService.getDefaultGroup(),
-                createAddStockLayout(releasedBook)));
+                createEditStockLayout(stock)));
     }
 
-    private Layout createAddStockLayout(ReleasedBook book) {
+    private Layout createEditStockLayout(Stock book) {
         ContentPane contentPane = new ContentPane();
 
         FormLayout form = new FormLayout();
@@ -121,11 +120,11 @@ public class AddBookView extends CustomComponent implements View {
         });
         form.addComponent(pagesField);
 
-        TextField commentField = new TextField("Comment");
+        TextField commentField = new TextField("Comment", book.getShortText());
         commentField.setWidth(100, Unit.PERCENTAGE);
         form.addComponent(commentField);
 
-        TextArea bookReviewTextArea = new TextArea("Book review");
+        TextArea bookReviewTextArea = new TextArea("Book review", book.getLongText());
         bookReviewTextArea.setWidth(100, Unit.PERCENTAGE);
         bookReviewTextArea.setDescription("Markdown allowed");
         form.addComponent(bookReviewTextArea);
@@ -134,27 +133,27 @@ public class AddBookView extends CustomComponent implements View {
         visibilityComboBox.setTextInputAllowed(false);
         visibilityComboBox.setNullSelectionAllowed(false);
         visibilityComboBox.addItems(Arrays.asList(Stock.Visibility.values()));
-        visibilityComboBox.setValue(Stock.Visibility.PUBLIC);
+        visibilityComboBox.setValue(book.getVisibility());
         form.addComponent(visibilityComboBox);
 
         ComboBox progressComboBox = new ComboBox("Progress");
         progressComboBox.setTextInputAllowed(false);
         progressComboBox.setNullSelectionAllowed(false);
         progressComboBox.addItems(Arrays.asList(Stock.Progress.values()));
-        progressComboBox.setValue(Stock.Progress.NOT_STARTED);
+        progressComboBox.setValue(book.getProgress());
         form.addComponent(progressComboBox);
 
         ComboBox obtainTypeComboBox = new ComboBox("Obtain type");
         obtainTypeComboBox.setTextInputAllowed(false);
         obtainTypeComboBox.setNullSelectionAllowed(false);
         obtainTypeComboBox.addItems(Arrays.asList(Stock.ObtainType.values()));
-        obtainTypeComboBox.setValue(Stock.ObtainType.BUY);
+        obtainTypeComboBox.setValue(book.getObtainType());
         form.addComponent(obtainTypeComboBox);
 
-        DateField obtainDateField = new DateField("Obtain date");
+        DateField obtainDateField = new DateField("Obtain date", book.getObtainDate());
         form.addComponent(obtainDateField);
 
-        DateField completeDateField = new DateField("Complete date");
+        DateField completeDateField = new DateField("Complete date", book.getCompletedDate());
         completeDateField.setRangeEnd(new Date());
         form.addComponent(completeDateField);
 
@@ -162,10 +161,10 @@ public class AddBookView extends CustomComponent implements View {
         mediaTypeComboBox.setTextInputAllowed(false);
         mediaTypeComboBox.setNullSelectionAllowed(false);
         mediaTypeComboBox.addItems(Arrays.asList(Stock.MediaType.values()));
-        mediaTypeComboBox.setValue(book.isEBook() ? Stock.MediaType.KINDLE : Stock.MediaType.PAPER);
+        mediaTypeComboBox.setValue(book.getMediaType());
         form.addComponent(mediaTypeComboBox);
 
-        TextField boughtPlaceField = new TextField("Bought place");
+        TextField boughtPlaceField = new TextField("Bought place", book.getBoughtPlace());
         boughtPlaceField.addValidator(new StringLengthValidator("Text is too long", 0, 128, true));
         form.addComponent(boughtPlaceField);
 
@@ -173,7 +172,7 @@ public class AddBookView extends CustomComponent implements View {
 
         Button cancelButton = new Button("Cancel", e -> getUI().getNavigator().navigateTo(FindBookView.VIEW_NAME));
 
-        Button submitButton = new Button("Add book", e -> {
+        Button submitButton = new Button("Update book", e -> {
             // Validate
             if (!titleField.isValid() || !publishedDate.isValid() || !pagesField.isValid() || !commentField.isValid() ||
                     !bookReviewTextArea.isValid() || !visibilityComboBox.isValid() || !progressComboBox.isValid() ||
@@ -186,35 +185,28 @@ public class AddBookView extends CustomComponent implements View {
             // Submit
             Date now = new Date();
             try {
-                Stock stock = Stock.builder()
-                        .user(userService.getUser())
-                        .isbn(Stock.normalizeIsbn(book.getIsbn()))
-                        .title(titleField.getValue())
-                        .subtitle(book.getSubtitle())
-                        .publishedDate(publishedDate.getValue())
-                        .pageCount(pagesField.getValueAsInt())
-                        .shortText(commentField.getValue())
-                        .longText(bookReviewTextArea.getValue())
-                        .visibility((Stock.Visibility) visibilityComboBox.getValue())
-                        .progress(((Stock.Progress) progressComboBox.getValue()).actualValue())
-                        .obtainType((Stock.ObtainType) obtainTypeComboBox.getValue())
-                        .obtainDate(obtainDateField.getValue())
-                        .completedDate(completeDateField.getValue())
-                        .mediaType((Stock.MediaType) mediaTypeComboBox.getValue())
-                        .boughtPlace(boughtPlaceField.getValue())
-                        .thumbnailUrl(book.getThumbnailUrl())
-                        .createdTime(now)
-                        .updatedTime(now)
-                        .build();
-                stockService.add(stock);
+                book.setVisibility((Stock.Visibility) visibilityComboBox.getValue());
+                book.setProgressPercentage(((Stock.Progress) progressComboBox.getValue()).actualValue());
+                book.setTitle(titleField.getValue());
+                book.setPublishedDate(publishedDate.getValue());
+                book.setPageCount(pagesField.getValueAsInt());
+                book.setShortText(commentField.getValue());
+                book.setLongText(bookReviewTextArea.getValue());
+                book.setObtainType((Stock.ObtainType) obtainTypeComboBox.getValue());
+                book.setObtainDate(obtainDateField.getValue());
+                book.setCompletedDate(completeDateField.getValue());
+                book.setMediaType((Stock.MediaType) mediaTypeComboBox.getValue());
+                book.setBoughtPlace(boughtPlaceField.getValue());
+                book.setUpdatedTime(now);
+                stockService.update(book);
             } catch (RuntimeException ex) {
-                ErrorView.show("Failed to add book.", ex);
+                ErrorView.show("Failed to update book.", ex);
                 return;
             }
 
             // Next
-            Notifications.showSuccess("Book added");
-            session.setAttribute(ATTR_BOOK_ADD, null); // clear session attribute
+            Notifications.showSuccess("Book updated");
+            session.setAttribute(ATTR_BOOK_EDIT, null); // clear session attribute
             getUI().getNavigator().navigateTo(BooksView.VIEW_NAME);
         });
         submitButton.setIcon(FontAwesome.CHECK);

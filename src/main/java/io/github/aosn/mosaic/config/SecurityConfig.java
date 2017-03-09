@@ -52,6 +52,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     public static final String LOGIN_PATH_GITHUB = "/login/github";
     public static final String CSS_PATH = "/css/mosaic.css";
+    public static final String NO_IMAGE_PATH = "/img/no-image.png\"";
+    public static final String V_PATH_PREFIX = "/VAADIN";
     private final OAuth2ClientContext oauth2ClientContext;
     private final UserService userService;
 
@@ -69,7 +71,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.formLogin().disable();
         http.authorizeRequests()
                 .antMatchers(MainUI.PATH, ErrorUI.PATH, CSS_PATH, LOGIN_PATH_GITHUB).permitAll()
-                .antMatchers("/VAADIN/**", "/vaadinServlet/**").permitAll()
+                .antMatchers(V_PATH_PREFIX + "/**", "/vaadinServlet/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling().authenticationEntryPoint(loginPage()).accessDeniedPage(MainUI.PATH)
