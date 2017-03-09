@@ -43,8 +43,8 @@ public class Group implements Serializable {
 
     @JoinColumn
     @OneToOne
-    @Getter
     @Nullable
+    @Getter
     private User owner; // null for default, otherwise for custom record
 
     public String getOrganization() {

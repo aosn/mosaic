@@ -48,7 +48,7 @@ public class ErrorView extends CustomComponent implements View {
         this.pollService = pollService;
     }
 
-    static void show(String message, Throwable throwable) {
+    static void show(@Nullable String message, @Nullable Throwable throwable) {
         UI ui = UI.getCurrent();
         VaadinSession session = ui.getSession();
         session.setAttribute(ATTR_ERROR_MESSAGE, message);

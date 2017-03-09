@@ -19,7 +19,7 @@ public class Notifications {
     private Notifications() {
     }
 
-    public static void showNormal(String message) {
+    public static void showSuccess(String message) {
         Notification notification = new Notification(message, Notification.Type.TRAY_NOTIFICATION);
         notification.setPosition(Position.TOP_CENTER);
         notification.setStyleName(ValoTheme.NOTIFICATION_SUCCESS);

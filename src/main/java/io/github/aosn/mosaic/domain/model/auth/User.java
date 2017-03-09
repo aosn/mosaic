@@ -17,7 +17,6 @@ import java.util.Objects;
  */
 @Entity
 @Table(name = "users")
-@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -31,6 +30,7 @@ public class User implements Serializable {
     private Long id;
 
     @Column(nullable = false, length = 40)
+    @Getter
     private String name;
 
     @Column(nullable = false)
@@ -43,6 +43,7 @@ public class User implements Serializable {
 
     @Column
     @Temporal(TemporalType.TIMESTAMP)
+    @Getter
     @Setter
     private Date lastLogin;
 
@@ -58,7 +59,7 @@ public class User implements Serializable {
             return false;
         }
         User otherUser = (User) other;
-        return id.equals(otherUser.getId());
+        return id.equals(otherUser.id);
     }
 
     public String getProfileUrl() {

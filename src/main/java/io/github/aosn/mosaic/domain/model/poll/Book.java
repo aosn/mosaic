@@ -19,7 +19,6 @@ import java.util.Objects;
  */
 @Entity
 @Table(name = "books")
-@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -33,12 +32,15 @@ public class Book implements Serializable {
     private Long id;
 
     @Column(nullable = false)
+    @Getter
     private Long issue;
 
     @Column(nullable = false)
+    @Getter
     private String url;
 
     @Transient // hand joining via IssueService
+    @Getter
     @Setter
     private GitHubIssue gitHubIssue;
 
@@ -49,6 +51,7 @@ public class Book implements Serializable {
      * @see io.github.aosn.mosaic.domain.service.issue.IssueService#resolveBooks(Poll)
      */
     @Transient
+    @Getter
     @Setter
     private int votes;
 
@@ -64,7 +67,7 @@ public class Book implements Serializable {
             return false;
         }
         Book otherBook = (Book) other;
-        return id.equals(otherBook.getId());
+        return id.equals(otherBook.id);
     }
 
     @Override

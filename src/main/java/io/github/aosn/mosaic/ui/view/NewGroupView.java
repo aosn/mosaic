@@ -97,7 +97,7 @@ public class NewGroupView extends CustomComponent implements View {
                     labelFilterField.getValue(), userService.getUser());
             try {
                 pollService.addGroup(group);
-                Notifications.showNormal(i18n.get("new-group.notification.add.success"));
+                Notifications.showSuccess(i18n.get("new-group.notification.add.success"));
                 getUI().getNavigator().navigateTo(NewPollView.VIEW_NAME);
             } catch (IllegalArgumentException ex) {
                 Notifications.showWarning(ex.getMessage());

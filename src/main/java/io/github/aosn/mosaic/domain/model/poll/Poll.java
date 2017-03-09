@@ -31,7 +31,6 @@ import java.util.stream.Collectors;
  */
 @Entity
 @Table(name = "polls")
-@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -43,47 +42,57 @@ public class Poll implements Serializable {
     @Id
     @Column
     @GeneratedValue
+    @Getter
     private Long id;
 
     @Column(nullable = false)
+    @Getter
     private String subject;
 
     @JoinColumn(nullable = false)
     @ManyToOne
+    @Getter
     private User owner;
 
     @Column(nullable = false)
     @Enumerated(EnumType.ORDINAL)
+    @Getter
     @Setter
     private PollState state;
 
     @Column
     @Temporal(TemporalType.DATE)
+    @Getter
     private Date begin;
 
     @Column
     @Temporal(TemporalType.DATE)
+    @Getter
     @Setter
     private Date end;
 
     @Column(nullable = false)
+    @Getter
     private Integer doubles;
 
     @JoinColumn
     @ManyToMany(cascade = CascadeType.ALL)
     @LazyCollection(LazyCollectionOption.FALSE)
+    @Getter
     @Setter
     private List<Book> books;
 
     @JoinColumn
     @OneToMany(cascade = CascadeType.ALL)
     @LazyCollection(LazyCollectionOption.FALSE)
+    @Getter
     @Setter
     private List<Vote> votes;
 
     @JoinColumn
     @OneToOne
     @NotFound(action = NotFoundAction.IGNORE)
+    @Getter
     @Setter
     @Nullable
     private Book winBook;
@@ -96,6 +105,7 @@ public class Poll implements Serializable {
     @JoinColumns({@JoinColumn(name = "organization"), @JoinColumn(name = "repository")})
     @ManyToOne
     @NotFound(action = NotFoundAction.IGNORE)
+    @Getter
     @Setter
     @Nullable
     private Group group;

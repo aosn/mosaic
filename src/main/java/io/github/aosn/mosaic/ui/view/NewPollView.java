@@ -213,7 +213,7 @@ public class NewPollView extends CustomComponent implements View {
                 if (notifyCheck.getValue()) {
                     notificationService.notifyCreatePoll(poll);
                 }
-                Notifications.showNormal(i18n.get("new.notification.poll.created"));
+                Notifications.showSuccess(i18n.get("new.notification.poll.created"));
                 getUI().getNavigator().navigateTo(FrontView.VIEW_NAME);
             } catch (RuntimeException ex) {
                 ErrorView.show(i18n.get("new.error.poll.create.failed"), ex);

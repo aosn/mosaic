@@ -1,3 +1,6 @@
+/*
+ * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ */
 package io.github.aosn.mosaic.ui.view.layout;
 
 import com.vaadin.ui.Alignment;
@@ -10,6 +13,8 @@ import io.github.aosn.mosaic.domain.service.auth.UserService;
 import org.vaadin.spring.i18n.I18N;
 
 /**
+ * Root layout for general views.
+ *
  * @author mikan
  * @since 0.1
  */
