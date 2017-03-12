@@ -3,6 +3,7 @@
  */
 package io.github.aosn.mosaic.config;
 
+import io.github.aosn.mosaic.controller.CatalogController;
 import io.github.aosn.mosaic.domain.model.auth.User;
 import io.github.aosn.mosaic.domain.service.auth.UserService;
 import io.github.aosn.mosaic.ui.ErrorUI;
@@ -71,6 +72,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.formLogin().disable();
         http.authorizeRequests()
                 .antMatchers(MainUI.PATH, ErrorUI.PATH, CSS_PATH, LOGIN_PATH_GITHUB).permitAll()
+                .antMatchers(CatalogController.CATALOG_ENDPOINT).permitAll()
                 .antMatchers(V_PATH_PREFIX + "/**", "/vaadinServlet/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
