@@ -8,7 +8,10 @@ import io.github.aosn.mosaic.domain.model.stock.Stock;
 import io.github.aosn.mosaic.domain.service.catalog.CatalogService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.Collections;
@@ -30,7 +33,7 @@ public class CatalogController {
         this.catalogService = catalogService;
     }
 
-    @RequestMapping(value = CATALOG_ENDPOINT, method = RequestMethod.GET)
+    @GetMapping(value = CATALOG_ENDPOINT)
     @ResponseBody
     public List<ReleasedBook> findBooks(@RequestParam("q") String keyword, HttpServletResponse response) {
         try {

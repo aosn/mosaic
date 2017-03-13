@@ -7,8 +7,7 @@ import io.github.aosn.mosaic.domain.model.stock.Stock;
 import io.github.aosn.mosaic.domain.service.stock.StockService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,7 +28,7 @@ public class BookController {
         this.stockService = stockService;
     }
 
-    @RequestMapping(value = "/book", method = RequestMethod.POST)
+    @PostMapping(value = "/book")
     @ResponseBody
     public void addBook(Stock stock, HttpServletResponse response) {
         try {
