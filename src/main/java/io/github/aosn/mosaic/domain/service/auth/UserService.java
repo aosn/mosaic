@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.domain.service.auth;
 
@@ -96,5 +96,15 @@ public class UserService {
      */
     public String getNewIssueUrl(Group group) {
         return issueRepository.getNewIssueUrl(group);
+    }
+
+    /**
+     * Count number of users registered.
+     *
+     * @return number of users
+     * @since 0.3
+     */
+    public long countUsers() {
+        return userRepository.count();
     }
 }

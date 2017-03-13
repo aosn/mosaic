@@ -41,5 +41,6 @@ public class VisibilityIndicator extends HorizontalLayout {
         }
         addComponents(icon, caption);
         setSpacing(true);
+        setMargin(false);
     }
 }

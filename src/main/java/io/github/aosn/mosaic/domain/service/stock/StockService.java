@@ -75,4 +75,14 @@ public class StockService {
         }
         stockRepository.saveAndFlush(stock);
     }
+
+    /**
+     * Count number of stocks registered.
+     *
+     * @return number of stocks
+     * @since 0.3
+     */
+    public long countStocks() {
+        return stockRepository.count();
+    }
 }
