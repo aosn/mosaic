@@ -31,10 +31,10 @@ import java.util.stream.Collectors;
  */
 @Entity
 @Table(name = "polls")
-@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
 public class Poll implements Serializable {
 
     private static final long serialVersionUID = MosaicApplication.MOSAIC_SERIAL_VERSION_UID;
@@ -42,48 +42,57 @@ public class Poll implements Serializable {
     @Id
     @Column
     @GeneratedValue
+    @Getter
     private Long id;
 
     @Column(nullable = false)
+    @Getter
     private String subject;
 
     @JoinColumn(nullable = false)
     @ManyToOne
+    @Getter
     private User owner;
 
     @Column(nullable = false)
     @Enumerated(EnumType.ORDINAL)
+    @Getter
     @Setter
     private PollState state;
 
     @Column
     @Temporal(TemporalType.DATE)
+    @Getter
     private Date begin;
 
     @Column
     @Temporal(TemporalType.DATE)
+    @Getter
     @Setter
     private Date end;
 
     @Column(nullable = false)
+    @Getter
     private Integer doubles;
 
     @JoinColumn
     @ManyToMany(cascade = CascadeType.ALL)
     @LazyCollection(LazyCollectionOption.FALSE)
+    @Getter
     @Setter
     private List<Book> books;
 
-    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     @JoinColumn
     @OneToMany(cascade = CascadeType.ALL)
     @LazyCollection(LazyCollectionOption.FALSE)
+    @Getter
     @Setter
     private List<Vote> votes;
 
     @JoinColumn
     @OneToOne
     @NotFound(action = NotFoundAction.IGNORE)
+    @Getter
     @Setter
     @Nullable
     private Book winBook;
@@ -96,6 +105,7 @@ public class Poll implements Serializable {
     @JoinColumns({@JoinColumn(name = "organization"), @JoinColumn(name = "repository")})
     @ManyToOne
     @NotFound(action = NotFoundAction.IGNORE)
+    @Getter
     @Setter
     @Nullable
     private Group group;
@@ -138,9 +148,45 @@ public class Poll implements Serializable {
         return state == PollState.CLOSED;
     }
 
+    public List<User> getVoters() {
+        return votes.stream().map(Vote::getUser).distinct().collect(Collectors.toList());
+    }
+
+    /**
+     * Calculate the popularity rate by book.
+     *
+     * @param book book for rate
+     * @return popularity rate, or zero if no votes in this poll
+     */
+    public PopularityRate calcPopularityRate(Book book) {
+        if (book == null || !books.contains(book)) {
+            return new PopularityRate(0, 0);
+        }
+        return new PopularityRate(book.getVotes(), getVoters().size());
+    }
+
     public enum PollState {
-        PRE_OPEN,
+        @SuppressWarnings("unused")PRE_OPEN, // currently unused yet
         OPEN,
         CLOSED
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class PopularityRate {
+        private final int votes;
+        private final int voters;
+
+        double getRate() {
+            if (votes == 0) {
+                return 0;
+            }
+            return (double) votes / voters;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%.1f%% (%d/%d)", getRate() * 100, votes, voters);
+        }
     }
 }

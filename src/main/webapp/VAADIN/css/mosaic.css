@@ -32,7 +32,6 @@
 }
 
 .content-pane {
-    width: 100%;
     max-width: 600px;
     padding-bottom: 5px;
 }
@@ -69,6 +68,27 @@
     border-radius: 0.3em;
     width: 1.5em;
     height: 1.5em;
+}
+
+.book-not-started {
+    border-radius: 0.3em;
+    background-color: dimgray;
+    color: white;
+    padding: 3px;
+}
+
+.book-in-progress {
+    border-radius: 0.3em;
+    background-color: indianred;
+    color: white;
+    padding: 3px;
+}
+
+.book-completed {
+    border-radius: 0.3em;
+    background-color: forestgreen;
+    color: white;
+    padding: 3px;
 }
 
 .error-label {

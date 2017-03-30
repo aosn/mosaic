@@ -3,8 +3,8 @@
  */
 package io.github.aosn.mosaic.ui.view.component;
 
-import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.themes.ValoTheme;
 import io.github.aosn.mosaic.MosaicApplication;
 import org.vaadin.spring.i18n.I18N;
 
@@ -19,7 +19,6 @@ public class LoginRequiredLabel extends Label {
 
     public LoginRequiredLabel(I18N i18n) {
         setValue(i18n.get("common.caption.login.required"));
-        setIcon(FontAwesome.WARNING);
-        setCaption(i18n.get("common.caption.warning"));
+        setStyleName(ValoTheme.LABEL_FAILURE);
     }
 }

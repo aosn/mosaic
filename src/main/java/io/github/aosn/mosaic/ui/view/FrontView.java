@@ -69,28 +69,30 @@ public class FrontView extends CustomComponent implements View {
             open = openAndClosed.getOrDefault(Poll.PollState.OPEN, Collections.emptyList());
             closed = openAndClosed.getOrDefault(Poll.PollState.CLOSED, Collections.emptyList());
         } catch (RuntimeException e) {
-            log.error("getOpeningPolls: ", e);
+            log.error("getOpenPolls: ", e);
             open = Collections.emptyList();
             closed = Collections.emptyList();
         }
 
-        // Opening Polls
+        // Open polls section
         if (open.isEmpty()) {
             Label label = new Label(FontAwesome.INFO_CIRCLE.getHtml() + " " +
                     i18n.get("front.label.poll.open.empty"), ContentMode.HTML);
             contentPane.addComponent(label);
             contentPane.setComponentAlignment(label, Alignment.MIDDLE_CENTER);
         } else {
+            // Display open polls
             contentPane.addComponent(new PollTable(i18n.get("front.caption.poll.open"), OPENING, open, i18n));
         }
 
-        // Closed Polls
+        // Closed polls section
         if (closed.isEmpty()) {
             Label label = new Label(FontAwesome.INFO_CIRCLE.getHtml() + " " +
                     i18n.get("front.label.poll.closed.empty"), ContentMode.HTML);
             contentPane.addComponent(label);
             contentPane.setComponentAlignment(label, Alignment.MIDDLE_CENTER);
         } else {
+            // Display closed polls
             contentPane.addComponent(new PollTable(i18n.get("front.caption.poll.closed"), CLOSED, closed, i18n));
         }
 

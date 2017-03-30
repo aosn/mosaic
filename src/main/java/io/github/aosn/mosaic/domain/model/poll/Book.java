@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.domain.model.poll;
 
@@ -19,7 +19,6 @@ import java.util.Objects;
  */
 @Entity
 @Table(name = "books")
-@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -33,16 +32,26 @@ public class Book implements Serializable {
     private Long id;
 
     @Column(nullable = false)
+    @Getter
     private Long issue;
 
     @Column(nullable = false)
+    @Getter
     private String url;
 
     @Transient // hand joining via IssueService
+    @Getter
     @Setter
     private GitHubIssue gitHubIssue;
 
+    /**
+     * Cached number of votes.
+     * This field is excluded from database table.
+     *
+     * @see io.github.aosn.mosaic.domain.service.issue.IssueService#resolveBooks(Poll)
+     */
     @Transient
+    @Getter
     @Setter
     private int votes;
 
@@ -58,7 +67,7 @@ public class Book implements Serializable {
             return false;
         }
         Book otherBook = (Book) other;
-        return id.equals(otherBook.getId());
+        return id.equals(otherBook.id);
     }
 
     @Override

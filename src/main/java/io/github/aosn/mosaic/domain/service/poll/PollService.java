@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.domain.service.poll;
 
@@ -192,5 +192,25 @@ public class PollService {
         }
         groupRepository.saveAndFlush(group);
         log.info("Group added: " + group);
+    }
+
+    /**
+     * Count number of polls registered.
+     *
+     * @return number of polls
+     * @since 0.3
+     */
+    public long countPolls() {
+        return pollRepository.count();
+    }
+
+    /**
+     * Count number of groups registered.
+     *
+     * @return number of groups
+     * @since 0.3
+     */
+    public long countGroups() {
+        return groupRepository.count();
     }
 }

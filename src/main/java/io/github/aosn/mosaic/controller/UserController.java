@@ -8,8 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,7 +27,7 @@ public class UserController {
 
     public static final String LOGOUT_PATH = "/logout";
 
-    @RequestMapping({"/user", "/me"})
+    @GetMapping(value = {"/user", "/me"})
     public Map<String, String> user(Principal principal) {
         log.info("user(" + principal + ")");
         Map<String, String> map = new LinkedHashMap<>();
@@ -36,7 +35,7 @@ public class UserController {
         return map;
     }
 
-    @RequestMapping(value = LOGOUT_PATH, method = RequestMethod.GET)
+    @GetMapping(value = LOGOUT_PATH)
     public String logoutPage(HttpServletRequest request, HttpServletResponse response) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null) {

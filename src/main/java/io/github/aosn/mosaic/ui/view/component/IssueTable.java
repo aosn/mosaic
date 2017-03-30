@@ -37,7 +37,7 @@ public class IssueTable extends Table {
     private static final long serialVersionUID = MosaicApplication.MOSAIC_SERIAL_VERSION_UID;
 
     public IssueTable(String caption, ColumnGroup columnGroup, List<Row> rows, I18N i18n) {
-        super(caption, new BeanItemContainer<>(IssueTable.Row.class, rows));
+        super(caption, new BeanItemContainer<>(Row.class, rows));
         setPageLength(0);
         setColumnHeader("checkBox", i18n.get("new.column.select"));
         setColumnHeader("title", i18n.get("new.column.title"));
@@ -84,7 +84,7 @@ public class IssueTable extends Table {
 
         public static Row from(Book entity, @Nullable Predicate<GitHubLabel> partFilter,
                                @Nullable UnaryOperator<String> labelTrimmer) {
-            String titleText = "#" + entity.getId() + " " + entity.getGitHubIssue().getTitle();
+            String titleText = "#" + entity.getGitHubIssue().getId() + " " + entity.getGitHubIssue().getTitle();
             Label title = new Label(createAnchor(entity.getUrl(), titleText), ContentMode.HTML);
             title.setStyleName(Style.LINK.className());
             title.setDescription(markdownToHtml(entity.getGitHubIssue().getBody()));

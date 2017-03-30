@@ -9,9 +9,11 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.UI;
+import com.vaadin.ui.themes.ValoTheme;
 import io.github.aosn.mosaic.MosaicApplication;
 import io.github.aosn.mosaic.domain.model.auth.User;
 import io.github.aosn.mosaic.domain.model.poll.Poll;
+import io.github.aosn.mosaic.domain.model.poll.Vote;
 import io.github.aosn.mosaic.ui.view.PollResultView;
 import io.github.aosn.mosaic.ui.view.PollingView;
 import io.github.aosn.mosaic.ui.view.style.Style;
@@ -108,6 +110,9 @@ public class PollTable extends Table {
                     VaadinSession.getCurrent().setAttribute(PollingView.ATTR_POLL_ID, pollId);
                     UI.getCurrent().getNavigator().navigateTo(PollingView.VIEW_NAME);
                 });
+                if (user != null) {
+                    voteOrProgressButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
+                }
             }
 
             // Result button
@@ -122,7 +127,7 @@ public class PollTable extends Table {
 
             // Votes count
             int votes = entity.getVotes() == null ? 0 : Math.toIntExact(entity.getVotes().stream()
-                    .map(v -> v.getUser().getId()).distinct().count());
+                    .map(Vote::getUser).distinct().count());
 
             // Build
             return Row.builder()

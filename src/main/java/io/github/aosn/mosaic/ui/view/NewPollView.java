@@ -35,6 +35,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.i18n.I18N;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -127,12 +129,12 @@ public class NewPollView extends CustomComponent implements View {
         form.addComponent(subject);
 
         DateField closeDate = new DateField(i18n.get("new.caption.close.date"));
-        Date now = new Date();
+        LocalDate now = LocalDate.now();
         closeDate.setRequired(true);
-        closeDate.setRangeStart(now);
+        closeDate.setRangeStart(Date.from(now.atStartOfDay(ZoneId.systemDefault()).toInstant()));
         closeDate.setResolution(Resolution.DAY);
         closeDate.setDateOutOfRangeMessage(i18n.get("common.validator.date.range.over"));
-        closeDate.setValue(now);
+        closeDate.setValue(Date.from(now.plusWeeks(1).atStartOfDay(ZoneId.systemDefault()).toInstant()));
         form.addComponent(closeDate);
 
         ComboBox votesSelect = new ComboBox(i18n.get("new.caption.doubles"));
@@ -200,7 +202,7 @@ public class NewPollView extends CustomComponent implements View {
                         .subject(subject.getValue())
                         .owner(userService.getUser())
                         .state(Poll.PollState.OPEN)
-                        .begin(now)
+                        .begin(Date.from(now.atStartOfDay(ZoneId.systemDefault()).toInstant()))
                         .end(closeDate.getValue())
                         .doubles(doubles)
                         .books(books)
@@ -211,7 +213,7 @@ public class NewPollView extends CustomComponent implements View {
                 if (notifyCheck.getValue()) {
                     notificationService.notifyCreatePoll(poll);
                 }
-                Notifications.showNormal(i18n.get("new.notification.poll.created"));
+                Notifications.showSuccess(i18n.get("new.notification.poll.created"));
                 getUI().getNavigator().navigateTo(FrontView.VIEW_NAME);
             } catch (RuntimeException ex) {
                 ErrorView.show(i18n.get("new.error.poll.create.failed"), ex);

@@ -1,8 +1,9 @@
 /*
- * Copyright (C) 2016 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.config;
 
+import io.github.aosn.mosaic.controller.CatalogController;
 import io.github.aosn.mosaic.domain.model.auth.User;
 import io.github.aosn.mosaic.domain.service.auth.UserService;
 import io.github.aosn.mosaic.ui.ErrorUI;
@@ -52,6 +53,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     public static final String LOGIN_PATH_GITHUB = "/login/github";
     public static final String CSS_PATH = "/css/mosaic.css";
+    public static final String NO_IMAGE_PATH = "/img/no-image.png\"";
+    public static final String V_PATH_PREFIX = "/VAADIN";
     private final OAuth2ClientContext oauth2ClientContext;
     private final UserService userService;
 
@@ -69,7 +72,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.formLogin().disable();
         http.authorizeRequests()
                 .antMatchers(MainUI.PATH, ErrorUI.PATH, CSS_PATH, LOGIN_PATH_GITHUB).permitAll()
-                .antMatchers("/VAADIN/**", "/vaadinServlet/**").permitAll()
+                .antMatchers(CatalogController.CATALOG_ENDPOINT).permitAll()
+                .antMatchers(V_PATH_PREFIX + "/**", "/vaadinServlet/**").permitAll()
+                .antMatchers("/swagger-ui.html", "/swagger-resources/**", "/webjars/**", "/v2/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling().authenticationEntryPoint(loginPage()).accessDeniedPage(MainUI.PATH)

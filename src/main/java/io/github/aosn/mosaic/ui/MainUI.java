@@ -6,6 +6,7 @@ package io.github.aosn.mosaic.ui;
 import com.vaadin.annotations.StyleSheet;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
+import com.vaadin.annotations.Viewport;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinService;
@@ -29,6 +30,7 @@ import org.vaadin.spring.i18n.I18N;
 @Theme("valo")
 @Title(MosaicApplication.DEFAULT_TITLE)
 @StyleSheet(value = "vaadin:/" + SecurityConfig.CSS_PATH)
+@Viewport("user-scalable=no,initial-scale=1.0")
 public class MainUI extends UI {
 
     public static final String PATH = "/";

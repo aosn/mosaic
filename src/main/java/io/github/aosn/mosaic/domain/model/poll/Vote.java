@@ -19,7 +19,6 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "votes")
-@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -35,14 +34,17 @@ public class Vote implements Serializable {
 
     @Column(nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
+    @Getter
     private Date date;
 
     @JoinColumn(nullable = false)
     @ManyToOne
+    @Getter
     private User user;
 
     @JoinColumn(nullable = false)
     @ManyToOne
+    @Getter
     private Book book;
 
     @JoinColumn(nullable = false)
