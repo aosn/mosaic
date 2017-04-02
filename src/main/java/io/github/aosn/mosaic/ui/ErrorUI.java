@@ -28,7 +28,7 @@ import org.vaadin.spring.i18n.I18N;
 @Theme(ValoTheme.THEME_NAME)
 @Title(MosaicApplication.DEFAULT_TITLE)
 @StyleSheet(value = "vaadin:/" + SecurityConfig.CSS_PATH)
-@Viewport("width=500,initial-scale=1.0")
+@Viewport("user-scalable=no,width=500")
 @Widgetset("com.vaadin.v7.Vaadin7WidgetSet")
 public class ErrorUI extends UI {
 

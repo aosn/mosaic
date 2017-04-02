@@ -24,6 +24,7 @@
 .copyright {
     font-size: 75%;
     padding-top: 15px;
+    padding-bottom: 10px;
 }
 
 .polls-table {
@@ -104,5 +105,5 @@
 /* Vaadin overrides */
 
 td.v-table-cell-content {
-    max-width: 350px;
+    max-width: 300px;
 }

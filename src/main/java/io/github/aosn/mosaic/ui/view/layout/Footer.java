@@ -23,6 +23,7 @@ class Footer extends VerticalLayout {
     private static final long serialVersionUID = MosaicApplication.MOSAIC_SERIAL_VERSION_UID;
 
     Footer(I18N i18n) {
+        setMargin(false);
         String copyright = i18n.get("footer.copyright").replace("%d", String.valueOf(LocalDate.now().getYear()))
                 .replace("%s", "<a href=\"" + i18n.get("footer.organization.url") +
                         "\" style=\"text-decoration:none;\">" + i18n.get("footer.organization") + "</a>");

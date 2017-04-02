@@ -30,6 +30,7 @@ class Header extends VerticalLayout {
 
     Header(I18N i18n, UserService userService, Group group) {
         setSpacing(true);
+        setMargin(false);
 
         // Logo
         Image logo = new Image(null, new ExternalResource("/VAADIN/img/logo.png"));
@@ -71,6 +72,7 @@ class Header extends VerticalLayout {
         } else {
             // Welcome label
             Label welcomeLabel = new Label(i18n.get("header.label.login"));
+            welcomeLabel.setStyleName(ValoTheme.LABEL_TINY);
 
             // Login button
             Button loginButton = new Button(i18n.get("header.button.login.github"),
