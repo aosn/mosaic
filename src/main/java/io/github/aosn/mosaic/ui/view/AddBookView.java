@@ -3,6 +3,7 @@
  */
 package io.github.aosn.mosaic.ui.view;
 
+import com.google.common.base.Strings;
 import com.vaadin.data.Binder;
 import com.vaadin.data.ValidationResult;
 import com.vaadin.data.converter.StringToIntegerConverter;
@@ -11,7 +12,6 @@ import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.ExternalResource;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
@@ -19,6 +19,7 @@ import io.github.aosn.mosaic.MosaicApplication;
 import io.github.aosn.mosaic.domain.model.catalog.ReleasedBook;
 import io.github.aosn.mosaic.domain.model.stock.Stock;
 import io.github.aosn.mosaic.domain.service.auth.UserService;
+import io.github.aosn.mosaic.domain.service.catalog.CatalogService;
 import io.github.aosn.mosaic.domain.service.poll.PollService;
 import io.github.aosn.mosaic.domain.service.stock.StockService;
 import io.github.aosn.mosaic.ui.MainUI;
@@ -31,13 +32,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.i18n.I18N;
 
 import java.time.LocalDate;
+import java.util.NoSuchElementException;
+import java.util.stream.Stream;
 
 /**
  * A {@link View} for adding a book.
- * <p>
- * <p>Required session parameter:</p>
+ * <p>Required path parameter:</p>
  * <ul>
- * <li>{@link #ATTR_BOOK_ADD} - A {@link ReleasedBook} object</li>
+ * <li>{@code /:isbn} - An ISBN number as {@link String}</li>
  * </ul>
  *
  * @author mikan
@@ -48,28 +50,53 @@ import java.time.LocalDate;
 public class AddBookView extends CustomComponent implements View {
 
     public static final String VIEW_NAME = "add-book";
-    public static final String ATTR_BOOK_ADD = "mosaic.book.add";
     private static final long serialVersionUID = MosaicApplication.MOSAIC_SERIAL_VERSION_UID;
     private transient final I18N i18n;
     private transient final UserService userService;
     private transient final PollService pollService;
     private transient final StockService stockService;
-    private final VaadinSession session;
+    private transient final CatalogService catalogService;
 
     @Autowired
-    public AddBookView(I18N i18n, UserService userService, PollService pollService, StockService stockService) {
+    public AddBookView(I18N i18n, UserService userService, PollService pollService, StockService stockService,
+                       CatalogService catalogService) {
         this.i18n = i18n;
         this.userService = userService;
         this.pollService = pollService;
         this.stockService = stockService;
-        session = VaadinSession.getCurrent();
+        this.catalogService = catalogService;
     }
 
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent event) {
-        ReleasedBook releasedBook = (ReleasedBook) session.getAttribute(ATTR_BOOK_ADD);
-        if (releasedBook == null) {
+
+        // Parse parameter
+        if (Strings.isNullOrEmpty(event.getParameters())) {
             ErrorView.show(i18n.get("common.error.parameter.missing"), null);
+            return;
+        }
+        String isbn;
+        try {
+            isbn = Stream.of(event.getParameters().split("/"))
+                    .findFirst().orElseThrow(NoSuchElementException::new);
+        } catch (RuntimeException e) {
+            ErrorView.show(i18n.get("common.error.parameter.missing"), e);
+            return;
+        }
+        try {
+            isbn = Stock.normalizeIsbn(isbn);
+        } catch (NullPointerException | IllegalArgumentException e) {
+            ErrorView.show(i18n.get("add-book.error.find.failed"), e);
+            return;
+        }
+
+        // Search API
+        ReleasedBook releasedBook;
+        try {
+            releasedBook = catalogService.searchByIsbn(isbn).stream()
+                    .findFirst().orElseThrow(NoSuchElementException::new);
+        } catch (RuntimeException e) {
+            ErrorView.show(i18n.get("add-book.error.find.failed"), e);
             return;
         }
         getUI().getPage().setTitle(i18n.get("header.label.title"));
@@ -203,7 +230,6 @@ public class AddBookView extends CustomComponent implements View {
 
             // Next
             Notifications.showSuccess(i18n.get("add-book.notification.add.success"));
-            session.setAttribute(ATTR_BOOK_ADD, null); // clear session attribute
             getUI().getNavigator().navigateTo(BooksView.VIEW_NAME);
         });
         submitButton.setIcon(VaadinIcons.CHECK);

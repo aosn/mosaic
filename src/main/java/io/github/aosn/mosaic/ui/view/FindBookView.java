@@ -6,9 +6,9 @@ package io.github.aosn.mosaic.ui.view;
 import com.google.common.base.Strings;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
-import com.vaadin.server.FontAwesome;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
@@ -98,7 +98,7 @@ public class FindBookView extends CustomComponent implements View {
             searchResultTable.setDataSource(searchResult);
             searchResultTable.setVisible(true);
         });
-        searchButton.setIcon(FontAwesome.SEARCH);
+        searchButton.setIcon(VaadinIcons.SEARCH);
         searchButton.setStyleName(ValoTheme.BUTTON_PRIMARY);
         contentPane.addComponent(searchButton);
 

@@ -3,9 +3,8 @@
  */
 package io.github.aosn.mosaic.ui.view.component;
 
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.ExternalResource;
-import com.vaadin.server.FontAwesome;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Image;
 import com.vaadin.ui.UI;
@@ -97,10 +96,9 @@ public class ReleasedBookTable extends Table {
 
         public static Row from(ReleasedBook entity) {
             Button selectButton = new Button();
-            selectButton.setIcon(FontAwesome.HAND_O_RIGHT);
+            selectButton.setIcon(VaadinIcons.CHEVRON_RIGHT);
             selectButton.addClickListener(e -> {
-                VaadinSession.getCurrent().setAttribute(AddBookView.ATTR_BOOK_ADD, entity);
-                UI.getCurrent().getNavigator().navigateTo(AddBookView.VIEW_NAME);
+                UI.getCurrent().getNavigator().navigateTo(AddBookView.VIEW_NAME + "/" + entity.getIsbn());
             });
             Image thumbnail = new Image(entity.getTitle(), new ExternalResource(entity.getThumbnailOrPlaceholder()));
             thumbnail.setWidth(70, Unit.PIXELS);
