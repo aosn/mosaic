@@ -3,7 +3,7 @@
  */
 package io.github.aosn.mosaic.ui.view.component;
 
-import com.vaadin.shared.data.sort.SortDirection;
+import com.vaadin.data.provider.GridSortOrderBuilder;
 import com.vaadin.ui.Grid;
 import io.github.aosn.mosaic.MosaicApplication;
 import io.github.aosn.mosaic.domain.model.poll.Vote;
@@ -20,19 +20,21 @@ import java.util.List;
  * @author mikan
  * @author 0.1
  */
-public class VoteTable extends Grid<VoteTable.Row> {
+public class VoteGrid extends Grid<VoteGrid.Row> {
 
     private static final long serialVersionUID = MosaicApplication.MOSAIC_SERIAL_VERSION_UID;
 
-    public VoteTable(String caption, List<Row> rows, I18N i18n) {
+    public VoteGrid(String caption, List<Row> rows, I18N i18n) {
         super(Row.class);
         setCaption(caption);
-        Column<Row, String> userColumn = addColumn(Row::getUser).setCaption(i18n.get("result.column.user"));
-        Column<Row, String> timeColumn = addColumn(Row::getTime).setCaption(i18n.get("result.column.timestamp"));
-        Column<Row, String> bookColumn = addColumn(Row::getBook).setCaption(i18n.get("result.column.book"));
-        //noinspection unchecked
-        setColumnOrder(userColumn, timeColumn, bookColumn);
-        sort(timeColumn, SortDirection.ASCENDING);
+        getColumn("user").setCaption(i18n.get("result.column.user"));
+        getColumn("time").setCaption(i18n.get("result.column.timestamp"));
+        getColumn("book").setCaption(i18n.get("result.column.book"));
+        setColumnOrder("user", "time", "book");
+        setSortOrder(new GridSortOrderBuilder<Row>().thenDesc(getColumn("time")));
+        setWidth(100, Unit.PERCENTAGE);
+        setHeightByRows(rows.size());
+        setItems(rows);
     }
 
     /**

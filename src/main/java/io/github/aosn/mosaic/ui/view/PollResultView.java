@@ -201,8 +201,8 @@ public class PollResultView extends CustomComponent implements View {
                 closeButton.setDescription(i18n.get("polling.error.closed"));
             }
 
-            contentPane.addComponent(new VoteTable(i18n.get("result.caption.votes"), poll.getVotes().stream()
-                    .map(VoteTable.Row::from).collect(Collectors.toList()), i18n));
+            contentPane.addComponent(new VoteGrid(i18n.get("result.caption.votes"), poll.getVotes().stream()
+                    .map(VoteGrid.Row::from).collect(Collectors.toList()), i18n));
         }
 
         return contentPane;
