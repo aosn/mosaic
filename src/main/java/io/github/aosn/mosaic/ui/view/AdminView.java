@@ -3,9 +3,9 @@
  */
 package io.github.aosn.mosaic.ui.view;
 
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
-import com.vaadin.server.FontAwesome;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.*;
 import io.github.aosn.mosaic.MosaicApplication;
@@ -66,7 +66,7 @@ public class AdminView extends CustomComponent implements View {
 
         FormLayout info = new FormLayout();
         info.setCaption("Application information");
-        info.setIcon(FontAwesome.INFO_CIRCLE);
+        info.setIcon(VaadinIcons.INFO_CIRCLE);
         contentPane.addComponent(info);
 
         info.addComponent(createFormEntry("App version", "Mosaic " + MosaicApplication.MOSAIC_VERSION));
@@ -76,7 +76,7 @@ public class AdminView extends CustomComponent implements View {
 
         FormLayout stats = new FormLayout();
         stats.setCaption("Statistics");
-        stats.setIcon(FontAwesome.LINE_CHART);
+        stats.setIcon(VaadinIcons.LINE_CHART);
         contentPane.addComponent(stats);
 
         Runtime runtime = Runtime.getRuntime();
@@ -93,11 +93,11 @@ public class AdminView extends CustomComponent implements View {
 
         Button newGroupButton = new Button("Create group",
                 e -> getUI().getNavigator().navigateTo(NewGroupView.VIEW_NAME));
-        newGroupButton.setIcon(FontAwesome.GROUP);
+        newGroupButton.setIcon(VaadinIcons.GROUP);
 
         Button apiDocsButton = new Button("API Docs",
                 e -> getUI().getPage().setLocation("/swagger-ui.html"));
-        apiDocsButton.setIcon(FontAwesome.PUZZLE_PIECE);
+        apiDocsButton.setIcon(VaadinIcons.PUZZLE_PIECE);
 
         HorizontalLayout buttonArea = new HorizontalLayout(newGroupButton, apiDocsButton);
         buttonArea.setSpacing(true);

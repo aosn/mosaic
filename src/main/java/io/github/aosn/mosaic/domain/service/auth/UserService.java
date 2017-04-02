@@ -72,12 +72,12 @@ public class UserService {
 
     @Nullable
     public User getUser() {
-        // Get from current session
+        // Get create current session
         User user = sessionRepository.getUser();
         if (user != null) {
             return user;
         }
-        // Get from DB when nothing in session
+        // Get create DB when nothing in session
         try {
             user = userRepository.findByNameAndSource(getName(), User.Source.GITHUB);
             sessionRepository.setUser(user);

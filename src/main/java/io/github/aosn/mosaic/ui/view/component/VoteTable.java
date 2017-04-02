@@ -3,8 +3,8 @@
  */
 package io.github.aosn.mosaic.ui.view.component;
 
-import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.ui.Table;
+import com.vaadin.v7.data.util.BeanItemContainer;
+import com.vaadin.v7.ui.Table;
 import io.github.aosn.mosaic.MosaicApplication;
 import io.github.aosn.mosaic.domain.model.poll.Vote;
 import lombok.Builder;

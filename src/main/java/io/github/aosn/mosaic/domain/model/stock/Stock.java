@@ -13,6 +13,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import javax.persistence.*;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -83,14 +84,12 @@ public class Stock implements ReleasedBook {
     @Temporal(TemporalType.DATE)
     @Nullable
     @Getter
-    @Setter
     private Date obtainDate;
 
     @Column
     @Temporal(TemporalType.DATE)
     @Nullable
     @Getter
-    @Setter
     private Date completedDate;
 
     @Column
@@ -154,6 +153,35 @@ public class Stock implements ReleasedBook {
     private Date updatedTime;
 
     /**
+     * Construct stock with {@link ReleasedBook}.
+     *
+     * @param owner owner user
+     * @param book  released book
+     * @return stock
+     * @since 0.4
+     */
+    public static Stock create(User owner, ReleasedBook book) {
+        Date now = new Date();
+        Stock stock = new Stock();
+        stock.user = owner;
+        stock.isbn = book.getIsbn();
+        stock.title = book.getTitle();
+        stock.subtitle = book.getSubtitle();
+        stock.publishedDate = book.getPublishedDate();
+        stock.thumbnailUrl = book.getThumbnailUrl();
+        stock.pageCount = book.getPageCount();
+        stock.visibility = Visibility.PUBLIC;
+        stock.progress = 0;
+        stock.obtainType = ObtainType.BUY;
+        stock.mediaType = book.isEBook() ? MediaType.OTHER : MediaType.PAPER;
+        stock.shortText = "";
+        stock.longText = "";
+        stock.createdTime = now;
+        stock.updatedTime = now;
+        return stock;
+    }
+
+    /**
      * Checks value for acceptable published date.
      *
      * @param value accepts yyyy-mm-dd, yyyy-mm, or yyyy
@@ -202,6 +230,12 @@ public class Stock implements ReleasedBook {
         }
     }
 
+    public void setProgress(Progress progress) {
+        if (getProgress() != progress) {
+            this.progress = progress.actualValue;
+        }
+    }
+
     public void setProgressPercentage(int percentage) {
         if (percentage < 0 || percentage > 100) {
             throw new IllegalArgumentException("percentage accepts 0~100");
@@ -211,6 +245,46 @@ public class Stock implements ReleasedBook {
 
     public int getProgressPercentage() {
         return progress;
+    }
+
+    /**
+     * Get obtain date as {@link LocalDate}.
+     *
+     * @return obtain date
+     * @since 0.4
+     */
+    public LocalDate getObtainDateAsLocalDate() {
+        return obtainDate == null ? null : new java.sql.Date(obtainDate.getTime()).toLocalDate();
+    }
+
+    /**
+     * Set obtain date by {@link LocalDate} object.
+     *
+     * @param localDate obtain date
+     * @since 0.4
+     */
+    public void setObtainDate(LocalDate localDate) {
+        obtainDate = localDate == null ? null : java.sql.Date.valueOf(localDate);
+    }
+
+    /**
+     * Get completed date as {@link LocalDate}.
+     *
+     * @return completed date
+     * @since 0.4
+     */
+    public LocalDate getCompletedDateAsLocalDate() {
+        return completedDate == null ? null : new java.sql.Date(completedDate.getTime()).toLocalDate();
+    }
+
+    /**
+     * Set completed date by {@link LocalDate} object.
+     *
+     * @param localDate completed date
+     * @since 0.4
+     */
+    public void setCompletedDate(LocalDate localDate) {
+        completedDate = localDate == null ? null : java.sql.Date.valueOf(localDate);
     }
 
     public void setPublishedDate(String date) {

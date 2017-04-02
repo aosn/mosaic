@@ -3,13 +3,13 @@
  */
 package io.github.aosn.mosaic.ui.view.component;
 
-import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Table;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
+import com.vaadin.v7.data.util.BeanItemContainer;
+import com.vaadin.v7.ui.Table;
 import io.github.aosn.mosaic.MosaicApplication;
 import io.github.aosn.mosaic.domain.model.auth.User;
 import io.github.aosn.mosaic.domain.model.poll.Poll;
@@ -77,7 +77,6 @@ public class PollTable extends Table {
      * Table row for {@link Poll} entity.
      *
      * @author mikan
-     * @see com.vaadin.data.util.BeanItemContainer
      * @since 0.1
      */
     @Getter

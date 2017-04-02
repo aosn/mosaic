@@ -14,10 +14,8 @@ import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.LongAdder;
@@ -47,6 +45,7 @@ public class Poll implements Serializable {
 
     @Column(nullable = false)
     @Getter
+    @Setter
     private String subject;
 
     @JoinColumn(nullable = false)
@@ -68,11 +67,11 @@ public class Poll implements Serializable {
     @Column
     @Temporal(TemporalType.DATE)
     @Getter
-    @Setter
     private Date end;
 
     @Column(nullable = false)
     @Getter
+    @Setter
     private Integer doubles;
 
     @JoinColumn
@@ -109,6 +108,24 @@ public class Poll implements Serializable {
     @Setter
     @Nullable
     private Group group;
+
+    /**
+     * Construct new poll.
+     *
+     * @param owner owner user
+     * @return poll
+     * @since 0.4
+     */
+    public static Poll create(User owner, LocalDate now) {
+        Poll poll = new Poll();
+        poll.owner = owner;
+        poll.state = Poll.PollState.OPEN;
+        poll.begin = java.sql.Date.valueOf(now);
+        poll.setEnd(now.plusDays(1));
+        poll.doubles = 2;
+        poll.votes = Collections.emptyList();
+        return poll;
+    }
 
     public Book judgeWinner() {
         Map<Book, Integer> votesMap = new HashMap<>();
@@ -163,6 +180,26 @@ public class Poll implements Serializable {
             return new PopularityRate(0, 0);
         }
         return new PopularityRate(book.getVotes(), getVoters().size());
+    }
+
+    /**
+     * Get end as {@link LocalDate}.
+     *
+     * @return end
+     * @since 0.4
+     */
+    public LocalDate getEndAsLocalDate() {
+        return new java.sql.Date(end.getTime()).toLocalDate();
+    }
+
+    /**
+     * Set end by {@link LocalDate}.
+     *
+     * @param end end
+     * @since 0.4
+     */
+    public void setEnd(LocalDate end) {
+        this.end = java.sql.Date.valueOf(end);
     }
 
     public enum PollState {

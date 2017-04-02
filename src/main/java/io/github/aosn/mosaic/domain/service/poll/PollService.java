@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -73,7 +74,7 @@ public class PollService {
                 .findFirst().orElseThrow(IllegalStateException::new);
         if (!group.equals(defaultGroup)) {
             // update record
-            log.info("Updating default group:\nfrom\t" + defaultGroup + "\nto\t" + group);
+            log.info("Updating default group:\ncreate\t" + defaultGroup + "\nto\t" + group);
             defaultGroup.replace(group);
             groupRepository.saveAndFlush(defaultGroup);
         }
@@ -150,7 +151,7 @@ public class PollService {
     public void close(Poll poll) {
         log.info("BEGIN close: " + poll);
         poll.setState(Poll.PollState.CLOSED);
-        poll.setEnd(new Date());
+        poll.setEnd(LocalDate.now());
         poll.setWinBook(poll.judgeWinner());
         pollRepository.saveAndFlush(poll);
         log.info("END close: " + poll);

@@ -3,7 +3,7 @@
  */
 package io.github.aosn.mosaic.ui.view.component;
 
-import com.vaadin.server.FontAwesome;
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.themes.ValoTheme;
@@ -26,7 +26,7 @@ public class BulkSelector extends HorizontalLayout {
         // Select all
         Button selectAllButton = new Button(i18n.get("common.button.bulk.select.all"),
                 e -> rows.forEach(r -> r.getCheckBox().setValue(true)));
-        selectAllButton.setIcon(FontAwesome.CHECK_SQUARE_O);
+        selectAllButton.setIcon(VaadinIcons.CHECK_SQUARE_O);
         selectAllButton.setStyleName(ValoTheme.BUTTON_TINY);
         addComponent(selectAllButton);
 
@@ -34,8 +34,8 @@ public class BulkSelector extends HorizontalLayout {
         rows.stream().map(r -> r.getCategory().getValue()).distinct().sorted().forEach(p -> {
             Button partButton = new Button(String.format(i18n.get("common.button.bulk.select.part"), p),
                     e -> rows.forEach(r -> r.getCheckBox().setValue(r.getCategory().getValue().equals(p))));
-            partButton.setHtmlContentAllowed(true);
-            partButton.setIcon(FontAwesome.CHECK_SQUARE_O);
+            partButton.setCaptionAsHtml(true);
+            partButton.setIcon(VaadinIcons.CHECK_SQUARE_O);
             partButton.setStyleName(ValoTheme.BUTTON_TINY);
             addComponent(partButton);
         });
@@ -43,7 +43,7 @@ public class BulkSelector extends HorizontalLayout {
         // Deselect all
         Button deselectAllButton = new Button(i18n.get("common.button.bulk.deselect.all"),
                 e -> rows.forEach(r -> r.getCheckBox().setValue(false)));
-        deselectAllButton.setIcon(FontAwesome.SQUARE_O);
+        deselectAllButton.setIcon(VaadinIcons.THIN_SQUARE);
         deselectAllButton.setStyleName(ValoTheme.BUTTON_TINY);
         addComponent(deselectAllButton);
     }

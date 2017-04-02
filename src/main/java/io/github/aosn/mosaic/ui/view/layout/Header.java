@@ -3,6 +3,7 @@
  */
 package io.github.aosn.mosaic.ui.view.layout;
 
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.*;
@@ -45,16 +46,24 @@ class Header extends VerticalLayout {
             String newIssueUrl = userService.getNewIssueUrl(group); // UserService isn't serializable
             Button newIssueButton = new Button(i18n.get("header.button.propose"),
                     e -> getUI().getPage().setLocation(newIssueUrl));
-            newIssueButton.setIcon(FontAwesome.LIGHTBULB_O);
+            newIssueButton.setIcon(VaadinIcons.LIGHTBULB);
 
             // Books button
             Button booksButton = new Button(i18n.get("header.button.stocks"),
                     e -> getUI().getNavigator().navigateTo(BooksView.VIEW_NAME));
-            booksButton.setIcon(FontAwesome.BOOK);
+            booksButton.setIcon(VaadinIcons.BOOK);
 
             // Logout button
             Button logoutButton = new Button(i18n.get("header.button.logout"),
                     e -> getUI().getPage().setLocation(UserController.LOGOUT_PATH));
+            logoutButton.setIcon(VaadinIcons.SIGN_OUT);
+
+            // Compaction for mobile device
+            if (UI.getCurrent().getPage().getWebBrowser().isTouchDevice()) {
+                newIssueButton.setCaption("");
+                booksButton.setCaption("");
+                logoutButton.setCaption("");
+            }
 
             // Wrap
             loginBar = new HorizontalLayout(iconAndName, newIssueButton, booksButton, logoutButton);

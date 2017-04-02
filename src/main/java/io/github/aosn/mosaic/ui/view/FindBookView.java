@@ -30,7 +30,7 @@ import org.vaadin.spring.i18n.I18N;
 import java.util.List;
 
 /**
- * Find book from the catalog for add to stock.
+ * Find book create the catalog for add to stock.
  *
  * @author mikan
  * @since 0.3

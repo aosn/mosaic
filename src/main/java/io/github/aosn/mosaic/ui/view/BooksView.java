@@ -3,10 +3,10 @@
  */
 package io.github.aosn.mosaic.ui.view;
 
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
-import com.vaadin.server.FontAwesome;
-import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
@@ -67,13 +67,13 @@ public class BooksView extends CustomComponent implements View {
 
         Button addBookButton = new Button(i18n.get("books.button.add"),
                 e -> getUI().getNavigator().navigateTo(FindBookView.VIEW_NAME));
-        addBookButton.setIcon(FontAwesome.PLUS);
+        addBookButton.setIcon(VaadinIcons.PLUS);
         addBookButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);
         contentPane.addComponent(addBookButton);
         contentPane.setComponentAlignment(addBookButton, Alignment.MIDDLE_RIGHT);
 
         if (stocks.isEmpty()) {
-            Label label = new Label(FontAwesome.INFO_CIRCLE.getHtml() + " " +
+            Label label = new Label(VaadinIcons.INFO_CIRCLE.getHtml() + " " +
                     i18n.get("books.label.empty"), ContentMode.HTML);
             contentPane.addComponent(label);
             contentPane.setComponentAlignment(label, Alignment.MIDDLE_CENTER);
