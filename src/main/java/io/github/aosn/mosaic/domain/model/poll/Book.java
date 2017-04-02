@@ -46,7 +46,7 @@ public class Book implements Serializable {
 
     /**
      * Cached number of votes.
-     * This field is excluded create database table.
+     * This field is excluded from database table.
      *
      * @see io.github.aosn.mosaic.domain.service.issue.IssueService#resolveBooks(Poll)
      */

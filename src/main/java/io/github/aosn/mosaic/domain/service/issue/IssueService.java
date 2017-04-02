@@ -45,7 +45,7 @@ public class IssueService {
     }
 
     /**
-     * Get all pollable issues create GitHub.
+     * Get all pollable issues from GitHub.
      *
      * @return {@link List} of GitHub issues
      * @throws IssueAccessException if GitHub API returns error
