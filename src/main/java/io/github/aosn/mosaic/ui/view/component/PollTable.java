@@ -3,7 +3,7 @@
  */
 package io.github.aosn.mosaic.ui.view.component;
 
-import com.vaadin.server.FontAwesome;
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.UI;
@@ -100,11 +100,11 @@ public class PollTable extends Table {
             // Start button or progress button
             Button voteOrProgressButton;
             if (entity.isVoted(user)) {
-                voteOrProgressButton = new Button(i18n.get("common.button.poll.progress"), FontAwesome.BAR_CHART);
+                voteOrProgressButton = new Button(i18n.get("common.button.poll.progress"), VaadinIcons.BAR_CHART);
                 voteOrProgressButton.addClickListener(e ->
                         UI.getCurrent().getNavigator().navigateTo(PollResultView.VIEW_NAME + "/" + pollId));
             } else {
-                voteOrProgressButton = new Button(i18n.get("common.button.poll.start"), FontAwesome.THUMBS_UP);
+                voteOrProgressButton = new Button(i18n.get("common.button.poll.start"), VaadinIcons.THUMBS_UP);
                 voteOrProgressButton.addClickListener(e -> {
                     VaadinSession.getCurrent().setAttribute(PollingView.ATTR_POLL_ID, pollId);
                     UI.getCurrent().getNavigator().navigateTo(PollingView.VIEW_NAME);
@@ -115,12 +115,12 @@ public class PollTable extends Table {
             }
 
             // Result button
-            Button resultButton = new Button(i18n.get("front.button.poll.result"), FontAwesome.BAR_CHART);
+            Button resultButton = new Button(i18n.get("front.button.poll.result"), VaadinIcons.BAR_CHART);
             resultButton.addClickListener(e ->
                     UI.getCurrent().getNavigator().navigateTo(PollResultView.VIEW_NAME + "/" + pollId));
 
             // Owner button
-            Button ownerButton = new Button(i18n.get("front.button.poll.review"), FontAwesome.LIST);
+            Button ownerButton = new Button(i18n.get("front.button.poll.review"), VaadinIcons.LIST);
             ownerButton.addClickListener(e ->
                     UI.getCurrent().getNavigator().navigateTo(PollResultView.VIEW_NAME + "/" + pollId));
 

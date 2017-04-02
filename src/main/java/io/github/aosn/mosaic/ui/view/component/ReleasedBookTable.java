@@ -97,9 +97,8 @@ public class ReleasedBookTable extends Table {
         public static Row from(ReleasedBook entity) {
             Button selectButton = new Button();
             selectButton.setIcon(VaadinIcons.CHEVRON_RIGHT);
-            selectButton.addClickListener(e -> {
-                UI.getCurrent().getNavigator().navigateTo(AddBookView.VIEW_NAME + "/" + entity.getIsbn());
-            });
+            selectButton.addClickListener(e ->
+                    UI.getCurrent().getNavigator().navigateTo(AddBookView.VIEW_NAME + "/" + entity.getIsbn()));
             Image thumbnail = new Image(entity.getTitle(), new ExternalResource(entity.getThumbnailOrPlaceholder()));
             thumbnail.setWidth(70, Unit.PIXELS);
             return Row.builder()
