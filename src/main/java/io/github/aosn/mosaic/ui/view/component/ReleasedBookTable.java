@@ -3,15 +3,13 @@
  */
 package io.github.aosn.mosaic.ui.view.component;
 
-import com.google.common.base.Strings;
-import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.ExternalResource;
-import com.vaadin.server.FontAwesome;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Image;
-import com.vaadin.ui.Table;
 import com.vaadin.ui.UI;
+import com.vaadin.v7.data.util.BeanItemContainer;
+import com.vaadin.v7.ui.Table;
 import io.github.aosn.mosaic.MosaicApplication;
 import io.github.aosn.mosaic.domain.model.catalog.ReleasedBook;
 import io.github.aosn.mosaic.ui.view.AddBookView;
@@ -83,7 +81,6 @@ public class ReleasedBookTable extends Table {
      * Table row for {@link ReleasedBook} entity.
      *
      * @author mikan
-     * @see com.vaadin.data.util.BeanItemContainer
      * @since 0.3
      */
     @Getter
@@ -99,11 +96,9 @@ public class ReleasedBookTable extends Table {
 
         public static Row from(ReleasedBook entity) {
             Button selectButton = new Button();
-            selectButton.setIcon(FontAwesome.HAND_O_RIGHT);
-            selectButton.addClickListener(e -> {
-                VaadinSession.getCurrent().setAttribute(AddBookView.ATTR_BOOK_ADD, entity);
-                UI.getCurrent().getNavigator().navigateTo(AddBookView.VIEW_NAME);
-            });
+            selectButton.setIcon(VaadinIcons.CHEVRON_RIGHT);
+            selectButton.addClickListener(e ->
+                    UI.getCurrent().getNavigator().navigateTo(AddBookView.VIEW_NAME + "/" + entity.getIsbn()));
             Image thumbnail = new Image(entity.getTitle(), new ExternalResource(entity.getThumbnailOrPlaceholder()));
             thumbnail.setWidth(70, Unit.PIXELS);
             return Row.builder()

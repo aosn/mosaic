@@ -3,10 +3,10 @@
  */
 package io.github.aosn.mosaic.ui.view;
 
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
-import com.vaadin.server.FontAwesome;
-import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.*;
 import io.github.aosn.mosaic.MosaicApplication;
@@ -76,7 +76,7 @@ public class FrontView extends CustomComponent implements View {
 
         // Open polls section
         if (open.isEmpty()) {
-            Label label = new Label(FontAwesome.INFO_CIRCLE.getHtml() + " " +
+            Label label = new Label(VaadinIcons.INFO_CIRCLE.getHtml() + " " +
                     i18n.get("front.label.poll.open.empty"), ContentMode.HTML);
             contentPane.addComponent(label);
             contentPane.setComponentAlignment(label, Alignment.MIDDLE_CENTER);
@@ -87,7 +87,7 @@ public class FrontView extends CustomComponent implements View {
 
         // Closed polls section
         if (closed.isEmpty()) {
-            Label label = new Label(FontAwesome.INFO_CIRCLE.getHtml() + " " +
+            Label label = new Label(VaadinIcons.INFO_CIRCLE.getHtml() + " " +
                     i18n.get("front.label.poll.closed.empty"), ContentMode.HTML);
             contentPane.addComponent(label);
             contentPane.setComponentAlignment(label, Alignment.MIDDLE_CENTER);
@@ -99,7 +99,7 @@ public class FrontView extends CustomComponent implements View {
         // New poll button
         Button newPollButton = new Button(i18n.get("front.button.poll.new"),
                 e -> getUI().getNavigator().navigateTo(NewPollView.VIEW_NAME));
-        newPollButton.setIcon(FontAwesome.BULLHORN);
+        newPollButton.setIcon(VaadinIcons.MEGAFONE);
         contentPane.addComponent(newPollButton);
 
         // Owners

@@ -3,8 +3,8 @@
  */
 package io.github.aosn.mosaic.ui.view.component;
 
-import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.ui.Table;
+import com.vaadin.data.provider.GridSortOrderBuilder;
+import com.vaadin.ui.Grid;
 import io.github.aosn.mosaic.MosaicApplication;
 import io.github.aosn.mosaic.domain.model.poll.Vote;
 import lombok.Builder;
@@ -20,19 +20,21 @@ import java.util.List;
  * @author mikan
  * @author 0.1
  */
-public class VoteTable extends Table {
+public class VoteGrid extends Grid<VoteGrid.Row> {
 
     private static final long serialVersionUID = MosaicApplication.MOSAIC_SERIAL_VERSION_UID;
 
-    public VoteTable(String caption, List<Row> rows, I18N i18n) {
-        super(caption, new BeanItemContainer<>(Row.class, rows));
-        setSortContainerPropertyId("time");
-        setSortAscending(false);
-        setPageLength(0);
-        setColumnHeader("user", i18n.get("result.column.user"));
-        setColumnHeader("time", i18n.get("result.column.timestamp"));
-        setColumnHeader("book", i18n.get("result.column.book"));
-        setVisibleColumns("user", "time", "book");
+    public VoteGrid(String caption, List<Row> rows, I18N i18n) {
+        super(Row.class);
+        setCaption(caption);
+        getColumn("user").setCaption(i18n.get("result.column.user"));
+        getColumn("time").setCaption(i18n.get("result.column.timestamp"));
+        getColumn("book").setCaption(i18n.get("result.column.book"));
+        setColumnOrder("user", "time", "book");
+        setSortOrder(new GridSortOrderBuilder<Row>().thenDesc(getColumn("time")));
+        setWidth(100, Unit.PERCENTAGE);
+        setHeightByRows(rows.size());
+        setItems(rows);
     }
 
     /**
@@ -45,14 +47,12 @@ public class VoteTable extends Table {
 
         private static final long serialVersionUID = MosaicApplication.MOSAIC_SERIAL_VERSION_UID;
         private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        private transient final Vote entity;
         private final String user;
         private final String time;
         private final String book;
 
         public static Row from(Vote entity) {
             return Row.builder()
-                    .entity(entity)
                     .user(entity.getUser().getName())
                     .time(DATE_FORMAT.format(entity.getDate()))
                     .book(entity.getBook().getGitHubIssue().getTitle())

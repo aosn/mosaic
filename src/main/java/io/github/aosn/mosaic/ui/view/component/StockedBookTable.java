@@ -3,10 +3,10 @@
  */
 package io.github.aosn.mosaic.ui.view.component;
 
-import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Table;
+import com.vaadin.v7.data.util.BeanItemContainer;
+import com.vaadin.v7.ui.Table;
 import io.github.aosn.mosaic.MosaicApplication;
 import io.github.aosn.mosaic.domain.model.stock.Stock;
 import io.github.aosn.mosaic.ui.view.BookView;
@@ -37,7 +37,6 @@ public class StockedBookTable extends Table {
      * Table row for {@link Stock} entity.
      *
      * @author mikan
-     * @see com.vaadin.data.util.BeanItemContainer
      * @since 0.3
      */
     @Getter

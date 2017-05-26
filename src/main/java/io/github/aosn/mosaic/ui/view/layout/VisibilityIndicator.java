@@ -3,7 +3,7 @@
  */
 package io.github.aosn.mosaic.ui.view.layout;
 
-import com.vaadin.server.FontAwesome;
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import io.github.aosn.mosaic.MosaicApplication;
@@ -24,19 +24,19 @@ public class VisibilityIndicator extends HorizontalLayout {
         switch (visibility) {
             case PUBLIC:
                 caption.setValue(i18n.get("book.column.visibility.public"));
-                icon.setIcon(FontAwesome.GLOBE);
+                icon.setIcon(VaadinIcons.GLOBE);
                 break;
             case ALL_USER:
                 caption.setValue(i18n.get("book.column.visibility.internal"));
-                icon.setIcon(FontAwesome.UNLOCK);
+                icon.setIcon(VaadinIcons.UNLOCK);
                 break;
             case PRIVATE:
                 caption.setValue(i18n.get("book.column.visibility.private"));
-                icon.setIcon(FontAwesome.LOCK);
+                icon.setIcon(VaadinIcons.LOCK);
                 break;
             default: // currently unsupported
                 caption.setValue(i18n.get("book.column.visibility.custom"));
-                icon.setIcon(FontAwesome.COG);
+                icon.setIcon(VaadinIcons.COG);
                 break;
         }
         addComponents(icon, caption);

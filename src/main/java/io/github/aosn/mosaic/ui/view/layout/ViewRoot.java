@@ -6,7 +6,6 @@ package io.github.aosn.mosaic.ui.view.layout;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.Reindeer;
 import io.github.aosn.mosaic.MosaicApplication;
 import io.github.aosn.mosaic.domain.model.poll.Group;
 import io.github.aosn.mosaic.domain.service.auth.UserService;
@@ -25,7 +24,7 @@ public class ViewRoot extends VerticalLayout {
     public ViewRoot(I18N i18n, UserService userService, Group group, Component... components) {
         setSizeFull();
         setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
-        setStyleName(Reindeer.LAYOUT_BLUE);
+        setMargin(false);
         addComponent(new Header(i18n, userService, group));
         addComponents(components);
         addComponent(new Footer(i18n));

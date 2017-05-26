@@ -4,12 +4,12 @@
 package io.github.aosn.mosaic.ui.view;
 
 import com.google.common.base.Strings;
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.ExternalResource;
-import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinSession;
-import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
@@ -182,7 +182,7 @@ public class BookView extends CustomComponent implements View {
                 VaadinSession.getCurrent().setAttribute(EditBookView.ATTR_BOOK_EDIT, book);
                 getUI().getNavigator().navigateTo(EditBookView.VIEW_NAME);
             });
-            editButton.setIcon(FontAwesome.EDIT);
+            editButton.setIcon(VaadinIcons.EDIT);
             editButton.setStyleName(ValoTheme.BUTTON_PRIMARY);
 
             HorizontalLayout buttonArea = new HorizontalLayout(backButton, editButton);

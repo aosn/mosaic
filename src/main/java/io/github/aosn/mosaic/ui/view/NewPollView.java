@@ -3,12 +3,13 @@
  */
 package io.github.aosn.mosaic.ui.view;
 
+import com.vaadin.data.Binder;
 import com.vaadin.data.validator.StringLengthValidator;
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
-import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinSession;
-import com.vaadin.shared.ui.datefield.Resolution;
+import com.vaadin.shared.ui.datefield.DateResolution;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
@@ -36,9 +37,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.i18n.I18N;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -121,51 +119,50 @@ public class NewPollView extends CustomComponent implements View {
         form.setCaption(i18n.get("new.caption.poll.info"));
         contentPane.addComponent(form);
 
-        TextField subject = new TextField(i18n.get("new.caption.subject"));
-        subject.setRequired(true);
-        subject.addValidator(new StringLengthValidator("common.validator.text.length.over", 0, 255, false));
-        subject.setWidth(100, Unit.PERCENTAGE);
-        subject.setInputPrompt(i18n.get("new.placeholder.subject"));
-        form.addComponent(subject);
-
-        DateField closeDate = new DateField(i18n.get("new.caption.close.date"));
         LocalDate now = LocalDate.now();
-        closeDate.setRequired(true);
-        closeDate.setRangeStart(Date.from(now.atStartOfDay(ZoneId.systemDefault()).toInstant()));
-        closeDate.setResolution(Resolution.DAY);
-        closeDate.setDateOutOfRangeMessage(i18n.get("common.validator.date.range.over"));
-        closeDate.setValue(Date.from(now.plusWeeks(1).atStartOfDay(ZoneId.systemDefault()).toInstant()));
-        form.addComponent(closeDate);
+        Poll poll = Poll.create(userService.getUser(), now);
+        Binder<Poll> pollBinder = new Binder<>();
+        pollBinder.readBean(poll);
 
-        ComboBox votesSelect = new ComboBox(i18n.get("new.caption.doubles"));
-        votesSelect.setNullSelectionAllowed(false);
-        votesSelect.setTextInputAllowed(false);
-        votesSelect.setRequired(true);
-        votesSelect.addItems(IntStream.rangeClosed(1, 3).mapToObj(String::valueOf).collect(Collectors.toList()));
-        votesSelect.setValue(String.valueOf(2));
-        form.addComponent(votesSelect);
+        TextField subjectField = new TextField(i18n.get("new.caption.subject"));
+        subjectField.setRequiredIndicatorVisible(true);
+        subjectField.setWidth(100, Unit.PERCENTAGE);
+        subjectField.setPlaceholder(i18n.get("new.placeholder.subject"));
+        pollBinder.forField(subjectField)
+                .withValidator(new StringLengthValidator("common.validator.text.length.over", 0, 255))
+                .bind(Poll::getSubject, Poll::setSubject);
+        form.addComponent(subjectField);
 
-        CheckBox notifyCheck = new CheckBox(i18n.get("common.caption.notify.slack"));
-        notifyCheck.setValue(false);
-        notifyCheck.setEnabled(false);
-        notifyCheck.setDescription(i18n.get("common.label.not.available"));
-        contentPane.addComponent(notifyCheck);
+        DateField closeDateField = new DateField(i18n.get("new.caption.close.date"));
+        closeDateField.setRequiredIndicatorVisible(true);
+        closeDateField.setRangeStart(now);
+        closeDateField.setResolution(DateResolution.DAY);
+        closeDateField.setDateOutOfRangeMessage(i18n.get("common.validator.date.range.over"));
+        closeDateField.setValue(poll.getEndAsLocalDate());
+        pollBinder.forField(closeDateField).bind(Poll::getEndAsLocalDate, Poll::setEnd);
+        form.addComponent(closeDateField);
+
+        ComboBox<Integer> votesComboBox = new ComboBox<>(i18n.get("new.caption.doubles"));
+        votesComboBox.setEmptySelectionAllowed(false);
+        votesComboBox.setTextInputAllowed(false);
+        votesComboBox.setRequiredIndicatorVisible(true);
+        votesComboBox.setItems(IntStream.rangeClosed(1, 3).boxed().collect(Collectors.toList()));
+        votesComboBox.setValue(poll.getDoubles());
+        pollBinder.forField(votesComboBox).bind(Poll::getDoubles, Poll::setDoubles);
+        form.addComponent(votesComboBox);
+
+        CheckBox notifyCheckBox = new CheckBox(i18n.get("common.caption.notify.slack"));
+        notifyCheckBox.setValue(false);
+        notifyCheckBox.setEnabled(false);
+        notifyCheckBox.setDescription(i18n.get("common.label.not.available"));
+        contentPane.addComponent(notifyCheckBox);
 
         Button cancelButton = new Button(i18n.get("common.button.cancel"),
                 e -> getUI().getNavigator().navigateTo(FrontView.VIEW_NAME));
         Button submitButton = new Button(i18n.get("new.button.submit"), e -> {
             // Validation
-            if (!subject.isValid() || !closeDate.isValid() || !votesSelect.isValid() || subject.isEmpty()) {
+            if (subjectField.isEmpty() || !pollBinder.writeBeanIfValid(poll)) {
                 Notifications.showWarning(i18n.get("common.notification.input.required"));
-                return;
-            }
-
-            // Doubles
-            int doubles;
-            try {
-                doubles = Integer.parseInt((String) votesSelect.getValue());
-            } catch (RuntimeException ex) {
-                ErrorView.show("Internal error", ex);
                 return;
             }
 
@@ -185,32 +182,21 @@ public class NewPollView extends CustomComponent implements View {
                 Notifications.showWarning(i18n.get("new.notification.select.more.2"));
                 return;
             }
-            if (doubles > selected.size()) {
+            if (poll.getDoubles() > selected.size()) {
                 Notifications.showWarning(i18n.get("new.notification.doubles.larger"));
+                return;
             }
+
+            // Set books
+            poll.setBooks(selected.stream()
+                    .map(i -> Book.builder().issue(i.getId()).url(i.getUrl()).build())
+                    .collect(Collectors.toList()));
+            poll.setGroup(groups.get(selectingGroupIndex));
 
             // Submit
             try {
-                // Build entities
-                List<Book> books = selected.stream()
-                        .map(i -> Book.builder()
-                                .issue(i.getId())
-                                .url(i.getUrl())
-                                .build())
-                        .collect(Collectors.toList());
-                Poll poll = Poll.builder()
-                        .subject(subject.getValue())
-                        .owner(userService.getUser())
-                        .state(Poll.PollState.OPEN)
-                        .begin(Date.from(now.atStartOfDay(ZoneId.systemDefault()).toInstant()))
-                        .end(closeDate.getValue())
-                        .doubles(doubles)
-                        .books(books)
-                        .votes(Collections.emptyList())
-                        .group(groups.get(selectingGroupIndex))
-                        .build();
                 pollService.create(poll);
-                if (notifyCheck.getValue()) {
+                if (notifyCheckBox.getValue()) {
                     notificationService.notifyCreatePoll(poll);
                 }
                 Notifications.showSuccess(i18n.get("new.notification.poll.created"));
@@ -219,7 +205,7 @@ public class NewPollView extends CustomComponent implements View {
                 ErrorView.show(i18n.get("new.error.poll.create.failed"), ex);
             }
         });
-        submitButton.setIcon(FontAwesome.BULLHORN);
+        submitButton.setIcon(VaadinIcons.MEGAFONE);
         submitButton.setStyleName(ValoTheme.BUTTON_PRIMARY);
         HorizontalLayout buttonArea = new HorizontalLayout(cancelButton, submitButton);
         buttonArea.setSpacing(true);

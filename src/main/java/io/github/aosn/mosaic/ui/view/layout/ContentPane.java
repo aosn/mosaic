@@ -1,3 +1,6 @@
+/*
+ * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ */
 package io.github.aosn.mosaic.ui.view.layout;
 
 import com.vaadin.ui.Alignment;
@@ -16,6 +19,7 @@ public class ContentPane extends VerticalLayout {
     public ContentPane() {
         setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
         setSpacing(true);
+        setMargin(false);
         setStyleName(Style.CONTENT_PANE.className());
     }
 }

@@ -3,16 +3,14 @@
  */
 package io.github.aosn.mosaic.ui;
 
-import com.vaadin.annotations.StyleSheet;
-import com.vaadin.annotations.Theme;
-import com.vaadin.annotations.Title;
-import com.vaadin.annotations.Viewport;
+import com.vaadin.annotations.*;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinService;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.spring.navigator.SpringViewProvider;
 import com.vaadin.ui.UI;
+import com.vaadin.ui.themes.ValoTheme;
 import io.github.aosn.mosaic.MosaicApplication;
 import io.github.aosn.mosaic.config.SecurityConfig;
 import io.github.aosn.mosaic.ui.i18n.I18nSystemMessageProvider;
@@ -27,10 +25,11 @@ import org.vaadin.spring.i18n.I18N;
  * @since 0.1
  */
 @SpringUI(path = ErrorUI.PATH)
-@Theme("valo")
+@Theme(ValoTheme.THEME_NAME)
 @Title(MosaicApplication.DEFAULT_TITLE)
 @StyleSheet(value = "vaadin:/" + SecurityConfig.CSS_PATH)
-@Viewport("user-scalable=no,initial-scale=1.0")
+@Viewport("user-scalable=no,width=500")
+@Widgetset("com.vaadin.v7.Vaadin7WidgetSet")
 public class ErrorUI extends UI {
 
     public static final String PATH = "/error";

@@ -3,12 +3,12 @@
  */
 package io.github.aosn.mosaic.ui.view.component;
 
-import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.server.FontAwesome;
-import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.icons.VaadinIcons;
+import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Table;
+import com.vaadin.v7.data.util.BeanItemContainer;
+import com.vaadin.v7.ui.Table;
 import io.github.aosn.mosaic.MosaicApplication;
 import io.github.aosn.mosaic.domain.model.issue.GitHubIssue;
 import io.github.aosn.mosaic.domain.model.issue.GitHubLabel;
@@ -97,7 +97,7 @@ public class IssueTable extends Table {
                     .user(new Label(entity.getGitHubIssue().getUser().getName()))
                     .votes(entity.getVotes())
                     .votesWithIcon(new Label(IntStream.range(0, entity.getVotes())
-                            .mapToObj(i -> FontAwesome.THUMBS_UP.getHtml())
+                            .mapToObj(i -> VaadinIcons.THUMBS_UP.getHtml())
                             .collect(Collectors.joining()), ContentMode.HTML))
                     .build();
         }
