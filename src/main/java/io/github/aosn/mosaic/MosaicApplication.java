@@ -15,8 +15,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class MosaicApplication {
 
-    public static final long MOSAIC_SERIAL_VERSION_UID = 4L;
-    public static final String MOSAIC_VERSION = "0.4";
+    public static final long MOSAIC_SERIAL_VERSION_UID = 5L;
+    public static final String MOSAIC_VERSION = "0.5";
     public static final String DEFAULT_TITLE = "Mosaic";
 
     public static void main(String[] args) {
