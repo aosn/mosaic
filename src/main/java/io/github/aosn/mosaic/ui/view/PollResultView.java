@@ -106,6 +106,10 @@ public class PollResultView extends CustomComponent implements View {
         aboutForm.setMargin(false);
         contentPane.addComponent(aboutForm);
 
+        IconAndName organizationLabel = new IconAndName(poll.getGroup());
+        organizationLabel.setCaption(i18n.get("result.caption.poll.organization"));
+        aboutForm.addComponent(organizationLabel);
+
         IconAndName ownerLabel = new IconAndName(poll.getOwner());
         ownerLabel.setCaption(i18n.get("result.caption.poll.owner"));
         aboutForm.addComponent(ownerLabel);

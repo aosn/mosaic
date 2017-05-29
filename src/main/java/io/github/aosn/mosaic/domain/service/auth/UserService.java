@@ -3,20 +3,27 @@
  */
 package io.github.aosn.mosaic.domain.service.auth;
 
+import io.github.aosn.mosaic.domain.model.auth.GitHubOrganization;
 import io.github.aosn.mosaic.domain.model.auth.User;
 import io.github.aosn.mosaic.domain.model.poll.Group;
+import io.github.aosn.mosaic.domain.repository.auth.GitHubOrganizationRepository;
 import io.github.aosn.mosaic.domain.repository.auth.UserRepository;
 import io.github.aosn.mosaic.domain.repository.issue.GitHubIssueRepository;
-import io.github.aosn.mosaic.domain.repository.ui.SessionRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * @author mikan
@@ -29,18 +36,19 @@ public class UserService {
     private static final String ROLE_USER = "ROLE_USER";
 
     private final UserRepository userRepository;
-    private final SessionRepository sessionRepository;
     private final GitHubIssueRepository issueRepository;
+    private final GitHubOrganizationRepository groupRepository;
+    private static Map<String, Set<String>> userGroupCache = new ConcurrentHashMap<>(); // WARNING: instance-local
 
     @Autowired
-    public UserService(UserRepository userRepository, SessionRepository sessionRepository,
+    public UserService(UserRepository userRepository, GitHubOrganizationRepository groupRepository,
                        GitHubIssueRepository issueRepository) {
         this.userRepository = userRepository;
-        this.sessionRepository = sessionRepository;
+        this.groupRepository = groupRepository;
         this.issueRepository = issueRepository;
     }
 
-    public void recordLogin(Principal principal, User.Source source) {
+    public void recordLogin(Principal principal, User.Source source, OAuth2RestTemplate restTemplate) {
         Date now = new Date();
         log.info("recordLogin: " + principal);
         User user = userRepository.findByNameAndSource(principal.getName(), source);
@@ -54,7 +62,7 @@ public class UserService {
         user.setLastLogin(now);
         try {
             userRepository.saveAndFlush(user);
-            sessionRepository.setUser(user);
+            cacheGroups(principal.getName(), restTemplate);
         } catch (RuntimeException e) {
             log.error("recordLogin: failed to persist.", e);
         }
@@ -72,16 +80,8 @@ public class UserService {
 
     @Nullable
     public User getUser() {
-        // Get from current session
-        User user = sessionRepository.getUser();
-        if (user != null) {
-            return user;
-        }
-        // Get from DB when nothing in session
         try {
-            user = userRepository.findByNameAndSource(getName(), User.Source.GITHUB);
-            sessionRepository.setUser(user);
-            return user;
+            return userRepository.findByNameAndSource(getName(), User.Source.GITHUB);
         } catch (RuntimeException e) {
             log.error("getUser failed.", e);
             return null;
@@ -106,5 +106,36 @@ public class UserService {
      */
     public long countUsers() {
         return userRepository.count();
+    }
+
+    /**
+     * Cache user groups.
+     *
+     * @param userName     user name
+     * @param restTemplate OAuth2 Rest Template
+     * @since 0.5
+     */
+    private void cacheGroups(String userName, OAuth2RestTemplate restTemplate) {
+        try {
+            Set<String> groups = groupRepository.getAll(restTemplate).stream()
+                    .map(GitHubOrganization::getOrganization)
+                    .collect(Collectors.toSet());
+            log.info("ORGS: user=" + userName + " orgs=" + String.join(",", groups));
+            userGroupCache.put(userName, groups);
+        } catch (RuntimeException e) {
+            log.warn("ORGS: Cannot check membership", e);
+        }
+    }
+
+    /**
+     * Either group (= organization) member or not.
+     *
+     * @param userName    user name
+     * @param targetGroup target group
+     * @return {@code true} if user is a member of group, {@code false} otherwise
+     * @since 0.5
+     */
+    public boolean isMember(String userName, String targetGroup) {
+        return userGroupCache.getOrDefault(userName, Collections.emptySet()).contains(targetGroup);
     }
 }

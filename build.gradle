@@ -29,7 +29,6 @@ dependencies {
     compile('org.springframework.security.oauth:spring-security-oauth2')
     // Vaadin
     compile("com.vaadin:vaadin-spring-boot-starter:${vaadinSpringBootVersion}")
-    compile("com.vaadin:vaadin-themes:${vaadinVersion}")
     compile('org.vaadin.spring.addons:vaadin-spring-addon-i18n:2.0.0.RELEASE')
     compile("com.vaadin:vaadin-compatibility-server:${vaadinVersion}")
     runtime("com.vaadin:vaadin-compatibility-client-compiled:${vaadinVersion}")

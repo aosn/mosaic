@@ -100,6 +100,11 @@ public class NewGroupView extends CustomComponent implements View {
                 Notifications.showWarning(i18n.get("common.notification.input.required"));
                 return;
             }
+            if (!userService.isMember(userService.getName(), organizationField.getValue())) {
+                Notifications.showWarning(String.format(i18n.get("common.caption.member.only"),
+                        organizationField.getValue()));
+                return;
+            }
             try {
                 pollService.addGroup(thinGroup.toGroup());
                 Notifications.showSuccess(i18n.get("new-group.notification.add.success"));

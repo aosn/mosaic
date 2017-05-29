@@ -97,16 +97,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     private Filter ssoFilter(ClientResources client, String path) {
+        OAuth2RestTemplate oAuth2RestTemplate = new OAuth2RestTemplate(client.getClient(), oauth2ClientContext);
         OAuth2ClientAuthenticationProcessingFilter filter = new OAuth2ClientAuthenticationProcessingFilter(path) {
             @Override
             protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                                     FilterChain chain, Authentication authResult)
                     throws IOException, ServletException {
                 super.successfulAuthentication(request, response, chain, authResult);
-                userService.recordLogin(authResult, User.Source.GITHUB);
+                userService.recordLogin(authResult, User.Source.GITHUB, oAuth2RestTemplate);
             }
         };
-        OAuth2RestTemplate oAuth2RestTemplate = new OAuth2RestTemplate(client.getClient(), oauth2ClientContext);
         filter.setRestTemplate(oAuth2RestTemplate);
         UserInfoTokenServices tokenServices = new UserInfoTokenServices(client.getResource().getUserInfoUri(),
                 client.getClient().getClientId());

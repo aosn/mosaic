@@ -9,6 +9,7 @@ import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.shared.ui.datefield.DateResolution;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.*;
@@ -62,8 +63,8 @@ public class NewPollView extends CustomComponent implements View {
     private int selectingGroupIndex = 0;
 
     @Autowired
-    public NewPollView(I18N i18n, UserService userService, IssueService issueService, PollService pollService,
-                       NotificationService notificationService) {
+    public NewPollView(I18N i18n, UserService userService, IssueService issueService,
+                       PollService pollService, NotificationService notificationService) {
         this.i18n = i18n;
         this.userService = userService;
         this.issueService = issueService;
@@ -82,20 +83,22 @@ public class NewPollView extends CustomComponent implements View {
             ErrorView.show(i18n.get("common.error.unexpected"), e);
             return;
         }
+        Group selectedGroup = groups.get(selectingGroupIndex);
         List<GitHubIssue> issues;
         try {
-            issues = issueService.getOpenIssues(groups.get(selectingGroupIndex));
+            issues = issueService.getOpenIssues(selectedGroup);
         } catch (RuntimeException e) {
             ErrorView.show(i18n.get("common.error.issue.obtain.failed"), e);
             return;
         }
         getUI().getPage().setTitle(i18n.get("header.label.title"));
-        setCompositionRoot(new ViewRoot(i18n, userService, groups.get(selectingGroupIndex),
-                createPollLayout(groups, issues)));
+        setCompositionRoot(new ViewRoot(i18n, userService, selectedGroup, createPollLayout(groups, issues)));
     }
 
     private Layout createPollLayout(List<Group> groups, List<GitHubIssue> issues) {
         ContentPane contentPane = new ContentPane();
+
+        Group selectedGroup = groups.get(selectingGroupIndex);
 
         GroupComboBox groupComboBox = new GroupComboBox(i18n.get("new.caption.group"), groups, selectingGroupIndex);
         groupComboBox.addValueChangeListener(e -> {
@@ -108,8 +111,8 @@ public class NewPollView extends CustomComponent implements View {
 
         List<IssueTable.Row> rows = issues.stream()
                 .map(r -> IssueTable.Row.from(r,
-                        l -> issueService.isIssueLabel(l, groups.get(selectingGroupIndex)),
-                        l -> issueService.trimPartLabel(l, groups.get(selectingGroupIndex))))
+                        l -> issueService.isIssueLabel(l, selectedGroup),
+                        l -> issueService.trimPartLabel(l, selectedGroup)))
                 .collect(Collectors.toList());
         contentPane.addComponent(new IssueTable(i18n.get("new.caption.select"), ColumnGroup.NEW, rows, i18n));
         contentPane.addComponent(new BulkSelector(i18n, rows));
@@ -120,7 +123,8 @@ public class NewPollView extends CustomComponent implements View {
         contentPane.addComponent(form);
 
         LocalDate now = LocalDate.now();
-        Poll poll = Poll.create(userService.getUser(), now);
+        User user = userService.getUser();
+        Poll poll = Poll.create(user, now);
         Binder<Poll> pollBinder = new Binder<>();
         pollBinder.readBean(poll);
 
@@ -159,6 +163,7 @@ public class NewPollView extends CustomComponent implements View {
 
         Button cancelButton = new Button(i18n.get("common.button.cancel"),
                 e -> getUI().getNavigator().navigateTo(FrontView.VIEW_NAME));
+
         Button submitButton = new Button(i18n.get("new.button.submit"), e -> {
             // Validation
             if (subjectField.isEmpty() || !pollBinder.writeBeanIfValid(poll)) {
@@ -167,7 +172,6 @@ public class NewPollView extends CustomComponent implements View {
             }
 
             // User
-            User user = userService.getUser();
             if (user == null) {
                 ErrorView.show(i18n.get("common.error.user.missing"), null);
                 return;
@@ -191,7 +195,7 @@ public class NewPollView extends CustomComponent implements View {
             poll.setBooks(selected.stream()
                     .map(i -> Book.builder().issue(i.getId()).url(i.getUrl()).build())
                     .collect(Collectors.toList()));
-            poll.setGroup(groups.get(selectingGroupIndex));
+            poll.setGroup(selectedGroup);
 
             // Submit
             try {
@@ -214,6 +218,15 @@ public class NewPollView extends CustomComponent implements View {
             submitButton.setEnabled(false);
             submitButton.setDescription(i18n.get("common.caption.login.required"));
             contentPane.addComponent(new LoginRequiredLabel(i18n));
+        } else if (!userService.isMember(user.getName(), selectedGroup.getOrganization())) {
+            submitButton.setEnabled(false);
+            String org = selectedGroup.getOrganization();
+            String message = String.format(i18n.get("common.caption.member.only"),
+                    "<a href=\"https://github.com/" + org + "\">" + org + "</a>");
+            submitButton.setDescription(message, ContentMode.HTML);
+            Label notAMemberLabel = new Label(message, ContentMode.HTML);
+            notAMemberLabel.setStyleName(ValoTheme.LABEL_FAILURE);
+            contentPane.addComponent(notAMemberLabel);
         }
 
         return contentPane;
