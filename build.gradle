@@ -1,7 +1,6 @@
 buildscript {
     ext {
         vaadinVersion = '8.0.6'
-        vaadinSpringBootVersion = '2.0.0'
         springFoxVersion = '2.6.1'
         checkerFrameworkVersion = '2.1.11'
     }
@@ -28,10 +27,10 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-actuator')
     compile('org.springframework.security.oauth:spring-security-oauth2')
     // Vaadin
-    compile("com.vaadin:vaadin-spring-boot-starter:${vaadinSpringBootVersion}")
+    compile('com.vaadin:vaadin-spring-boot-starter')
     compile('org.vaadin.spring.addons:vaadin-spring-addon-i18n:2.0.0.RELEASE')
-    compile("com.vaadin:vaadin-compatibility-server:${vaadinVersion}")
-    runtime("com.vaadin:vaadin-compatibility-client-compiled:${vaadinVersion}")
+    compile('com.vaadin:vaadin-compatibility-server')
+    runtime('com.vaadin:vaadin-compatibility-client-compiled')
     // Utilities
     compile('org.projectlombok:lombok')
     compile("org.checkerframework:checker-qual:${checkerFrameworkVersion}")
