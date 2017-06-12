@@ -4,7 +4,7 @@ AOSN Workshop book voting system.
 
 Demo:
 
-* [vote.tasktoys.com](http://vote.tasktoys.com) (works on Bluemix US-South region)
+* [vote.tasktoys.com](https://vote.tasktoys.com) (works on [VULTR VPS](http://www.vultr.com/?ref=7053029) Tokyo Region)
 
 ## Key features
 
