@@ -1,5 +1,7 @@
 # Mosaic
 
+[![Build Status](https://travis-ci.org/aosn/mosaic.svg?branch=master)](https://travis-ci.org/aosn/mosaic)
+
 AOSN Workshop book voting system.
 
 Demo:
