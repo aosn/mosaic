@@ -73,7 +73,7 @@ public class IssueService {
         poll.getBooks().forEach(b -> {
             b.setGitHubIssue(issues.stream()
                     .filter(i -> i.getId().equals(b.getIssue()))
-                    .findFirst().orElseThrow(NoSuchElementException::new));
+                    .findFirst().orElseThrow(() -> new NoSuchElementException("Cannot resolved: #" + b.getIssue())));
             b.setVotes(Math.toIntExact(poll.getVotes().stream()
                     .filter(p -> b.equals(p.getBook())).count()));
         });
