@@ -6,7 +6,7 @@ AOSN Workshop book voting system.
 
 Demo:
 
-* [vote.tasktoys.com](https://vote.tasktoys.com) (works on [VULTR VPS](http://www.vultr.com/?ref=7053029) Tokyo Region)
+* [vote.aosn.ws](https://vote.aosn.ws) (works on [VULTR VPS](http://www.vultr.com/?ref=7053029) Tokyo Region)
 
 ## Key features
 
@@ -66,7 +66,7 @@ sudo service mosaic start
 NOTE: You need to create `application-production.yml` and systemd configuration.
 See our [Wiki](https://github.com/aosn/mosaic/wiki) for more information.
 
-### Run at Cloud Foundry
+### Run on Cloud Foundry
 
 ```bash
 ./gradlew bootRepackage
