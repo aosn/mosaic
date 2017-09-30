@@ -33,7 +33,7 @@ public class BulkSelector extends HorizontalLayout {
         // Select all for each reading parts
         rows.stream().map(r -> r.getCategory().getValue()).distinct().sorted().forEach(p -> {
             Button partButton = new Button(String.format(i18n.get("common.button.bulk.select.part"), p),
-                    e -> rows.forEach(r -> r.getCheckBox().setValue(r.getCategory().getValue().equals(p))));
+                    e -> rows.forEach(r -> r.getCheckBox().setValue(r.getCategory().getValue().contains(p))));
             partButton.setCaptionAsHtml(true);
             partButton.setIcon(VaadinIcons.CHECK_SQUARE_O);
             partButton.setStyleName(ValoTheme.BUTTON_TINY);

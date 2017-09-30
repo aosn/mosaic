@@ -56,7 +56,7 @@ public class GitHubIssueRepository {
      */
     public List<GitHubIssue> getWithState(Group group, @Nullable State state) {
         List<GitHubIssue> overall = new LinkedList<>();
-        for (int page = 0; ; page++) { // Retrieves all page
+        for (int page = 1; ; page++) { // Retrieves all page
             log.info("GET / " + group.getOrganization() + "/" + group.getRepository() + "/issues [" + page + "]");
             GitHubIssue[] part = retrievePage(group, state == null ? State.ALL : state, page);
             if (part.length == 0) {
