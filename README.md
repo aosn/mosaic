@@ -1,6 +1,6 @@
 # Mosaic
 
-[![Build Status](https://travis-ci.org/aosn/mosaic.svg?branch=master)](https://travis-ci.org/aosn/mosaic)
+[![Build Status](https://travis-ci.org/aosn/mosaic.svg?branch=develop)](https://travis-ci.org/aosn/mosaic)
 
 AOSN Workshop book voting system.
 
