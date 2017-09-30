@@ -29,7 +29,7 @@ public class GitHubIssueRepository {
     }
 
     private static final String RESOURCE_PATH = "https://api.github.com/repos/{" + Param.OWNER + "}/{" +
-            Param.REPO + "}/issues?page={" + Param.PAGE + "}&?state={" + Param.STATE + "}";
+            Param.REPO + "}/issues?state={" + Param.STATE + "}&page={" + Param.PAGE + "}";
     private static final String NEW_ISSUE_PAGE = "https://github.com/{" + Param.OWNER + "}/{" +
             Param.REPO + "}/issues/new";
     private final RestTemplate restTemplate;
@@ -51,14 +51,14 @@ public class GitHubIssueRepository {
     /**
      * Get issues with specified state.
      *
-     * @param state {@link State} for filter issue state, or {@code null} unfiltered
+     * @param state {@link State} target issue state
      * @return {@link List} of {@link GitHubIssue}s
      */
-    public List<GitHubIssue> getWithState(Group group, @Nullable State state) {
+    public List<GitHubIssue> getWithState(Group group, State state) {
         List<GitHubIssue> overall = new LinkedList<>();
         for (int page = 1; ; page++) { // Retrieves all page
-            log.info("GET / " + group.getOrganization() + "/" + group.getRepository() + "/issues [" + page + "]");
-            GitHubIssue[] part = retrievePage(group, state == null ? State.ALL : state, page);
+            log.info("GET /" + group.getOrganization() + "/" + group.getRepository() + "/issues [" + page + "]");
+            GitHubIssue[] part = retrievePage(group, state, page);
             if (part.length == 0) {
                 break;
             }
