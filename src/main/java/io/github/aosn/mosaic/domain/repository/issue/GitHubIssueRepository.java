@@ -16,7 +16,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Repository of {@link GitHubIssue} entity.
@@ -47,43 +46,24 @@ public class GitHubIssueRepository {
     /**
      * Get all issues.
      *
+     * @return {@link List} of {@link GitHubIssue}s
+     */
+    public List<GitHubIssue> getAll(Group group) {
+        return getWithState(group, State.ALL);
+    }
+
+    /**
+     * Get issues with specified state.
+     *
      * @param state {@link State} for filter issue state, or {@code null} unfiltered
      * @return {@link List} of {@link GitHubIssue}s
      */
-    public List<GitHubIssue> getAll(Group group, @Nullable State state) {
+    public List<GitHubIssue> getWithState(Group group, @Nullable State state) {
         Map<String, String> params = new HashMap<>(3);
         params.put(PARAM_OWNER, group.getOrganization());
         params.put(PARAM_REPO, group.getRepository());
         params.put(PARAM_STATE, state == null ? State.ALL.stateValue : state.stateValue);
         ResponseEntity<GitHubIssue[]> entity = restTemplate.getForEntity(RESOURCE_PATH, GitHubIssue[].class, params);
-        if (!entity.getStatusCode().is2xxSuccessful()) {
-            log.error("GitHub error: " + entity.getStatusCodeValue());
-            throw new RuntimeException("GitHub error: " + entity.getStatusCodeValue());
-        }
-        return Arrays.asList(entity.getBody());
-    }
-
-    /**
-     * Get issues by given labels and state.
-     *
-     * @param labels {@link List} of labels
-     * @param state  {@link State} for filter issue state, or {@code null} unfiltered
-     * @return {@link List} of {@link GitHubIssue}s
-     */
-    public List<GitHubIssue> getByLabels(Group group, List<String> labels, @Nullable State state) {
-        if (labels == null) {
-            throw new NullPointerException("label is null.");
-        }
-        if (labels.isEmpty()) {
-            throw new IllegalArgumentException("label is empty.");
-        }
-        Map<String, String> params = new HashMap<>(4);
-        params.put(PARAM_OWNER, group.getOrganization());
-        params.put(PARAM_REPO, group.getRepository());
-        params.put(PARAM_LABELS, labels.stream().collect(Collectors.joining(",")));
-        params.put(PARAM_STATE, state == null ? State.ALL.stateValue : state.stateValue);
-        ResponseEntity<GitHubIssue[]> entity = restTemplate.getForEntity(RESOURCE_PATH + QUERY_LABEL,
-                GitHubIssue[].class, params);
         if (!entity.getStatusCode().is2xxSuccessful()) {
             log.error("GitHub error: " + entity.getStatusCodeValue());
             throw new RuntimeException("GitHub error: " + entity.getStatusCodeValue());
