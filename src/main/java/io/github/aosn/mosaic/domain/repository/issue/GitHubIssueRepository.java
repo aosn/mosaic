@@ -6,7 +6,6 @@ package io.github.aosn.mosaic.domain.repository.issue;
 import io.github.aosn.mosaic.domain.model.issue.GitHubIssue;
 import io.github.aosn.mosaic.domain.model.poll.Group;
 import lombok.extern.slf4j.Slf4j;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
@@ -25,12 +24,15 @@ import java.util.*;
 public class GitHubIssueRepository {
 
     private enum Param {
-        OWNER, REPO, STATE, PAGE;
+        OWNER, REPO, STATE, PAGE
     }
 
-    private static final String RESOURCE_PATH = "https://api.github.com/repos/{" + Param.OWNER + "}/{" +
-            Param.REPO + "}/issues?state={" + Param.STATE + "}&page={" + Param.PAGE + "}";
-    private static final String NEW_ISSUE_PAGE = "https://github.com/{" + Param.OWNER + "}/{" +
+    private static final String RESOURCE_PATH = "https://api.github.com/repos/" +
+            "{" + Param.OWNER + "}/{" + Param.REPO + "}/issues?" +
+            "state={" + Param.STATE + "}" +
+            "&page={" + Param.PAGE + "}";
+    private static final String NEW_ISSUE_PAGE = "https://github.com/" +
+            "{" + Param.OWNER + "}/{" +
             Param.REPO + "}/issues/new";
     private final RestTemplate restTemplate;
 

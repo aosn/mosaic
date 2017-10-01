@@ -156,8 +156,8 @@ public class NewPollView extends CustomComponent implements View {
         form.addComponent(votesComboBox);
 
         CheckBox notifyCheckBox = new CheckBox(i18n.get("common.caption.notify.slack"));
-        notifyCheckBox.setValue(false);
-        notifyCheckBox.setEnabled(false);
+        notifyCheckBox.setValue(selectedGroup.isSlackEnabled());
+        notifyCheckBox.setEnabled(selectedGroup.isSlackEnabled());
         notifyCheckBox.setDescription(i18n.get("common.label.not.available"));
         contentPane.addComponent(notifyCheckBox);
 
@@ -201,7 +201,7 @@ public class NewPollView extends CustomComponent implements View {
             try {
                 pollService.create(poll);
                 if (notifyCheckBox.getValue()) {
-                    notificationService.notifyCreatePoll(poll);
+                    notificationService.notifyBeginOfPoll(poll);
                 }
                 Notifications.showSuccess(i18n.get("new.notification.poll.created"));
                 getUI().getNavigator().navigateTo(FrontView.VIEW_NAME);

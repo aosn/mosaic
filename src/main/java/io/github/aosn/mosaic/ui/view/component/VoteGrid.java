@@ -33,7 +33,7 @@ public class VoteGrid extends Grid<VoteGrid.Row> {
         setColumnOrder("user", "time", "book");
         setSortOrder(new GridSortOrderBuilder<Row>().thenDesc(getColumn("time")));
         setWidth(100, Unit.PERCENTAGE);
-        setHeightByRows(rows.size());
+        setHeightByRows(rows.size() == 0 ? 1 : rows.size());
         setItems(rows);
     }
 
