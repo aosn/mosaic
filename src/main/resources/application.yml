@@ -42,8 +42,8 @@ mosaic:
      channel: "debug"
      username: "Mosaic"
      template:
-       begin: "「%s」が開始されました。投票を行ってください。\nhttps://vote.aosn.ws/"
-       end: "「%s」が終了しました。結果を確認してください。\nhttps://vote.aosn.ws/"
+       begin: "「%s」が開始されました。投票を行ってください。 https://vote.aosn.ws/"
+       end: "「%s」が終了しました。結果を確認してください。 https://vote.aosn.ws/"
 
 # Demo application token
 github:
