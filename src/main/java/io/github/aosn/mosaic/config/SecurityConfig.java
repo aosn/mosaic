@@ -1,12 +1,11 @@
 /*
- * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2018 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.config;
 
 import io.github.aosn.mosaic.controller.CatalogController;
 import io.github.aosn.mosaic.domain.model.auth.User;
 import io.github.aosn.mosaic.domain.service.auth.UserService;
-import io.github.aosn.mosaic.ui.ErrorUI;
 import io.github.aosn.mosaic.ui.MainUI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
@@ -71,7 +70,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.httpBasic().disable();
         http.formLogin().disable();
         http.authorizeRequests()
-                .antMatchers(MainUI.PATH, ErrorUI.PATH, CSS_PATH, LOGIN_PATH_GITHUB).permitAll()
+                .antMatchers(MainUI.PATH, CSS_PATH, LOGIN_PATH_GITHUB).permitAll()
                 .antMatchers(CatalogController.CATALOG_ENDPOINT).permitAll()
                 .antMatchers(V_PATH_PREFIX + "/**", "/vaadinServlet/**").permitAll()
                 .antMatchers("/swagger-ui.html", "/swagger-resources/**", "/webjars/**", "/v2/**").permitAll()
