@@ -1,14 +1,15 @@
 buildscript {
     ext {
-        vaadinVersion = '8.1.6'
+        vaadinVersion = '8.3.1'
         springFoxVersion = '2.6.1'
-        checkerFrameworkVersion = '2.2.0'
+        checkerFrameworkVersion = '2.4.0'
     }
 }
 
 plugins {
-    id 'com.gradle.build-scan' version '1.9'
-    id 'org.springframework.boot' version '1.5.8.RELEASE'
+    id 'com.gradle.build-scan' version '1.11'
+    id "io.spring.dependency-management" version "1.0.4.RELEASE"
+    id 'org.springframework.boot' version '2.0.0.RELEASE'
     id "com.github.kt3k.coveralls" version "2.8.1"
     id 'war'
     id 'jacoco'
@@ -19,6 +20,7 @@ targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 dependencies {
@@ -27,14 +29,14 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-data-jpa')
     compile('org.springframework.boot:spring-boot-starter-security')
     compile('org.springframework.boot:spring-boot-starter-actuator')
-    compile('org.springframework.security.oauth:spring-security-oauth2')
+    compile('org.springframework.security.oauth.boot:spring-security-oauth2-autoconfigure:2.0.0.RELEASE')
     // Vaadin
     compile('com.vaadin:vaadin-spring-boot-starter')
     compile('org.vaadin.spring.addons:vaadin-spring-addon-i18n:2.0.0.RELEASE')
     compile('com.vaadin:vaadin-compatibility-server')
     runtime('com.vaadin:vaadin-compatibility-client-compiled')
     // OkHttp
-    compile('com.squareup.okhttp3:okhttp:3.9.0')
+    compile('com.squareup.okhttp3:okhttp:3.10.0')
     // Utilities
     compile('org.projectlombok:lombok')
     compile("org.checkerframework:checker-qual:${checkerFrameworkVersion}")
@@ -65,9 +67,10 @@ war {
     archiveName = baseName + "." + extension
 }
 
-springBoot {
-    executable = true
-}
+// replaced to "bootWar" task
+//springBoot {
+//    executable = true
+//}
 
 buildScan {
     licenseAgreementUrl = 'https://gradle.com/terms-of-service'

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2017-2018 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.domain.service.stock;
 
@@ -49,7 +49,7 @@ public class StockService {
      * @throws DataAccessException if the database error occurred
      */
     public Stock get(long id) {
-        return stockRepository.findOne(id);
+        return stockRepository.findById(id).orElse(null);
     }
 
     /**
@@ -70,7 +70,7 @@ public class StockService {
      * @throws DataAccessException      if the database error occurred
      */
     public void update(Stock stock) {
-        if (stockRepository.findOne(stock.getId()) == null) {
+        if (!stockRepository.findById(stock.getId()).isPresent()) {
             throw new IllegalArgumentException("No such book: " + stock.getId());
         }
         stockRepository.saveAndFlush(stock);
