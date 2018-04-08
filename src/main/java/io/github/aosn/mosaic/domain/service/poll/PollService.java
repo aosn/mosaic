@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2018 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.domain.service.poll;
 
@@ -116,7 +116,7 @@ public class PollService {
      * @throws DataAccessException    if the database error occurred
      */
     public Poll get(Long pollId) {
-        Poll poll = pollRepository.findById(pollId).orElse(null);
+        Poll poll = pollRepository.findOne(pollId);
         if (poll == null) {
             throw new NoSuchElementException("Poll not found: " + pollId);
         }
@@ -197,7 +197,7 @@ public class PollService {
      * @throws IllegalStateException if default entry is missing
      */
     public Group getDefaultGroup() {
-        Group group = groupRepository.findById(new Group.GroupKey(defaultOrganization, defaultRepository)).orElse(null);
+        Group group = groupRepository.findOne(new Group.GroupKey(defaultOrganization, defaultRepository));
         if (group == null) {
             throw new IllegalStateException("Missing default entry");
         }
