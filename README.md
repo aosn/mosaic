@@ -57,7 +57,7 @@ Mosaic using full-stack Java frameworks that provides SQL-free, HTML-free and Ja
 ### Run as service
 
 ```bash
-./gradlew bootWar
+./gradlew bootRepackage
 sudo service mosaic stop
 sudo cp build/libs/mosaic.war /opt/mosaic/
 sudo service mosaic start
@@ -69,7 +69,7 @@ See our [Wiki](https://github.com/aosn/mosaic/wiki) for more information.
 ### Run on Cloud Foundry
 
 ```bash
-./gradlew bootWar
+./gradlew bootRepackage
 cf push
 ```
 
