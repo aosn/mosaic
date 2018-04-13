@@ -7,6 +7,7 @@ import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
@@ -101,6 +102,10 @@ public class PollingView extends CustomComponent implements View {
         aboutForm.setMargin(false);
         contentPane.addComponent(aboutForm);
 
+        IconAndName organizationLabel = new IconAndName(poll.getGroup());
+        organizationLabel.setCaption(i18n.get("result.caption.poll.organization"));
+        aboutForm.addComponent(organizationLabel);
+
         IconAndName ownerLabel = new IconAndName(poll.getOwner());
         ownerLabel.setCaption(i18n.get("result.caption.poll.owner"));
         aboutForm.addComponent(ownerLabel);
@@ -180,6 +185,15 @@ public class PollingView extends CustomComponent implements View {
         if (!userService.isLoggedIn()) {
             submitButton.setEnabled(false);
             contentPane.addComponent(new LoginRequiredLabel(i18n));
+        } else if (!userService.isMember(userService.getName(), poll.getGroup().getOrganization())) {
+            submitButton.setEnabled(false);
+            String org = poll.getGroup().getOrganization();
+            String message = String.format(i18n.get("common.caption.member.only"),
+                    "<a href=\"https://github.com/" + org + "\">" + org + "</a>");
+            submitButton.setDescription(message, ContentMode.HTML);
+            Label notAMemberLabel = new Label(message, ContentMode.HTML);
+            notAMemberLabel.setStyleName(ValoTheme.LABEL_FAILURE);
+            contentPane.addComponent(notAMemberLabel);
         }
 
         return contentPane;

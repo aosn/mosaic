@@ -63,7 +63,7 @@ public class User implements Serializable {
     }
 
     public String getProfileUrl() {
-        return String.format(source.profileUrlPattern, name);
+        return source.getProfileUrl(name);
     }
 
     public String getIconUrl() {
@@ -83,6 +83,10 @@ public class User implements Serializable {
         Source(String profileUrlPattern, String iconUrlPattern) {
             this.profileUrlPattern = profileUrlPattern;
             this.iconUrlPattern = iconUrlPattern;
+        }
+
+        public String getProfileUrl(String name) {
+            return String.format(profileUrlPattern, name);
         }
 
         public String getIconUrl(String name) {

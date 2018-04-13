@@ -106,6 +106,10 @@ public class PollResultView extends CustomComponent implements View {
         aboutForm.setMargin(false);
         contentPane.addComponent(aboutForm);
 
+        IconAndName organizationLabel = new IconAndName(poll.getGroup());
+        organizationLabel.setCaption(i18n.get("result.caption.poll.organization"));
+        aboutForm.addComponent(organizationLabel);
+
         IconAndName ownerLabel = new IconAndName(poll.getOwner());
         ownerLabel.setCaption(i18n.get("result.caption.poll.owner"));
         aboutForm.addComponent(ownerLabel);
@@ -178,8 +182,8 @@ public class PollResultView extends CustomComponent implements View {
             }
 
             CheckBox notifyCheck = new CheckBox(i18n.get("common.caption.notify.slack"));
-            notifyCheck.setValue(false);
-            notifyCheck.setEnabled(false);
+            notifyCheck.setValue(poll.getGroup().isSlackEnabled());
+            notifyCheck.setEnabled(poll.getGroup().isSlackEnabled());
             contentPane.addComponent(notifyCheck);
 
             String confirmMessage = i18n.get("result.label.confirm.close") + "<br/>" +
@@ -188,7 +192,7 @@ public class PollResultView extends CustomComponent implements View {
                     e -> UI.getCurrent().addWindow(new ConfirmWindow(confirmMessage, i18n, ok -> {
                         pollService.close(poll);
                         if (notifyCheck.getValue()) {
-                            notificationService.notifyClosePoll(poll);
+                            notificationService.notifyEndOfPoll(poll);
                         }
                         Notifications.showSuccess(i18n.get("result.notification.poll.closed"));
                         getUI().getNavigator().navigateTo(FrontView.VIEW_NAME);

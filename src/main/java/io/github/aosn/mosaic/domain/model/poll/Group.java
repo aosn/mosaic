@@ -28,10 +28,16 @@ public class Group implements Serializable {
     public static final String LABEL_FILTER_PATTERN = "%s";
     private static final long serialVersionUID = MosaicApplication.MOSAIC_SERIAL_VERSION_UID;
 
-    public Group(String organization, String repository, String labelFilter, @Nullable User owner) {
+    public Group(String organization, String repository, String labelFilter, @Nullable User owner,
+                 @Nullable SlackParam slack) {
         this.groupKey = new GroupKey(organization, repository);
         this.labelFilter = labelFilter;
         this.owner = owner;
+        this.slackWebhook = slack.webhook;
+        this.slackChannel = slack.channel;
+        this.slackUsername = slack.username;
+        this.slackBeginTemplate = slack.beginTemplate;
+        this.slackEndTemplate = slack.endTemplate;
     }
 
     @EmbeddedId
@@ -47,6 +53,31 @@ public class Group implements Serializable {
     @Getter
     private User owner; // null for default, otherwise for custom record
 
+    @Column(length = 80)
+    @Nullable
+    @Getter
+    private String slackWebhook;
+
+    @Column(length = 32)
+    @Nullable
+    @Getter
+    private String slackChannel;
+
+    @Column(length = 32)
+    @Nullable
+    @Getter
+    private String slackUsername;
+
+    @Column(length = 200)
+    @Nullable
+    @Getter
+    private String slackBeginTemplate;
+
+    @Column(length = 200)
+    @Nullable
+    @Getter
+    private String slackEndTemplate;
+
     public String getOrganization() {
         return groupKey.organization;
     }
@@ -59,6 +90,10 @@ public class Group implements Serializable {
         groupKey.organization = group.getOrganization();
         groupKey.repository = group.getRepository();
         labelFilter = group.labelFilter;
+    }
+
+    public boolean isSlackEnabled() {
+        return slackWebhook != null && !slackWebhook.isEmpty();
     }
 
     @Embeddable
@@ -79,5 +114,14 @@ public class Group implements Serializable {
         public String toString() {
             return String.format("GroupKey(org=%s, repo=%s)", organization, repository);
         }
+    }
+
+    @Builder
+    public static class SlackParam {
+        private String webhook;
+        private String channel;
+        private String username;
+        private String beginTemplate;
+        private String endTemplate;
     }
 }

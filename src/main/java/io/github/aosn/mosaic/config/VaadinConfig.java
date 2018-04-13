@@ -3,6 +3,7 @@
  */
 package io.github.aosn.mosaic.config;
 
+import com.vaadin.spring.annotation.EnableVaadin;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.vaadin.spring.i18n.MessageProvider;
@@ -14,8 +15,9 @@ import org.vaadin.spring.i18n.annotation.EnableI18N;
  * @since 0.1
  */
 @Configuration
+@EnableVaadin
 @EnableI18N
-public class I18nConfig {
+public class VaadinConfig {
 
     @Bean
     MessageProvider communicationMessages() {

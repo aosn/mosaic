@@ -100,6 +100,7 @@
 .issue-label {
     border-radius: 0.3em;
     padding: 0 0.5em;
+    margin: 0 2px;
 }
 
 /* Vaadin overrides */

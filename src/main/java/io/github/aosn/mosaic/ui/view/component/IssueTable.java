@@ -87,7 +87,7 @@ public class IssueTable extends Table {
             String titleText = "#" + entity.getGitHubIssue().getId() + " " + entity.getGitHubIssue().getTitle();
             Label title = new Label(createAnchor(entity.getUrl(), titleText), ContentMode.HTML);
             title.setStyleName(Style.LINK.className());
-            title.setDescription(markdownToHtml(entity.getGitHubIssue().getBody()));
+            title.setDescription(markdownToHtml(entity.getGitHubIssue().getBody()), ContentMode.HTML);
             return Row.builder()
                     .bookEntity(entity)
                     .issueEntity(entity.getGitHubIssue())
@@ -107,7 +107,7 @@ public class IssueTable extends Table {
             String titleText = "#" + entity.getId() + " " + entity.getTitle();
             Label title = new Label(createAnchor(entity.getUrl(), titleText), ContentMode.HTML);
             title.setStyleName(Style.LINK.className());
-            title.setDescription(markdownToHtml(entity.getBody()));
+            title.setDescription(markdownToHtml(entity.getBody()), ContentMode.HTML);
             return Row.builder()
                     .issueEntity(entity)
                     .checkBox(new CheckBox())

@@ -33,17 +33,6 @@ public class IssueService {
         this.gitHubIssueRepository = gitHubIssueRepository;
     }
 
-    public List<GitHubIssue> getAll(Group group) {
-        try {
-            return gitHubIssueRepository.getAll(group, null).stream()
-                    .filter(i -> Stream.of(i.getLabels())
-                            .anyMatch(l -> isIssueLabel(l, group)))
-                    .collect(Collectors.toList());
-        } catch (RuntimeException e) {
-            throw new IssueAccessException("Failed to obtain GitHub issues.", e);
-        }
-    }
-
     /**
      * Get all pollable issues from GitHub.
      *
@@ -52,7 +41,7 @@ public class IssueService {
      */
     public List<GitHubIssue> getOpenIssues(Group group) {
         try {
-            return gitHubIssueRepository.getAll(group, State.OPEN).stream()
+            return gitHubIssueRepository.getWithState(group, State.OPEN).stream()
                     .filter(i -> Stream.of(i.getLabels())
                             .anyMatch(l -> isIssueLabel(l, group)))
                     .collect(Collectors.toList());
@@ -69,11 +58,11 @@ public class IssueService {
      * @throws NoSuchElementException if cannot resolved
      */
     public Poll resolveBooks(Poll poll) {
-        List<GitHubIssue> issues = gitHubIssueRepository.getAll(poll.getGroup(), State.ALL);
+        List<GitHubIssue> issues = gitHubIssueRepository.getAll(poll.getGroup());
         poll.getBooks().forEach(b -> {
             b.setGitHubIssue(issues.stream()
                     .filter(i -> i.getId().equals(b.getIssue()))
-                    .findFirst().orElseThrow(NoSuchElementException::new));
+                    .findFirst().orElseThrow(() -> new NoSuchElementException("Cannot resolved: #" + b.getIssue())));
             b.setVotes(Math.toIntExact(poll.getVotes().stream()
                     .filter(p -> b.equals(p.getBook())).count()));
         });

@@ -10,6 +10,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
 import io.github.aosn.mosaic.MosaicApplication;
 import io.github.aosn.mosaic.domain.model.auth.User;
+import io.github.aosn.mosaic.domain.model.poll.Group;
 import io.github.aosn.mosaic.ui.view.style.Style;
 
 /**
@@ -26,6 +27,12 @@ public class IconAndName extends HorizontalLayout {
         setStyleName(Style.ICON_AND_NAME.className());
     }
 
+    public IconAndName(Group group) {
+        super(new OrganizationIcon(group), new Label(group.getOrganization()));
+        setSpacing(true);
+        setStyleName(Style.ICON_AND_NAME.className());
+    }
+
     private static class UserIcon extends Image {
         private static final long serialVersionUID = MosaicApplication.MOSAIC_SERIAL_VERSION_UID;
 
@@ -34,6 +41,18 @@ public class IconAndName extends HorizontalLayout {
             setSource(new ExternalResource(user.getIconUrl()));
             setStyleName(Style.USER_ICON.className());
             addClickListener(l -> UI.getCurrent().getPage().setLocation(user.getProfileUrl()));
+        }
+    }
+
+    private static class OrganizationIcon extends Image {
+        private static final long serialVersionUID = MosaicApplication.MOSAIC_SERIAL_VERSION_UID;
+
+        private OrganizationIcon(Group group) {
+            super();
+            String org = group.getOrganization();
+            setSource(new ExternalResource(User.Source.GITHUB.getIconUrl(org)));
+            setStyleName(Style.USER_ICON.className());
+            addClickListener(l -> UI.getCurrent().getPage().setLocation(User.Source.GITHUB.getProfileUrl(org)));
         }
     }
 }

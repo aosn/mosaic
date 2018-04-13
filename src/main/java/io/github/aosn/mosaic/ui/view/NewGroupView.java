@@ -93,11 +93,48 @@ public class NewGroupView extends CustomComponent implements View {
                 .bind(GroupBean::getLabelFilter, GroupBean::setLabelFilter);
         form.addComponent(labelFilterField);
 
+        TextField slackWebhookField = new TextField();
+        slackWebhookField.setCaption("Webhook");
+        slackWebhookField.setPlaceholder("https://hooks.slack.com/services/...");
+        groupBinder.forField(slackWebhookField).bind(GroupBean::getWebhook, GroupBean::setWebhook);
+        form.addComponent(slackWebhookField);
+
+        TextField slackChannelField = new TextField();
+        slackChannelField.setCaption("Channel");
+        slackChannelField.setPlaceholder("general");
+        groupBinder.forField(slackChannelField).bind(GroupBean::getChannel, GroupBean::setChannel);
+        form.addComponent(slackChannelField);
+
+        TextField slackUsernameField = new TextField();
+        slackUsernameField.setCaption("Username");
+        slackUsernameField.setPlaceholder("Mosaic");
+        groupBinder.forField(slackUsernameField).bind(GroupBean::getUsername, GroupBean::setUsername);
+        form.addComponent(slackUsernameField);
+
+        TextField slackBeginTemplate = new TextField();
+        slackBeginTemplate.setWidth(100, Unit.PERCENTAGE);
+        slackBeginTemplate.setCaption("Begin message");
+        slackBeginTemplate.setPlaceholder("%s has started. Let's vote!\nhttps://vote.aosn.ws/");
+        groupBinder.forField(slackBeginTemplate).bind(GroupBean::getBeginTemplate, GroupBean::setBeginTemplate);
+        form.addComponent(slackBeginTemplate);
+
+        TextField slackEndTemplate = new TextField();
+        slackEndTemplate.setWidth(100, Unit.PERCENTAGE);
+        slackEndTemplate.setCaption("Begin message");
+        slackEndTemplate.setPlaceholder("%s has been ended. Please check result.\nhttps://vote.aosn.ws/");
+        groupBinder.forField(slackEndTemplate).bind(GroupBean::getEndTemplate, GroupBean::setEndTemplate);
+        form.addComponent(slackEndTemplate);
+
         Button cancelButton = new Button(i18n.get("common.button.cancel"),
                 e -> getUI().getNavigator().navigateTo(FrontView.VIEW_NAME));
         Button submitButton = new Button(i18n.get("new-group.button.create"), e -> {
             if (!groupBinder.writeBeanIfValid(thinGroup)) {
                 Notifications.showWarning(i18n.get("common.notification.input.required"));
+                return;
+            }
+            if (!userService.isMember(userService.getName(), organizationField.getValue())) {
+                Notifications.showWarning(String.format(i18n.get("common.caption.member.only"),
+                        organizationField.getValue()));
                 return;
             }
             try {
@@ -130,6 +167,7 @@ public class NewGroupView extends CustomComponent implements View {
         private static final long serialVersionUID = MosaicApplication.MOSAIC_SERIAL_VERSION_UID;
         private User owner;
         private String organization, repository, labelFilter;
+        private String webhook, channel, username, iconEmoji, beginTemplate, endTemplate;
 
         GroupBean(User owner, Group defaultGroup) {
             this.owner = owner;
@@ -139,7 +177,9 @@ public class NewGroupView extends CustomComponent implements View {
         }
 
         Group toGroup() {
-            return new Group(organization, repository, labelFilter, owner);
+            return new Group(organization, repository, labelFilter, owner, Group.SlackParam.builder()
+                    .webhook(webhook).channel(channel).username(username)
+                    .beginTemplate(beginTemplate).endTemplate(endTemplate).build());
         }
     }
 }

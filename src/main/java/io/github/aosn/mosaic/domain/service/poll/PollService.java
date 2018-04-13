@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.locks.Lock;
@@ -47,6 +46,21 @@ public class PollService {
     @Value("${mosaic.issue.filter}")
     private String defaultLabelFilter;
 
+    @Value("${mosaic.slack.webhook}")
+    private String webhook;
+
+    @Value("${mosaic.slack.channel}")
+    private String channel;
+
+    @Value("${mosaic.slack.username}")
+    private String username;
+
+    @Value("${mosaic.slack.template.begin}")
+    private String beginTemplate;
+
+    @Value("${mosaic.slack.template.end}")
+    private String endTemplate;
+
     @Autowired
     public PollService(PollRepository pollRepository, GroupRepository groupRepository) {
         this.pollRepository = pollRepository;
@@ -57,7 +71,10 @@ public class PollService {
     private void init() {
         // insert default record at first time
         List<Group> allInDataSource = groupRepository.findAll();
-        Group group = new Group(defaultOrganization, defaultRepository, defaultLabelFilter, null);
+        Group.SlackParam slack = Group.SlackParam.builder()
+                .webhook(webhook).channel(channel).username(username)
+                .beginTemplate(beginTemplate).endTemplate(endTemplate).build();
+        Group group = new Group(defaultOrganization, defaultRepository, defaultLabelFilter, null, slack);
         if (allInDataSource.isEmpty()) {
             log.info("Inserting default group: " + group);
             groupRepository.saveAndFlush(group);

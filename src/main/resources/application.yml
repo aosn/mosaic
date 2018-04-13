@@ -36,6 +36,14 @@ mosaic:
     organization: aosn
     repository: aosn.github.io
     filter: "%sパート提案"
+  slack:
+     # sample webhook url
+     webhook: https://hooks.slack.com/services/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
+     channel: "debug"
+     username: "Mosaic"
+     template:
+       begin: "「%s」が開始されました。投票を行ってください。 https://vote.aosn.ws/"
+       end: "「%s」が終了しました。結果を確認してください。 https://vote.aosn.ws/"
 
 # Demo application token
 github:
@@ -45,6 +53,7 @@ github:
     accessTokenUri: https://github.com/login/oauth/access_token
     userAuthorizationUri: https://github.com/login/oauth/authorize
     clientAuthenticationScheme: form
+    scope: read:org
   resource:
     userInfoUri: https://api.github.com/user
 
