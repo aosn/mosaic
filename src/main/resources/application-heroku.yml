@@ -9,7 +9,8 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.MySQLDialect
     show-sql: false
-    generate-ddl: true
+    #generate-ddl: true
+    generate-ddl: false
     hibernate:
       # ddl-auto: update
       ddl-auto: none
