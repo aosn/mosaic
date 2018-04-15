@@ -46,8 +46,8 @@ github:
   client:
     clientId: ${GITHUB_CLIENT_ID}
     clientSecret: ${GITHUB_CLIENT_SECRET}
-    accessTokenUri: ${GITHUB_ACCESS_TOKEN_URI}
-    userAuthorizationUri: ${GITHUB_USER_AUTHORIZATION_URI}
+    accessTokenUri: https://github.com/login/oauth/access_token
+    userAuthorizationUri: https://github.com/login/oauth/authorize
     clientAuthenticationScheme: form
   resource:
     userInfoUri: https://api.github.com/user
