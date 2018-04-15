@@ -10,7 +10,6 @@ plugins {
     id 'com.gradle.build-scan' version '1.13'
     id 'org.springframework.boot' version '1.5.11.RELEASE'
     id "com.github.kt3k.coveralls" version "2.8.2"
-    id 'war'
     id 'jacoco'
 }
 
@@ -36,7 +35,7 @@ dependencies {
     // OkHttp
     compile('com.squareup.okhttp3:okhttp:3.10.0')
     // Utilities
-    compile('org.projectlombok:lombok')
+    compileOnly('org.projectlombok:lombok')
     compile("org.checkerframework:checker-qual:${checkerFrameworkVersion}")
     compile("com.google.guava:guava:20.0")
     compile('org.pegdown:pegdown:1.6.0')
@@ -59,9 +58,9 @@ dependencyManagement {
     }
 }
 
-war {
+jar {
     baseName = 'mosaic'
-    version = '0.5'
+    version = '0.6'
     archiveName = baseName + "." + extension
 }
 

@@ -1,0 +1,59 @@
+# heroku profile
+
+spring:
+  datasource:
+      url: ${MYSQL_URI}
+      username: ${MYSQL_USER}
+      password: ${MYSQL_PASSWORD}
+      driverClassName: com.mysql.jdbc.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    show-sql: false
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+
+logging:
+  level:
+    org.springframework: INFO
+    io.github.aosn.mosaic: DEBUG
+
+security:
+  basic:
+    enabled: false
+  oauth2:
+    client:
+      client-id: acme
+      client-secret: acmesecret
+      scope: read,write
+      auto-approve-scopes: '.*'
+
+mosaic:
+  issue:
+    organization: ${GITHUB_ORG:aosn}
+    repository: ${GITHUB_REPO:aosn.github.io}
+    filter: "%sパート提案"
+  slack:
+    webhook: ${SLACK_WEBHOOK}
+    channel: ${SLACK_CHANNEL}
+    username: "Mosaic"
+    template:
+      begin: "「%s」が開始されました。投票を行ってください。 https://vote.aosn.ws/"
+      end: "「%s」が終了しました。結果を確認してください。 https://vote.aosn.ws/"
+
+# Production application token
+github:
+  client:
+    clientId: ${GITHUB_CLIENT_ID}
+    clientSecret: ${GITHUB_CLIENT_SECRET}
+    accessTokenUri: ${GITHUB_ACCESS_TOKEN_URI}
+    userAuthorizationUri: ${GITHUB_USER_AUTHORIZATION_URI}
+    clientAuthenticationScheme: form
+  resource:
+    userInfoUri: https://api.github.com/user
+
+management:
+  context-path: /admin
+
+endpoints:
+  sensitive: true
