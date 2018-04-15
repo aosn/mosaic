@@ -9,11 +9,9 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.MySQLDialect
     show-sql: false
-    #generate-ddl: true
-    generate-ddl: false
+    generate-ddl: true
     hibernate:
-      # ddl-auto: update
-      ddl-auto: none
+      ddl-auto: update
 
 logging:
   level:
@@ -23,25 +21,23 @@ logging:
 security:
   basic:
     enabled: false
-  oauth2:
-    client:
-      client-id: acme
-      client-secret: acmesecret
-      scope: read,write
-      auto-approve-scopes: '.*'
+
+vaadin:
+  servlet:
+    production-mode: true
 
 mosaic:
   issue:
     organization: ${GITHUB_ORG:aosn}
     repository: ${GITHUB_REPO:aosn.github.io}
-    filter: "%sパート提案"
+    filter: ${LABEL_FILTER:%sパート提案}
   slack:
     webhook: ${SLACK_WEBHOOK}
     channel: ${SLACK_CHANNEL}
-    username: "Mosaic"
+    username: ${SLACK_NAME:Mosaic}
     template:
-      begin: "「%s」が開始されました。投票を行ってください。 https://vote.aosn.ws/"
-      end: "「%s」が終了しました。結果を確認してください。 https://vote.aosn.ws/"
+      begin: ${SLACK_MESSAGE_BEGIN:「%s」が開始されました。投票を行ってください。 https://vote.aosn.ws/}
+      end: ${SLACK_MESSAGE_END:「%s」が終了しました。結果を確認してください。 https://vote.aosn.ws/}
 
 # Production application token
 github:

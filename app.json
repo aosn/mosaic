@@ -1,0 +1,56 @@
+{
+  "name": "Mosaic",
+  "description": "Book Voting Application",
+  "repository": "https://github.com/aosn/mosaic",
+  "logo": "https://github.com/aosn.png",
+  "keywords": [
+    "java"
+  ],
+  "env": {
+    "MYSQL_URI": {
+      "description": "MySQL JDBC URI",
+      "value": "jdbc:mysql://foo.bar.com:3306/mosaic"
+    },
+    "MYSQL_USER": {
+      "description": "MySQL user"
+    },
+    "MYSQL_PASSWORD": {
+      "description": "MySQL password"
+    },
+    "GITHUB_ORG": {
+      "description": "Target GitHub organization"
+    },
+    "GITHUB_REPO": {
+      "description": "Target GitHub issue repository"
+    },
+    "LABEL_FILTER": {
+      "description": "Issue label filter",
+      "value": "%sパート提案"
+    },
+    "SLACK_WEBHOOK": {
+      "description": "Slack notification incoming webhooks URL"
+    },
+    "SLACK_CHANNEL": {
+      "description": "Slack notification target channel",
+      "value": "general"
+    },
+    "SLACK_NAME": {
+      "description": "Slack notification display name",
+      "value": "Mosaic"
+    },
+    "SLACK_MESSAGE_BEGIN": {
+      "description": "Slack vote begin message template",
+      "value": "「%s」が開始されました。投票を行ってください。 https://vote.aosn.ws/"
+    },
+    "SLACK_MESSAGE_END": {
+      "description": "Slack vote begin message template",
+      "value": "「%s」が終了しました。結果を確認してください。 https://vote.aosn.ws/"
+    },
+    "GITHUB_CLIENT_ID": {
+      "description": "GitHub OAuth client ID"
+    },
+    "GITHUB_CLIENT_SECRET": {
+      "description": "GitHub OAuth client secret"
+    }
+  }
+}
