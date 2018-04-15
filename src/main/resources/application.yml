@@ -50,9 +50,3 @@ github:
     scope: read:org
   resource:
     userInfoUri: https://api.github.com/user
-
-management:
-  context-path: /admin
-
-endpoints:
-  sensitive: true

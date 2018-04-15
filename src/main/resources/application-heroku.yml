@@ -49,9 +49,3 @@ github:
     clientAuthenticationScheme: form
   resource:
     userInfoUri: https://api.github.com/user
-
-management:
-  context-path: /admin
-
-endpoints:
-  sensitive: true
