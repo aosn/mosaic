@@ -59,22 +59,16 @@ Mosaic using full-stack Java frameworks that provides SQL-free, HTML-free and Ja
 ```bash
 ./gradlew bootRepackage
 sudo service mosaic stop
-sudo cp build/libs/mosaic.war /opt/mosaic/
+sudo cp build/libs/mosaic.jar /opt/mosaic/
 sudo service mosaic start
 ```
 
 NOTE: You need to create `application-production.yml` and systemd configuration.
 See our [Wiki](https://github.com/aosn/mosaic/wiki) for more information.
 
-### Run on Cloud Foundry
+### Deploy to Heroku
 
-```bash
-./gradlew bootRepackage
-cf push
-```
-
-NOTE: You need to create `application-cloud.yml` and check [manifest.yml](manifest.yml) attributes.
-See our [Wiki](https://github.com/aosn/mosaic/wiki) for more information.
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/aosn/mosaic)
 
 ## Author
 

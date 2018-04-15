@@ -1,8 +1,0 @@
----
-applications:
-- name: aosn-mosaic
-  memory: 512M
-  instances: 1
-  path: build/libs/mosaic.war
-  env:
-    SPRING_PROFILES_ACTIVE: cloud
