@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        vaadinVersion = '8.3.3'
+        vaadinVersion = '8.4.0'
         springFoxVersion = '2.6.1'
         checkerFrameworkVersion = '2.5.0'
     }
