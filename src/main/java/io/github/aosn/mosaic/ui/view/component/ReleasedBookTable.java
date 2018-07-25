@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2017-2018 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.ui.view.component;
 
@@ -46,7 +46,7 @@ public class ReleasedBookTable extends Table {
     }
 
     public void setDataSource(List<ReleasedBook> source) {
-        List<Row> rows = source.stream()
+        var rows = source.stream()
                 .map(Row::from)
                 .sorted((Comparator.comparing(Row::getPublishedDate).reversed()))
                 .collect(Collectors.toList());
@@ -95,11 +95,11 @@ public class ReleasedBookTable extends Table {
         private final Image thumbnail;
 
         public static Row from(ReleasedBook entity) {
-            Button selectButton = new Button();
+            var selectButton = new Button();
             selectButton.setIcon(VaadinIcons.CHEVRON_RIGHT);
             selectButton.addClickListener(e ->
                     UI.getCurrent().getNavigator().navigateTo(AddBookView.VIEW_NAME + "/" + entity.getIsbn()));
-            Image thumbnail = new Image(entity.getTitle(), new ExternalResource(entity.getThumbnailOrPlaceholder()));
+            var thumbnail = new Image(entity.getTitle(), new ExternalResource(entity.getThumbnailOrPlaceholder()));
             thumbnail.setWidth(70, Unit.PIXELS);
             return Row.builder()
                     .entity(entity)

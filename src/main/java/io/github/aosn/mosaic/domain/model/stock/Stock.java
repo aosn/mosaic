@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2017-2018 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.domain.model.stock;
 
@@ -161,8 +161,8 @@ public class Stock implements ReleasedBook {
      * @since 0.4
      */
     public static Stock create(User owner, ReleasedBook book) {
-        Date now = new Date();
-        Stock stock = new Stock();
+        var now = new Date();
+        var stock = new Stock();
         stock.user = owner;
         stock.isbn = book.getIsbn();
         stock.title = book.getTitle();
@@ -208,8 +208,8 @@ public class Stock implements ReleasedBook {
         if (isbn.isEmpty()) {
             throw new IllegalArgumentException("isbn is empty.");
         }
-        String trimmed = isbn.replaceAll(" ", "").replaceAll("-", "").replaceAll(":", "").replaceAll("ISBN", "");
-        ISBNValidator validator = ISBNValidator.getInstance();
+        var trimmed = isbn.replaceAll(" ", "").replaceAll("-", "").replaceAll(":", "").replaceAll("ISBN", "");
+        var validator = ISBNValidator.getInstance();
         if (trimmed.length() == 10) {
             trimmed = validator.convertToISBN13(trimmed);
         }

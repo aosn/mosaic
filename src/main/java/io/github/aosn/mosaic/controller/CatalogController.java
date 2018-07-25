@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2017-2018 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.controller;
 
@@ -7,7 +7,6 @@ import io.github.aosn.mosaic.domain.model.catalog.ReleasedBook;
 import io.github.aosn.mosaic.domain.model.stock.Stock;
 import io.github.aosn.mosaic.domain.service.catalog.CatalogService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -28,7 +27,6 @@ public class CatalogController {
     public static final String CATALOG_ENDPOINT = "/catalog";
     private final CatalogService catalogService;
 
-    @Autowired
     public CatalogController(CatalogService catalogService) {
         this.catalogService = catalogService;
     }
@@ -37,8 +35,7 @@ public class CatalogController {
     @ResponseBody
     public List<ReleasedBook> findBooks(@RequestParam("q") String keyword, HttpServletResponse response) {
         try {
-            String isbn = Stock.normalizeIsbn(keyword);
-            return catalogService.searchByIsbn(isbn);
+            return catalogService.searchByIsbn(Stock.normalizeIsbn(keyword));
         } catch (IllegalArgumentException e) {
             // Not a ISBN, search by name
             return catalogService.searchByKeyword(keyword);

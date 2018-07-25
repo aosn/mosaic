@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2018 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.ui.view;
 
@@ -18,12 +18,10 @@ import io.github.aosn.mosaic.ui.view.component.PollTable;
 import io.github.aosn.mosaic.ui.view.layout.ContentPane;
 import io.github.aosn.mosaic.ui.view.layout.ViewRoot;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.i18n.I18N;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static io.github.aosn.mosaic.ui.view.component.PollTable.ColumnGroup.*;
@@ -44,7 +42,6 @@ public class FrontView extends CustomComponent implements View {
     private transient final UserService userService;
     private transient final PollService pollService;
 
-    @Autowired
     public FrontView(I18N i18n, UserService userService, PollService pollService) {
         this.i18n = i18n;
         this.userService = userService;
@@ -58,12 +55,12 @@ public class FrontView extends CustomComponent implements View {
     }
 
     private Layout createFrontLayout() {
-        ContentPane contentPane = new ContentPane();
+        var contentPane = new ContentPane();
 
         // Retrieve poll data
         List<PollTable.Row> open, closed;
         try {
-            Map<Poll.PollState, List<PollTable.Row>> openAndClosed = pollService.getAll()
+            var openAndClosed = pollService.getAll()
                     .map(p -> PollTable.Row.from(p, userService.getUser(), i18n))
                     .collect(Collectors.groupingBy(p -> p.getEntity().getState()));
             open = openAndClosed.getOrDefault(Poll.PollState.OPEN, Collections.emptyList());
@@ -76,7 +73,7 @@ public class FrontView extends CustomComponent implements View {
 
         // Open polls section
         if (open.isEmpty()) {
-            Label label = new Label(VaadinIcons.INFO_CIRCLE.getHtml() + " " +
+            var label = new Label(VaadinIcons.INFO_CIRCLE.getHtml() + " " +
                     i18n.get("front.label.poll.open.empty"), ContentMode.HTML);
             contentPane.addComponent(label);
             contentPane.setComponentAlignment(label, Alignment.MIDDLE_CENTER);
@@ -87,7 +84,7 @@ public class FrontView extends CustomComponent implements View {
 
         // Closed polls section
         if (closed.isEmpty()) {
-            Label label = new Label(VaadinIcons.INFO_CIRCLE.getHtml() + " " +
+            var label = new Label(VaadinIcons.INFO_CIRCLE.getHtml() + " " +
                     i18n.get("front.label.poll.closed.empty"), ContentMode.HTML);
             contentPane.addComponent(label);
             contentPane.setComponentAlignment(label, Alignment.MIDDLE_CENTER);
@@ -97,13 +94,13 @@ public class FrontView extends CustomComponent implements View {
         }
 
         // New poll button
-        Button newPollButton = new Button(i18n.get("front.button.poll.new"),
+        var newPollButton = new Button(i18n.get("front.button.poll.new"),
                 e -> getUI().getNavigator().navigateTo(NewPollView.VIEW_NAME));
         newPollButton.setIcon(VaadinIcons.MEGAFONE);
         contentPane.addComponent(newPollButton);
 
         // Owners
-        List<PollTable.Row> owners = open.stream()
+        var owners = open.stream()
                 .filter(r -> r.getEntity().isOwner(userService.getUser()))
                 .collect(Collectors.toList());
         if (!owners.isEmpty()) {

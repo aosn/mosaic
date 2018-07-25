@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2018 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.ui.view.layout;
 
@@ -33,7 +33,7 @@ class Header extends VerticalLayout {
         setMargin(false);
 
         // Logo
-        Image logo = new Image(null, new ExternalResource("/VAADIN/img/logo.png"));
+        var logo = new Image(null, new ExternalResource("/VAADIN/img/logo.png"));
         logo.addClickListener(e -> UI.getCurrent().getPage().setLocation(MainUI.PATH));
         addComponent(logo);
 
@@ -41,21 +41,21 @@ class Header extends VerticalLayout {
         HorizontalLayout loginBar;
         if (userService.isLoggedIn()) {
             // Icon and name
-            IconAndName iconAndName = new IconAndName(userService.getUser());
+            var iconAndName = new IconAndName(userService.getUser());
 
             // New issue button
-            String newIssueUrl = userService.getNewIssueUrl(group); // UserService isn't serializable
-            Button newIssueButton = new Button(i18n.get("header.button.propose"),
+            var newIssueUrl = userService.getNewIssueUrl(group); // UserService isn't serializable
+            var newIssueButton = new Button(i18n.get("header.button.propose"),
                     e -> getUI().getPage().setLocation(newIssueUrl));
             newIssueButton.setIcon(VaadinIcons.LIGHTBULB);
 
             // Books button
-            Button booksButton = new Button(i18n.get("header.button.stocks"),
+            var booksButton = new Button(i18n.get("header.button.stocks"),
                     e -> getUI().getNavigator().navigateTo(BooksView.VIEW_NAME));
             booksButton.setIcon(VaadinIcons.BOOK);
 
             // Logout button
-            Button logoutButton = new Button(i18n.get("header.button.logout"),
+            var logoutButton = new Button(i18n.get("header.button.logout"),
                     e -> getUI().getPage().setLocation(UserController.LOGOUT_PATH));
             logoutButton.setIcon(VaadinIcons.SIGN_OUT);
 
@@ -71,11 +71,11 @@ class Header extends VerticalLayout {
             loginBar.setComponentAlignment(iconAndName, Alignment.MIDDLE_CENTER);
         } else {
             // Welcome label
-            Label welcomeLabel = new Label(i18n.get("header.label.login"));
+            var welcomeLabel = new Label(i18n.get("header.label.login"));
             welcomeLabel.setStyleName(ValoTheme.LABEL_TINY);
 
             // Login button
-            Button loginButton = new Button(i18n.get("header.button.login.github"),
+            var loginButton = new Button(i18n.get("header.button.login.github"),
                     e -> getUI().getPage().setLocation(SecurityConfig.LOGIN_PATH_GITHUB));
             loginButton.setIcon(FontAwesome.GITHUB);
             loginButton.setStyleName(ValoTheme.BUTTON_FRIENDLY);

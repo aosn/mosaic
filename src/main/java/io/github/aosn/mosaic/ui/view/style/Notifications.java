@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2018 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.ui.view.style;
 
@@ -20,14 +20,14 @@ public class Notifications {
     }
 
     public static void showSuccess(String message) {
-        Notification notification = new Notification(message, Notification.Type.TRAY_NOTIFICATION);
+        var notification = new Notification(message, Notification.Type.TRAY_NOTIFICATION);
         notification.setPosition(Position.TOP_CENTER);
         notification.setStyleName(ValoTheme.NOTIFICATION_SUCCESS);
         notification.show(Page.getCurrent());
     }
 
     public static void showWarning(String message) {
-        Notification notification = new Notification(message, Notification.Type.WARNING_MESSAGE);
+        var notification = new Notification(message, Notification.Type.WARNING_MESSAGE);
         notification.setPosition(Position.MIDDLE_CENTER);
         notification.setStyleName(ValoTheme.NOTIFICATION_WARNING);
         notification.show(Page.getCurrent());

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2017-2018 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.domain.model.catalog;
 
@@ -42,7 +42,7 @@ public interface ReleasedBook extends Serializable {
     String getThumbnailUrl();
 
     default String getThumbnailOrPlaceholder() {
-        String url = getThumbnailUrl();
+        var url = getThumbnailUrl();
         return url == null ? SecurityConfig.V_PATH_PREFIX + SecurityConfig.NO_IMAGE_PATH : url;
     }
 }

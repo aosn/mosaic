@@ -1,12 +1,11 @@
 /*
- * Copyright (C) 2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2017-2018 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.domain.service.catalog;
 
 import io.github.aosn.mosaic.domain.model.catalog.ReleasedBook;
 import io.github.aosn.mosaic.domain.repository.catalog.GoogleBookRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -25,7 +24,6 @@ public class CatalogService {
 
     private final GoogleBookRepository googleBookRepository;
 
-    @Autowired
     public CatalogService(GoogleBookRepository googleBookRepository) {
         this.googleBookRepository = googleBookRepository;
     }

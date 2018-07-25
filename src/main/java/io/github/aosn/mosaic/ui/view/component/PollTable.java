@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2018 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.ui.view.component;
 
@@ -95,7 +95,7 @@ public class PollTable extends Table {
         private final Button ownerButton;
 
         public static Row from(Poll entity, User user, I18N i18n) {
-            Long pollId = entity.getId();
+            var pollId = entity.getId();
 
             // Start button or progress button
             Button voteOrProgressButton;
@@ -115,12 +115,12 @@ public class PollTable extends Table {
             }
 
             // Result button
-            Button resultButton = new Button(i18n.get("front.button.poll.result"), VaadinIcons.BAR_CHART);
+            var resultButton = new Button(i18n.get("front.button.poll.result"), VaadinIcons.BAR_CHART);
             resultButton.addClickListener(e ->
                     UI.getCurrent().getNavigator().navigateTo(PollResultView.VIEW_NAME + "/" + pollId));
 
             // Owner button
-            Button ownerButton = new Button(i18n.get("front.button.poll.review"), VaadinIcons.LIST);
+            var ownerButton = new Button(i18n.get("front.button.poll.review"), VaadinIcons.LIST);
             ownerButton.addClickListener(e ->
                     UI.getCurrent().getNavigator().navigateTo(PollResultView.VIEW_NAME + "/" + pollId));
 

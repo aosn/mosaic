@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2018 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.ui.view;
 
@@ -15,7 +15,6 @@ import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 import io.github.aosn.mosaic.MosaicApplication;
-import io.github.aosn.mosaic.domain.model.auth.User;
 import io.github.aosn.mosaic.domain.model.issue.GitHubIssue;
 import io.github.aosn.mosaic.domain.model.poll.Book;
 import io.github.aosn.mosaic.domain.model.poll.Group;
@@ -34,7 +33,6 @@ import io.github.aosn.mosaic.ui.view.layout.ContentPane;
 import io.github.aosn.mosaic.ui.view.layout.ViewRoot;
 import io.github.aosn.mosaic.ui.view.style.Notifications;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.i18n.I18N;
 
 import java.time.LocalDate;
@@ -62,7 +60,6 @@ public class NewPollView extends CustomComponent implements View {
     private transient final NotificationService notificationService;
     private int selectingGroupIndex = 0;
 
-    @Autowired
     public NewPollView(I18N i18n, UserService userService, IssueService issueService,
                        PollService pollService, NotificationService notificationService) {
         this.i18n = i18n;
@@ -74,7 +71,7 @@ public class NewPollView extends CustomComponent implements View {
 
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent event) {
-        Integer groupIndex = (Integer) VaadinSession.getCurrent().getAttribute(PARAM_GROUP_INDEX);
+        var groupIndex = (Integer) VaadinSession.getCurrent().getAttribute(PARAM_GROUP_INDEX);
         selectingGroupIndex = groupIndex == null ? 0 : groupIndex;
         List<Group> groups;
         try {
@@ -83,7 +80,7 @@ public class NewPollView extends CustomComponent implements View {
             ErrorView.show(i18n.get("common.error.unexpected"), e);
             return;
         }
-        Group selectedGroup = groups.get(selectingGroupIndex);
+        var selectedGroup = groups.get(selectingGroupIndex);
         List<GitHubIssue> issues;
         try {
             issues = issueService.getOpenIssues(selectedGroup);
@@ -96,20 +93,20 @@ public class NewPollView extends CustomComponent implements View {
     }
 
     private Layout createPollLayout(List<Group> groups, List<GitHubIssue> issues) {
-        ContentPane contentPane = new ContentPane();
+        var contentPane = new ContentPane();
 
-        Group selectedGroup = groups.get(selectingGroupIndex);
+        var selectedGroup = groups.get(selectingGroupIndex);
 
-        GroupComboBox groupComboBox = new GroupComboBox(i18n.get("new.caption.group"), groups, selectingGroupIndex);
+        var groupComboBox = new GroupComboBox(i18n.get("new.caption.group"), groups, selectingGroupIndex);
         groupComboBox.addValueChangeListener(e -> {
             VaadinSession.getCurrent().setAttribute(PARAM_GROUP_INDEX, groupComboBox.getSelectIndex());
             UI.getCurrent().getPage().reload();
         });
-        FormLayout groupWrapper = new FormLayout(groupComboBox);
+        var groupWrapper = new FormLayout(groupComboBox);
         groupWrapper.setMargin(false);
         contentPane.addComponent(groupWrapper);
 
-        List<IssueTable.Row> rows = issues.stream()
+        var rows = issues.stream()
                 .map(r -> IssueTable.Row.from(r,
                         l -> issueService.isIssueLabel(l, selectedGroup),
                         l -> issueService.trimPartLabel(l, selectedGroup)))
@@ -117,18 +114,18 @@ public class NewPollView extends CustomComponent implements View {
         contentPane.addComponent(new IssueTable(i18n.get("new.caption.select"), ColumnGroup.NEW, rows, i18n));
         contentPane.addComponent(new BulkSelector(i18n, rows));
 
-        FormLayout form = new FormLayout();
+        var form = new FormLayout();
         form.setMargin(false);
         form.setCaption(i18n.get("new.caption.poll.info"));
         contentPane.addComponent(form);
 
-        LocalDate now = LocalDate.now();
-        User user = userService.getUser();
-        Poll poll = Poll.create(user, now);
-        Binder<Poll> pollBinder = new Binder<>();
+        var now = LocalDate.now();
+        var user = userService.getUser();
+        var poll = Poll.create(user, now);
+        var pollBinder = new Binder<Poll>();
         pollBinder.readBean(poll);
 
-        TextField subjectField = new TextField(i18n.get("new.caption.subject"));
+        var subjectField = new TextField(i18n.get("new.caption.subject"));
         subjectField.setRequiredIndicatorVisible(true);
         subjectField.setWidth(100, Unit.PERCENTAGE);
         subjectField.setPlaceholder(i18n.get("new.placeholder.subject"));
@@ -137,7 +134,7 @@ public class NewPollView extends CustomComponent implements View {
                 .bind(Poll::getSubject, Poll::setSubject);
         form.addComponent(subjectField);
 
-        DateField closeDateField = new DateField(i18n.get("new.caption.close.date"));
+        var closeDateField = new DateField(i18n.get("new.caption.close.date"));
         closeDateField.setRequiredIndicatorVisible(true);
         closeDateField.setRangeStart(now);
         closeDateField.setResolution(DateResolution.DAY);
@@ -146,7 +143,7 @@ public class NewPollView extends CustomComponent implements View {
         pollBinder.forField(closeDateField).bind(Poll::getEndAsLocalDate, Poll::setEnd);
         form.addComponent(closeDateField);
 
-        ComboBox<Integer> votesComboBox = new ComboBox<>(i18n.get("new.caption.doubles"));
+        var votesComboBox = new ComboBox<Integer>(i18n.get("new.caption.doubles"));
         votesComboBox.setEmptySelectionAllowed(false);
         votesComboBox.setTextInputAllowed(false);
         votesComboBox.setRequiredIndicatorVisible(true);
@@ -155,16 +152,16 @@ public class NewPollView extends CustomComponent implements View {
         pollBinder.forField(votesComboBox).bind(Poll::getDoubles, Poll::setDoubles);
         form.addComponent(votesComboBox);
 
-        CheckBox notifyCheckBox = new CheckBox(i18n.get("common.caption.notify.slack"));
+        var notifyCheckBox = new CheckBox(i18n.get("common.caption.notify.slack"));
         notifyCheckBox.setValue(selectedGroup.isSlackEnabled());
         notifyCheckBox.setEnabled(selectedGroup.isSlackEnabled());
         notifyCheckBox.setDescription(i18n.get("common.label.not.available"));
         contentPane.addComponent(notifyCheckBox);
 
-        Button cancelButton = new Button(i18n.get("common.button.cancel"),
+        var cancelButton = new Button(i18n.get("common.button.cancel"),
                 e -> getUI().getNavigator().navigateTo(FrontView.VIEW_NAME));
 
-        Button submitButton = new Button(i18n.get("new.button.submit"), e -> {
+        var submitButton = new Button(i18n.get("new.button.submit"), e -> {
             // Validation
             if (subjectField.isEmpty() || !pollBinder.writeBeanIfValid(poll)) {
                 Notifications.showWarning(i18n.get("common.notification.input.required"));
@@ -178,7 +175,7 @@ public class NewPollView extends CustomComponent implements View {
             }
 
             // Issues
-            List<GitHubIssue> selected = rows.stream()
+            var selected = rows.stream()
                     .filter(r -> r.getCheckBox().getValue())
                     .map(IssueTable.Row::getIssueEntity)
                     .collect(Collectors.toList());
@@ -211,7 +208,7 @@ public class NewPollView extends CustomComponent implements View {
         });
         submitButton.setIcon(VaadinIcons.MEGAFONE);
         submitButton.setStyleName(ValoTheme.BUTTON_PRIMARY);
-        HorizontalLayout buttonArea = new HorizontalLayout(cancelButton, submitButton);
+        var buttonArea = new HorizontalLayout(cancelButton, submitButton);
         buttonArea.setSpacing(true);
         contentPane.addComponent(buttonArea);
         if (!userService.isLoggedIn()) {
@@ -220,11 +217,11 @@ public class NewPollView extends CustomComponent implements View {
             contentPane.addComponent(new LoginRequiredLabel(i18n));
         } else if (!userService.isMember(user.getName(), selectedGroup.getOrganization())) {
             submitButton.setEnabled(false);
-            String org = selectedGroup.getOrganization();
-            String message = String.format(i18n.get("common.caption.member.only"),
+            var org = selectedGroup.getOrganization();
+            var message = String.format(i18n.get("common.caption.member.only"),
                     "<a href=\"https://github.com/" + org + "\">" + org + "</a>");
             submitButton.setDescription(message, ContentMode.HTML);
-            Label notAMemberLabel = new Label(message, ContentMode.HTML);
+            var notAMemberLabel = new Label(message, ContentMode.HTML);
             notAMemberLabel.setStyleName(ValoTheme.LABEL_FAILURE);
             contentPane.addComponent(notAMemberLabel);
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2018 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.ui.view.layout;
 
@@ -24,12 +24,12 @@ class Footer extends VerticalLayout {
 
     Footer(I18N i18n) {
         setMargin(false);
-        String copyright = i18n.get("footer.copyright").replace("%d", String.valueOf(LocalDate.now().getYear()))
+        var copyright = i18n.get("footer.copyright").replace("%d", String.valueOf(LocalDate.now().getYear()))
                 .replace("%s", "<a href=\"" + i18n.get("footer.organization.url") +
                         "\" style=\"text-decoration:none;\">" + i18n.get("footer.organization") + "</a>");
-        Label copyrightLabel = new Label(copyright, ContentMode.HTML);
+        var copyrightLabel = new Label(copyright, ContentMode.HTML);
         copyrightLabel.setStyleName(Style.COPYRIGHT.className());
-        HorizontalLayout labelArea = new HorizontalLayout(copyrightLabel);
+        var labelArea = new HorizontalLayout(copyrightLabel);
         addComponent(labelArea);
         setComponentAlignment(labelArea, Alignment.BOTTOM_CENTER);
     }

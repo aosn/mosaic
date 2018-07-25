@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2018 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.domain.service.auth;
 
@@ -11,8 +11,6 @@ import io.github.aosn.mosaic.domain.repository.auth.UserRepository;
 import io.github.aosn.mosaic.domain.repository.issue.GitHubIssueRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.stereotype.Service;
@@ -40,7 +38,6 @@ public class UserService {
     private final GitHubOrganizationRepository groupRepository;
     private static Map<String, Set<String>> userGroupCache = new ConcurrentHashMap<>(); // WARNING: instance-local
 
-    @Autowired
     public UserService(UserRepository userRepository, GitHubOrganizationRepository groupRepository,
                        GitHubIssueRepository issueRepository) {
         this.userRepository = userRepository;
@@ -49,9 +46,9 @@ public class UserService {
     }
 
     public void recordLogin(Principal principal, User.Source source, OAuth2RestTemplate restTemplate) {
-        Date now = new Date();
+        var now = new Date();
         log.info("recordLogin: " + principal);
-        User user = userRepository.findByNameAndSource(principal.getName(), source);
+        var user = userRepository.findByNameAndSource(principal.getName(), source);
         if (user == null) {
             user = User.builder()
                     .name(principal.getName())
@@ -69,7 +66,7 @@ public class UserService {
     }
 
     public boolean isLoggedIn() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication != null && authentication.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals(ROLE_USER));
     }
@@ -117,7 +114,7 @@ public class UserService {
      */
     private void cacheGroups(String userName, OAuth2RestTemplate restTemplate) {
         try {
-            Set<String> groups = groupRepository.getAll(restTemplate).stream()
+            var groups = groupRepository.getAll(restTemplate).stream()
                     .map(GitHubOrganization::getOrganization)
                     .collect(Collectors.toSet());
             log.info("ORGS: user=" + userName + " orgs=" + String.join(",", groups));

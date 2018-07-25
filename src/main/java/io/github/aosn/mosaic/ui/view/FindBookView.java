@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2017-2018 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.ui.view;
 
@@ -24,7 +24,6 @@ import io.github.aosn.mosaic.ui.view.layout.ContentPane;
 import io.github.aosn.mosaic.ui.view.layout.ViewRoot;
 import io.github.aosn.mosaic.ui.view.style.Notifications;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.i18n.I18N;
 
 import java.util.List;
@@ -46,7 +45,6 @@ public class FindBookView extends CustomComponent implements View {
     private transient final PollService pollService;
     private transient final CatalogService catalogService;
 
-    @Autowired
     public FindBookView(I18N i18n, UserService userService, PollService pollService, CatalogService catalogService) {
         this.i18n = i18n;
         this.userService = userService;
@@ -61,28 +59,28 @@ public class FindBookView extends CustomComponent implements View {
     }
 
     private Layout createFindBookLayout() {
-        ContentPane contentPane = new ContentPane();
+        var contentPane = new ContentPane();
 
-        FormLayout searchInputForm = new FormLayout();
+        var searchInputForm = new FormLayout();
         searchInputForm.setCaption(i18n.get("find-book.label.title"));
         searchInputForm.setMargin(false);
         contentPane.addComponent(searchInputForm);
 
-        TextField searchField = new TextField(i18n.get("find-book.caption.search.input"));
+        var searchField = new TextField(i18n.get("find-book.caption.search.input"));
         searchField.setWidth(100, Unit.PERCENTAGE);
         searchInputForm.addComponent(searchField);
 
-        ReleasedBookTable searchResultTable = new ReleasedBookTable(i18n);
+        var searchResultTable = new ReleasedBookTable(i18n);
         searchResultTable.setVisible(false);
 
-        Button searchButton = new Button(i18n.get("find-book.button.search"), e -> {
+        var searchButton = new Button(i18n.get("find-book.button.search"), e -> {
             if (Strings.isNullOrEmpty(searchField.getValue())) {
                 Notifications.showWarning(i18n.get("common.notification.input.incomplete"));
                 return;
             }
             List<ReleasedBook> searchResult;
             try {
-                String isbn = Stock.normalizeIsbn(searchField.getValue());
+                var isbn = Stock.normalizeIsbn(searchField.getValue());
                 searchResult = catalogService.searchByIsbn(isbn);
             } catch (IllegalArgumentException ex) {
                 // Not a ISBN, search by name

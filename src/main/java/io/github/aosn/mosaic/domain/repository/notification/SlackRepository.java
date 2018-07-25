@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2017-2018 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.domain.repository.notification;
 
@@ -33,21 +33,21 @@ public class SlackRepository {
         try {
             json = new ObjectMapper().writeValueAsString(message);
         } catch (IOException e) {
-            String msg = "Failed to serialize slack message";
+            var msg = "Failed to serialize slack message";
             log.error(msg, e);
             throw new RuntimeException(msg, e);
         }
         log.info("POST " + url + " params: " + message);
-        OkHttpClient client = new OkHttpClient();
-        RequestBody body = RequestBody.create(JSON, json);
-        Request request = new Request.Builder().url(url).post(body).build();
+        var client = new OkHttpClient();
+        var body = RequestBody.create(JSON, json);
+        var request = new Request.Builder().url(url).post(body).build();
         try {
-            Response response = client.newCall(request).execute();
+            var response = client.newCall(request).execute();
             if (!response.isSuccessful()) {
                 log.error("Slack: " + response.code() + " " + response.message());
             }
         } catch (IOException e) {
-            String msg = "Failed to send slack message";
+            var msg = "Failed to send slack message";
             log.error(msg, e);
             throw new RuntimeException(msg, e);
         }

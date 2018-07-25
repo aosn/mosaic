@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2018 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.domain.model.issue;
 
@@ -41,5 +41,4 @@ public class GitHubIssue implements Serializable {
 
     @JsonProperty("labels")
     private GitHubLabel[] labels;
-
 }

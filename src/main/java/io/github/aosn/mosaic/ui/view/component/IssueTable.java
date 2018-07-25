@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2018 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.ui.view.component;
 
@@ -84,8 +84,8 @@ public class IssueTable extends Table {
 
         public static Row from(Book entity, @Nullable Predicate<GitHubLabel> partFilter,
                                @Nullable UnaryOperator<String> labelTrimmer) {
-            String titleText = "#" + entity.getGitHubIssue().getId() + " " + entity.getGitHubIssue().getTitle();
-            Label title = new Label(createAnchor(entity.getUrl(), titleText), ContentMode.HTML);
+            var titleText = "#" + entity.getGitHubIssue().getId() + " " + entity.getGitHubIssue().getTitle();
+            var title = new Label(createAnchor(entity.getUrl(), titleText), ContentMode.HTML);
             title.setStyleName(Style.LINK.className());
             title.setDescription(markdownToHtml(entity.getGitHubIssue().getBody()), ContentMode.HTML);
             return Row.builder()
@@ -104,8 +104,8 @@ public class IssueTable extends Table {
 
         public static Row from(GitHubIssue entity, @Nullable Predicate<GitHubLabel> partFilter,
                                @Nullable UnaryOperator<String> labelTrimmer) {
-            String titleText = "#" + entity.getId() + " " + entity.getTitle();
-            Label title = new Label(createAnchor(entity.getUrl(), titleText), ContentMode.HTML);
+            var titleText = "#" + entity.getId() + " " + entity.getTitle();
+            var title = new Label(createAnchor(entity.getUrl(), titleText), ContentMode.HTML);
             title.setStyleName(Style.LINK.className());
             title.setDescription(markdownToHtml(entity.getBody()), ContentMode.HTML);
             return Row.builder()
@@ -123,13 +123,11 @@ public class IssueTable extends Table {
 
         private static Label createCategory(GitHubLabel[] labels, @Nullable Predicate<GitHubLabel> partFilter,
                                             @Nullable UnaryOperator<String> labelTrimmer) {
-            Predicate<GitHubLabel> f = partFilter == null ? l -> true : partFilter;
             UnaryOperator<String> t = labelTrimmer == null ? l -> l : labelTrimmer;
-            String label = Stream.of(labels)
-                    .filter(f)
-                    .map(l -> "<span class=\"" + Style.ISSUE_LABEL.className() +
-                            "\" style=\"color:white;background:#" + l.getColor() + ";\">" +
-                            t.apply(l.getName()) + "</span>")
+            var label = Stream.of(labels)
+                    .filter(partFilter == null ? l -> true : partFilter)
+                    .map(l -> "<span class=\"" + Style.ISSUE_LABEL.className() + "\" style=\"color:white;background:#" +
+                            l.getColor() + ";\">" + t.apply(l.getName()) + "</span>")
                     .collect(Collectors.joining());
             return new Label(label, ContentMode.HTML);
         }

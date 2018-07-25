@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2018 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.ui;
 
@@ -14,7 +14,6 @@ import io.github.aosn.mosaic.MosaicApplication;
 import io.github.aosn.mosaic.config.SecurityConfig;
 import io.github.aosn.mosaic.ui.i18n.I18nSystemMessageProvider;
 import io.github.aosn.mosaic.ui.view.ErrorView;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.i18n.I18N;
 
 /**
@@ -36,7 +35,6 @@ public class MainUI extends UI {
     private static final long serialVersionUID = MosaicApplication.MOSAIC_SERIAL_VERSION_UID;
     private transient final I18N i18n;
 
-    @Autowired
     public MainUI(I18N i18n) {
         this.i18n = i18n;
     }

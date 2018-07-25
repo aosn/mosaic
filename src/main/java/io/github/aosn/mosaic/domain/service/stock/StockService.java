@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2017-2018 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.domain.service.stock;
 
@@ -8,7 +8,6 @@ import io.github.aosn.mosaic.domain.model.catalog.ReleasedBook;
 import io.github.aosn.mosaic.domain.model.stock.Stock;
 import io.github.aosn.mosaic.domain.repository.stock.StockRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +25,6 @@ public class StockService {
 
     private final StockRepository stockRepository;
 
-    @Autowired
     public StockService(StockRepository stockRepository) {
         this.stockRepository = stockRepository;
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2017-2018 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.ui.view;
 
@@ -18,7 +18,6 @@ import io.github.aosn.mosaic.ui.view.layout.ViewRoot;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.ocpsoft.prettytime.PrettyTime;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.vaadin.spring.i18n.I18N;
 
@@ -45,7 +44,6 @@ public class AdminView extends CustomComponent implements View {
     private transient final PollService pollService;
     private transient final StockService stockService;
 
-    @Autowired
     public AdminView(Environment env, I18N i18n, UserService userService, PollService pollService,
                      StockService stockService) {
         this.env = env;
@@ -62,9 +60,9 @@ public class AdminView extends CustomComponent implements View {
     }
 
     private Layout createAdminLayout() {
-        ContentPane contentPane = new ContentPane();
+        var contentPane = new ContentPane();
 
-        FormLayout info = new FormLayout();
+        var info = new FormLayout();
         info.setCaption("Application information");
         info.setIcon(VaadinIcons.INFO_CIRCLE);
         contentPane.addComponent(info);
@@ -74,12 +72,12 @@ public class AdminView extends CustomComponent implements View {
         info.addComponent(createFormEntry("Profile", Stream.of(env.getActiveProfiles())
                 .collect(Collectors.joining(" "))));
 
-        FormLayout stats = new FormLayout();
+        var stats = new FormLayout();
         stats.setCaption("Statistics");
         stats.setIcon(VaadinIcons.LINE_CHART);
         contentPane.addComponent(stats);
 
-        Runtime runtime = Runtime.getRuntime();
+        var runtime = Runtime.getRuntime();
         long maxMemory = runtime.maxMemory();
         long allocatedMemory = runtime.totalMemory();
 
@@ -91,15 +89,15 @@ public class AdminView extends CustomComponent implements View {
         stats.addComponent(createFormEntry("Number of polls", Long.toString(pollService.countPolls())));
         stats.addComponent(createFormEntry("Number of books", Long.toString(stockService.countStocks())));
 
-        Button newGroupButton = new Button("Create group",
+        var newGroupButton = new Button("Create group",
                 e -> getUI().getNavigator().navigateTo(NewGroupView.VIEW_NAME));
         newGroupButton.setIcon(VaadinIcons.GROUP);
 
-        Button apiDocsButton = new Button("API Docs",
+        var apiDocsButton = new Button("API Docs",
                 e -> getUI().getPage().setLocation("/swagger-ui.html"));
         apiDocsButton.setIcon(VaadinIcons.PUZZLE_PIECE);
 
-        HorizontalLayout buttonArea = new HorizontalLayout(newGroupButton, apiDocsButton);
+        var buttonArea = new HorizontalLayout(newGroupButton, apiDocsButton);
         buttonArea.setSpacing(true);
         contentPane.addComponent(buttonArea);
 
@@ -107,7 +105,7 @@ public class AdminView extends CustomComponent implements View {
     }
 
     private Label createFormEntry(String caption, String text) {
-        Label label = new Label(text);
+        var label = new Label(text);
         label.setCaption(caption);
         return label;
     }

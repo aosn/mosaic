@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2017-2018 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.ui.view.layout;
 
@@ -19,8 +19,8 @@ public class VisibilityIndicator extends HorizontalLayout {
     private static final long serialVersionUID = MosaicApplication.MOSAIC_SERIAL_VERSION_UID;
 
     public VisibilityIndicator(Stock.Visibility visibility, I18N i18n) {
-        Label icon = new Label();
-        Label caption = new Label();
+        var icon = new Label();
+        var caption = new Label();
         switch (visibility) {
             case PUBLIC:
                 caption.setValue(i18n.get("book.column.visibility.public"));

@@ -1,12 +1,11 @@
 /*
- * Copyright (C) 2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2017-2018 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.controller;
 
 import io.github.aosn.mosaic.domain.model.stock.Stock;
 import io.github.aosn.mosaic.domain.service.stock.StockService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,7 +22,6 @@ public class BookController {
 
     private final StockService stockService;
 
-    @Autowired
     public BookController(StockService stockService) {
         this.stockService = stockService;
     }

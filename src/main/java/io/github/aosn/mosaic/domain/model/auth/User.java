@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2018 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.domain.model.auth;
 
@@ -58,7 +58,7 @@ public class User implements Serializable {
         if (getClass() != other.getClass()) {
             return false;
         }
-        User otherUser = (User) other;
+        var otherUser = (User) other;
         return id.equals(otherUser.id);
     }
 

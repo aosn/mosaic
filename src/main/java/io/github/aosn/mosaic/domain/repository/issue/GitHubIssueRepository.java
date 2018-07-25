@@ -6,12 +6,13 @@ package io.github.aosn.mosaic.domain.repository.issue;
 import io.github.aosn.mosaic.domain.model.issue.GitHubIssue;
 import io.github.aosn.mosaic.domain.model.poll.Group;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Repository of {@link GitHubIssue} entity.
@@ -36,7 +37,6 @@ public class GitHubIssueRepository {
             Param.REPO + "}/issues/new";
     private final RestTemplate restTemplate;
 
-    @Autowired
     public GitHubIssueRepository(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
@@ -57,9 +57,9 @@ public class GitHubIssueRepository {
      * @return {@link List} of {@link GitHubIssue}s
      */
     public List<GitHubIssue> getWithState(Group group, State state) {
-        List<GitHubIssue> overall = new LinkedList<>();
+        var overall = new LinkedList<GitHubIssue>();
         for (int page = 1; ; page++) { // Retrieves all page
-            GitHubIssue[] part = retrievePage(group, state, page);
+            var part = retrievePage(group, state, page);
             if (part.length == 0) {
                 break;
             }
@@ -86,13 +86,13 @@ public class GitHubIssueRepository {
     }
 
     private GitHubIssue[] retrievePage(Group group, State state, int page) {
-        Map<String, String> params = new HashMap<>(4);
-        params.put(Param.OWNER.name(), group.getOrganization());
-        params.put(Param.REPO.name(), group.getRepository());
-        params.put(Param.STATE.name(), state.stateValue);
-        params.put(Param.PAGE.name(), Integer.toString(page));
+        var params = Map.of(
+                Param.OWNER.name(), group.getOrganization(),
+                Param.REPO.name(), group.getRepository(),
+                Param.STATE.name(), state.stateValue,
+                Param.PAGE.name(), Integer.toString(page));
         log.info("GET " + restTemplate.getUriTemplateHandler().expand(RESOURCE_PATH, params));
-        ResponseEntity<GitHubIssue[]> entity = restTemplate.getForEntity(RESOURCE_PATH, GitHubIssue[].class, params);
+        var entity = restTemplate.getForEntity(RESOURCE_PATH, GitHubIssue[].class, params);
         if (!entity.getStatusCode().is2xxSuccessful()) {
             log.error("GitHub error: " + entity.getStatusCodeValue());
             throw new RuntimeException("GitHub error: " + entity.getStatusCodeValue());

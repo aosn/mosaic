@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2017-2018 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.ui.view;
 
@@ -26,11 +26,9 @@ import io.github.aosn.mosaic.ui.view.layout.ContentPane;
 import io.github.aosn.mosaic.ui.view.layout.ViewRoot;
 import io.github.aosn.mosaic.ui.view.style.Notifications;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.i18n.I18N;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.Date;
 
 /**
@@ -57,7 +55,6 @@ public class EditBookView extends CustomComponent implements View {
     private transient final StockService stockService;
     private final VaadinSession session;
 
-    @Autowired
     public EditBookView(I18N i18n, UserService userService, PollService pollService, StockService stockService) {
         this.i18n = i18n;
         this.userService = userService;
@@ -68,7 +65,7 @@ public class EditBookView extends CustomComponent implements View {
 
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent event) {
-        Stock stock = (Stock) session.getAttribute(ATTR_BOOK_EDIT);
+        var stock = (Stock) session.getAttribute(ATTR_BOOK_EDIT);
         if (stock == null) {
             ErrorView.show(i18n.get("common.error.parameter.missing"), null);
             return;
@@ -79,23 +76,23 @@ public class EditBookView extends CustomComponent implements View {
     }
 
     private Layout createEditStockLayout(Stock book) {
-        ContentPane contentPane = new ContentPane();
+        var contentPane = new ContentPane();
 
-        FormLayout form = new FormLayout();
+        var form = new FormLayout();
         form.setMargin(false);
         contentPane.addComponent(form);
-        Binder<Stock> bookBinder = new Binder<>();
+        var bookBinder = new Binder<Stock>();
         bookBinder.readBean(book);
 
-        Image thumbnail = new Image(book.getTitle(), new ExternalResource(book.getThumbnailOrPlaceholder()));
+        var thumbnail = new Image(book.getTitle(), new ExternalResource(book.getThumbnailOrPlaceholder()));
         thumbnail.setCaption(i18n.get("book.column.cover"));
         form.addComponent(thumbnail);
 
-        Label isbnLabel = new Label(book.getIsbn());
+        var isbnLabel = new Label(book.getIsbn());
         isbnLabel.setCaption(i18n.get("book.column.isbn"));
         form.addComponent(isbnLabel);
 
-        TextField titleField = new TextField(i18n.get("book.column.title"));
+        var titleField = new TextField(i18n.get("book.column.title"));
         titleField.setRequiredIndicatorVisible(true);
         titleField.setValue(book.getTitle());
         titleField.setWidth(100, Unit.PERCENTAGE);
@@ -104,7 +101,7 @@ public class EditBookView extends CustomComponent implements View {
                 .bind(Stock::getTitle, Stock::setTitle);
         form.addComponent(titleField);
 
-        TextField publishedDateField = new TextField(i18n.get("book.column.published.date"));
+        var publishedDateField = new TextField(i18n.get("book.column.published.date"));
         publishedDateField.setRequiredIndicatorVisible(true);
         publishedDateField.setValue(book.getPublishedDate());
         bookBinder.forField(publishedDateField)
@@ -113,7 +110,7 @@ public class EditBookView extends CustomComponent implements View {
                 .bind(Stock::getPublishedDate, Stock::setPublishedDate);
         form.addComponent(publishedDateField);
 
-        TextField pagesField = new TextField(i18n.get("book.column.page.count"));
+        var pagesField = new TextField(i18n.get("book.column.page.count"));
         pagesField.setValue(String.valueOf(book.getPageCount()));
         bookBinder.forField(pagesField)
                 .withConverter(new StringToIntegerConverter(i18n.get("common.validator.date.range.over")))
@@ -122,18 +119,18 @@ public class EditBookView extends CustomComponent implements View {
                 .bind(Stock::getPageCount, Stock::setPageCount);
         form.addComponent(pagesField);
 
-        TextField commentField = new TextField(i18n.get("book.column.text.short"), book.getShortText());
+        var commentField = new TextField(i18n.get("book.column.text.short"), book.getShortText());
         commentField.setWidth(100, Unit.PERCENTAGE);
         bookBinder.forField(commentField).bind(Stock::getShortText, Stock::setShortText);
         form.addComponent(commentField);
 
-        TextArea bookReviewTextArea = new TextArea(i18n.get("book.column.text.long"), book.getLongText());
+        var bookReviewTextArea = new TextArea(i18n.get("book.column.text.long"), book.getLongText());
         bookReviewTextArea.setWidth(100, Unit.PERCENTAGE);
         bookReviewTextArea.setDescription(i18n.get("edit-book.description.text.long")); // markdown available
         bookBinder.forField(bookReviewTextArea).bind(Stock::getLongText, Stock::setLongText);
         form.addComponent(bookReviewTextArea);
 
-        ComboBox<Stock.Visibility> visibilityComboBox = new ComboBox<>(i18n.get("book.column.visibility"));
+        var visibilityComboBox = new ComboBox<Stock.Visibility>(i18n.get("book.column.visibility"));
         visibilityComboBox.setTextInputAllowed(false);
         visibilityComboBox.setEmptySelectionAllowed(false);
         visibilityComboBox.setItems(Stock.Visibility.values());
@@ -141,7 +138,7 @@ public class EditBookView extends CustomComponent implements View {
         bookBinder.forField(visibilityComboBox).bind(Stock::getVisibility, Stock::setVisibility);
         form.addComponent(visibilityComboBox);
 
-        ComboBox<Stock.Progress> progressComboBox = new ComboBox<>(i18n.get("book.column.progress"));
+        var progressComboBox = new ComboBox<Stock.Progress>(i18n.get("book.column.progress"));
         progressComboBox.setTextInputAllowed(false);
         progressComboBox.setEmptySelectionAllowed(false);
         progressComboBox.setItems(Stock.Progress.values());
@@ -149,7 +146,7 @@ public class EditBookView extends CustomComponent implements View {
         bookBinder.forField(progressComboBox).bind(Stock::getProgress, Stock::setProgress);
         form.addComponent(progressComboBox);
 
-        ComboBox<Stock.ObtainType> obtainTypeComboBox = new ComboBox<>(i18n.get("book.column.obtain.type"));
+        var obtainTypeComboBox = new ComboBox<Stock.ObtainType>(i18n.get("book.column.obtain.type"));
         obtainTypeComboBox.setTextInputAllowed(false);
         obtainTypeComboBox.setEmptySelectionAllowed(false);
         obtainTypeComboBox.setItems(Stock.ObtainType.values());
@@ -157,18 +154,18 @@ public class EditBookView extends CustomComponent implements View {
         bookBinder.forField(obtainTypeComboBox).bind(Stock::getObtainType, Stock::setObtainType);
         form.addComponent(obtainTypeComboBox);
 
-        DateField obtainDateField = new DateField(i18n.get("book.column.obtain.date"));
+        var obtainDateField = new DateField(i18n.get("book.column.obtain.date"));
         obtainDateField.setValue(book.getObtainDateAsLocalDate());
         bookBinder.forField(obtainDateField).bind(Stock::getObtainDateAsLocalDate, Stock::setObtainDate);
         form.addComponent(obtainDateField);
 
-        DateField completeDateField = new DateField(i18n.get("book.column.progress.date.completed"));
+        var completeDateField = new DateField(i18n.get("book.column.progress.date.completed"));
         completeDateField.setRangeEnd(LocalDate.now());
         completeDateField.setValue(book.getCompletedDateAsLocalDate());
         bookBinder.forField(completeDateField).bind(Stock::getCompletedDateAsLocalDate, Stock::setCompletedDate);
         form.addComponent(completeDateField);
 
-        ComboBox<Stock.MediaType> mediaTypeComboBox = new ComboBox<>(i18n.get("book.column.media.type"));
+        var mediaTypeComboBox = new ComboBox<Stock.MediaType>(i18n.get("book.column.media.type"));
         mediaTypeComboBox.setTextInputAllowed(false);
         mediaTypeComboBox.setEmptySelectionAllowed(false);
         mediaTypeComboBox.setItems(Stock.MediaType.values());
@@ -176,17 +173,17 @@ public class EditBookView extends CustomComponent implements View {
         bookBinder.forField(mediaTypeComboBox).bind(Stock::getMediaType, Stock::setMediaType);
         form.addComponent(mediaTypeComboBox);
 
-        TextField boughtPlaceField = new TextField(i18n.get("book.column.bought.place"), book.getBoughtPlace());
+        var boughtPlaceField = new TextField(i18n.get("book.column.bought.place"), book.getBoughtPlace());
         boughtPlaceField.setValue(book.getBoughtPlace());
         bookBinder.forField(boughtPlaceField)
                 .withValidator(new StringLengthValidator(i18n.get("common.validator.text.length.over"), 0, 128))
                 .bind(Stock::getBoughtPlace, Stock::setBoughtPlace);
         form.addComponent(boughtPlaceField);
 
-        Button cancelButton = new Button(i18n.get("common.button.cancel"),
+        var cancelButton = new Button(i18n.get("common.button.cancel"),
                 e -> getUI().getNavigator().navigateTo(BookView.VIEW_NAME + "/" + book.getId()));
 
-        Button submitButton = new Button(i18n.get("edit-book.button.submit"), e -> {
+        var submitButton = new Button(i18n.get("edit-book.button.submit"), e -> {
             // Validate
             if (!bookBinder.writeBeanIfValid(book)) {
                 Notifications.showWarning(i18n.get("common.notification.input.incomplete"));
@@ -210,7 +207,7 @@ public class EditBookView extends CustomComponent implements View {
         submitButton.setIcon(VaadinIcons.CHECK);
         submitButton.setStyleName(ValoTheme.BUTTON_PRIMARY);
 
-        HorizontalLayout buttonArea = new HorizontalLayout(cancelButton, submitButton);
+        var buttonArea = new HorizontalLayout(cancelButton, submitButton);
         buttonArea.setSpacing(true);
         contentPane.addComponent(buttonArea);
 

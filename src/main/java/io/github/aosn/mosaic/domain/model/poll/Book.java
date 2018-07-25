@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2018 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.domain.model.poll;
 
@@ -66,7 +66,7 @@ public class Book implements Serializable {
         if (getClass() != other.getClass()) {
             return false;
         }
-        Book otherBook = (Book) other;
+        var otherBook = (Book) other;
         return id.equals(otherBook.id);
     }
 

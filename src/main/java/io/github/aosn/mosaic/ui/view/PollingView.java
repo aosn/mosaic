@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2018 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.ui.view;
 
@@ -12,7 +12,6 @@ import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 import io.github.aosn.mosaic.MosaicApplication;
-import io.github.aosn.mosaic.domain.model.poll.Book;
 import io.github.aosn.mosaic.domain.model.poll.Poll;
 import io.github.aosn.mosaic.domain.model.poll.Vote;
 import io.github.aosn.mosaic.domain.service.auth.UserService;
@@ -27,11 +26,9 @@ import io.github.aosn.mosaic.ui.view.layout.ContentPane;
 import io.github.aosn.mosaic.ui.view.layout.IconAndName;
 import io.github.aosn.mosaic.ui.view.layout.ViewRoot;
 import io.github.aosn.mosaic.ui.view.style.Notifications;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.i18n.I18N;
 
 import java.util.Date;
-import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -54,7 +51,6 @@ public class PollingView extends CustomComponent implements View {
     private transient final PollService pollService;
     private transient final IssueService issueService;
 
-    @Autowired
     public PollingView(I18N i18n, UserService userService, PollService pollService, IssueService issueService) {
         this.i18n = i18n;
         this.userService = userService;
@@ -64,14 +60,14 @@ public class PollingView extends CustomComponent implements View {
 
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent event) {
-        Long pollId = (Long) VaadinSession.getCurrent().getAttribute(ATTR_POLL_ID);
+        var pollId = (Long) VaadinSession.getCurrent().getAttribute(ATTR_POLL_ID);
         if (pollId == null) {
             ErrorView.show(i18n.get("common.error.parameter.missing"), null);
             return;
         }
 
         // Search DB
-        Poll poll = ErrorView.showIfExceptionThrows(() -> issueService.resolveBooks(pollService.get(pollId)));
+        var poll = ErrorView.showIfExceptionThrows(() -> issueService.resolveBooks(pollService.get(pollId)));
         if (poll == null) {
             return;
         }
@@ -93,30 +89,30 @@ public class PollingView extends CustomComponent implements View {
     }
 
     private Layout createPollingLayout(Poll poll) {
-        ContentPane contentPane = new ContentPane();
+        var contentPane = new ContentPane();
 
         contentPane.addComponent(new HeadingLabel(i18n.get("polling.label.subject.prefix") + " " +
                 poll.getSubject()));
 
-        FormLayout aboutForm = new FormLayout();
+        var aboutForm = new FormLayout();
         aboutForm.setMargin(false);
         contentPane.addComponent(aboutForm);
 
-        IconAndName organizationLabel = new IconAndName(poll.getGroup());
+        var organizationLabel = new IconAndName(poll.getGroup());
         organizationLabel.setCaption(i18n.get("result.caption.poll.organization"));
         aboutForm.addComponent(organizationLabel);
 
-        IconAndName ownerLabel = new IconAndName(poll.getOwner());
+        var ownerLabel = new IconAndName(poll.getOwner());
         ownerLabel.setCaption(i18n.get("result.caption.poll.owner"));
         aboutForm.addComponent(ownerLabel);
 
-        String begin = poll.getBegin() == null ? "?" : PollTable.Row.DATE_FORMAT.format(poll.getBegin());
-        String end = poll.getEnd() == null ? "?" : PollTable.Row.DATE_FORMAT.format(poll.getEnd());
-        Label termLabel = new Label(begin + " - " + end);
+        var begin = poll.getBegin() == null ? "?" : PollTable.Row.DATE_FORMAT.format(poll.getBegin());
+        var end = poll.getEnd() == null ? "?" : PollTable.Row.DATE_FORMAT.format(poll.getEnd());
+        var termLabel = new Label(begin + " - " + end);
         termLabel.setCaption(i18n.get("result.caption.poll.term"));
         aboutForm.addComponent(termLabel);
 
-        int doubles = poll.getDoubles();
+        var doubles = poll.getDoubles();
         String doublesCaption;
         String tableCaption;
         if (poll.getDoubles() == 1) {
@@ -128,31 +124,31 @@ public class PollingView extends CustomComponent implements View {
         }
         contentPane.addComponent(new Label(doublesCaption));
 
-        List<IssueTable.Row> rows = poll.getBooks().stream()
+        var rows = poll.getBooks().stream()
                 .map(r -> IssueTable.Row.from(r,
                         l -> issueService.isIssueLabel(l, poll.getGroup()),
                         l -> issueService.trimPartLabel(l, poll.getGroup())))
                 .collect(Collectors.toList());
         contentPane.addComponent(new IssueTable(tableCaption, IssueTable.ColumnGroup.OPEN, rows, i18n));
 
-        Button cancelButton = new Button(i18n.get("common.button.cancel"),
+        var cancelButton = new Button(i18n.get("common.button.cancel"),
                 e -> getUI().getNavigator().navigateTo(FrontView.VIEW_NAME));
-        Button submitButton = new Button(i18n.get("polling.button.submit"), VaadinIcons.THUMBS_UP);
+        var submitButton = new Button(i18n.get("polling.button.submit"), VaadinIcons.THUMBS_UP);
         submitButton.setStyleName(ValoTheme.BUTTON_PRIMARY);
         submitButton.addClickListener(e -> {
             // Selection
-            List<Book> selected = rows.stream()
+            var selected = rows.stream()
                     .filter(r -> r.getCheckBox().getValue()).map(IssueTable.Row::getBookEntity)
                     .collect(Collectors.toList());
 
             // Validation
             if (selected.size() < doubles) {
-                int under = doubles - selected.size();
+                var under = doubles - selected.size();
                 Notifications.showWarning((under == 1 ? i18n.get("polling.notification.books.under.1") :
                         i18n.get("polling.notification.books.under.n")).replace("%d", Integer.toString(under)));
                 return;
             } else if (selected.size() > doubles) {
-                int over = selected.size() - doubles;
+                var over = selected.size() - doubles;
                 Notifications.showWarning((over == 1 ? i18n.get("polling.notification.books.over.1") :
                         i18n.get("polling.notification.books.over.n")).replace("%d", Integer.toString(over)));
                 return;
@@ -164,8 +160,8 @@ public class PollingView extends CustomComponent implements View {
                 return;
             }
 
-            Date now = new Date();
-            List<Vote> votes = selected.stream().map(i -> Vote.builder()
+            var now = new Date();
+            var votes = selected.stream().map(i -> Vote.builder()
                     .date(now)
                     .user(userService.getUser())
                     .book(i)
@@ -179,7 +175,7 @@ public class PollingView extends CustomComponent implements View {
                 ErrorView.show(i18n.get("polling.error.vote.failed"), ex);
             }
         });
-        HorizontalLayout buttonArea = new HorizontalLayout(cancelButton, submitButton);
+        var buttonArea = new HorizontalLayout(cancelButton, submitButton);
         buttonArea.setSpacing(true);
         contentPane.addComponent(buttonArea);
         if (!userService.isLoggedIn()) {
@@ -187,11 +183,11 @@ public class PollingView extends CustomComponent implements View {
             contentPane.addComponent(new LoginRequiredLabel(i18n));
         } else if (!userService.isMember(userService.getName(), poll.getGroup().getOrganization())) {
             submitButton.setEnabled(false);
-            String org = poll.getGroup().getOrganization();
-            String message = String.format(i18n.get("common.caption.member.only"),
+            var org = poll.getGroup().getOrganization();
+            var message = String.format(i18n.get("common.caption.member.only"),
                     "<a href=\"https://github.com/" + org + "\">" + org + "</a>");
             submitButton.setDescription(message, ContentMode.HTML);
-            Label notAMemberLabel = new Label(message, ContentMode.HTML);
+            var notAMemberLabel = new Label(message, ContentMode.HTML);
             notAMemberLabel.setStyleName(ValoTheme.LABEL_FAILURE);
             contentPane.addComponent(notAMemberLabel);
         }

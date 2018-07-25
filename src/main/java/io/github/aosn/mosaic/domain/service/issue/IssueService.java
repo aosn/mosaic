@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2018 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.domain.service.issue;
 
@@ -11,7 +11,6 @@ import io.github.aosn.mosaic.domain.model.poll.Group;
 import io.github.aosn.mosaic.domain.model.poll.Poll;
 import io.github.aosn.mosaic.domain.repository.issue.GitHubIssueRepository;
 import io.github.aosn.mosaic.domain.repository.issue.GitHubIssueRepository.State;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,7 +27,6 @@ public class IssueService {
 
     private final GitHubIssueRepository gitHubIssueRepository;
 
-    @Autowired
     public IssueService(GitHubIssueRepository gitHubIssueRepository) {
         this.gitHubIssueRepository = gitHubIssueRepository;
     }
@@ -58,7 +56,7 @@ public class IssueService {
      * @throws NoSuchElementException if cannot resolved
      */
     public Poll resolveBooks(Poll poll) {
-        List<GitHubIssue> issues = gitHubIssueRepository.getAll(poll.getGroup());
+        var issues = gitHubIssueRepository.getAll(poll.getGroup());
         poll.getBooks().forEach(b -> {
             b.setGitHubIssue(issues.stream()
                     .filter(i -> i.getId().equals(b.getIssue()))

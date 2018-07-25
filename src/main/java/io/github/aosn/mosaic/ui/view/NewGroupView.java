@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2017-2018 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.ui.view;
 
@@ -23,7 +23,6 @@ import io.github.aosn.mosaic.ui.view.style.Notifications;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.i18n.I18N;
 
 import java.io.Serializable;
@@ -42,7 +41,6 @@ public class NewGroupView extends CustomComponent implements View {
     private transient final UserService userService;
     private transient final PollService pollService;
 
-    @Autowired
     public NewGroupView(I18N i18n, UserService userService, PollService pollService) {
         this.i18n = i18n;
         this.userService = userService;
@@ -56,33 +54,33 @@ public class NewGroupView extends CustomComponent implements View {
     }
 
     private Layout createNewGroupLayout() {
-        ContentPane contentPane = new ContentPane();
+        var contentPane = new ContentPane();
 
-        Group defaultGroup = pollService.getDefaultGroup();
-        GroupBean thinGroup = new GroupBean(userService.getUser(), defaultGroup);
+        var defaultGroup = pollService.getDefaultGroup();
+        var thinGroup = new GroupBean(userService.getUser(), defaultGroup);
 
-        FormLayout form = new FormLayout();
+        var form = new FormLayout();
         form.setCaption(i18n.get("new-group.caption.title"));
         form.setMargin(false);
         contentPane.addComponent(form);
-        Binder<GroupBean> groupBinder = new Binder<>();
+        var groupBinder = new Binder<GroupBean>();
         groupBinder.readBean(thinGroup);
 
-        TextField organizationField = new TextField();
+        var organizationField = new TextField();
         organizationField.setCaption(i18n.get("new-group.caption.organization"));
         organizationField.setPlaceholder(defaultGroup.getOrganization());
         organizationField.setRequiredIndicatorVisible(true);
         groupBinder.forField(organizationField).bind(GroupBean::getOrganization, GroupBean::setOrganization);
         form.addComponent(organizationField);
 
-        TextField repositoryField = new TextField();
+        var repositoryField = new TextField();
         repositoryField.setCaption(i18n.get("new-group.caption.repository"));
         repositoryField.setPlaceholder(defaultGroup.getRepository());
         repositoryField.setRequiredIndicatorVisible(true);
         groupBinder.forField(repositoryField).bind(GroupBean::getRepository, GroupBean::setRepository);
         form.addComponent(repositoryField);
 
-        TextField labelFilterField = new TextField();
+        var labelFilterField = new TextField();
         labelFilterField.setCaption(i18n.get("new-group.caption.label.filter"));
         labelFilterField.setPlaceholder(defaultGroup.getLabelFilter());
         labelFilterField.setRequiredIndicatorVisible(true);
@@ -93,41 +91,41 @@ public class NewGroupView extends CustomComponent implements View {
                 .bind(GroupBean::getLabelFilter, GroupBean::setLabelFilter);
         form.addComponent(labelFilterField);
 
-        TextField slackWebhookField = new TextField();
+        var slackWebhookField = new TextField();
         slackWebhookField.setCaption("Webhook");
         slackWebhookField.setPlaceholder("https://hooks.slack.com/services/...");
         groupBinder.forField(slackWebhookField).bind(GroupBean::getWebhook, GroupBean::setWebhook);
         form.addComponent(slackWebhookField);
 
-        TextField slackChannelField = new TextField();
+        var slackChannelField = new TextField();
         slackChannelField.setCaption("Channel");
         slackChannelField.setPlaceholder("general");
         groupBinder.forField(slackChannelField).bind(GroupBean::getChannel, GroupBean::setChannel);
         form.addComponent(slackChannelField);
 
-        TextField slackUsernameField = new TextField();
+        var slackUsernameField = new TextField();
         slackUsernameField.setCaption("Username");
         slackUsernameField.setPlaceholder("Mosaic");
         groupBinder.forField(slackUsernameField).bind(GroupBean::getUsername, GroupBean::setUsername);
         form.addComponent(slackUsernameField);
 
-        TextField slackBeginTemplate = new TextField();
+        var slackBeginTemplate = new TextField();
         slackBeginTemplate.setWidth(100, Unit.PERCENTAGE);
         slackBeginTemplate.setCaption("Begin message");
         slackBeginTemplate.setPlaceholder("%s has started. Let's vote!\nhttps://vote.aosn.ws/");
         groupBinder.forField(slackBeginTemplate).bind(GroupBean::getBeginTemplate, GroupBean::setBeginTemplate);
         form.addComponent(slackBeginTemplate);
 
-        TextField slackEndTemplate = new TextField();
+        var slackEndTemplate = new TextField();
         slackEndTemplate.setWidth(100, Unit.PERCENTAGE);
         slackEndTemplate.setCaption("Begin message");
         slackEndTemplate.setPlaceholder("%s has been ended. Please check result.\nhttps://vote.aosn.ws/");
         groupBinder.forField(slackEndTemplate).bind(GroupBean::getEndTemplate, GroupBean::setEndTemplate);
         form.addComponent(slackEndTemplate);
 
-        Button cancelButton = new Button(i18n.get("common.button.cancel"),
+        var cancelButton = new Button(i18n.get("common.button.cancel"),
                 e -> getUI().getNavigator().navigateTo(FrontView.VIEW_NAME));
-        Button submitButton = new Button(i18n.get("new-group.button.create"), e -> {
+        var submitButton = new Button(i18n.get("new-group.button.create"), e -> {
             if (!groupBinder.writeBeanIfValid(thinGroup)) {
                 Notifications.showWarning(i18n.get("common.notification.input.required"));
                 return;
@@ -149,7 +147,7 @@ public class NewGroupView extends CustomComponent implements View {
         });
         submitButton.setStyleName(ValoTheme.BUTTON_PRIMARY);
 
-        HorizontalLayout buttonArea = new HorizontalLayout(cancelButton, submitButton);
+        var buttonArea = new HorizontalLayout(cancelButton, submitButton);
         buttonArea.setSpacing(true);
         contentPane.addComponent(buttonArea);
         if (!userService.isLoggedIn()) {

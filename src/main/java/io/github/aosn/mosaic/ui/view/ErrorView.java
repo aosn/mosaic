@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2018 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.ui.view;
 
@@ -19,7 +19,6 @@ import io.github.aosn.mosaic.ui.view.layout.ViewRoot;
 import io.github.aosn.mosaic.ui.view.style.Style;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.i18n.I18N;
 
 import java.util.function.Supplier;
@@ -43,7 +42,6 @@ public class ErrorView extends CustomComponent implements View {
     private transient final UserService userService;
     private transient final PollService pollService;
 
-    @Autowired
     public ErrorView(I18N i18n, UserService userService, PollService pollService) {
         this.i18n = i18n;
         this.userService = userService;
@@ -51,8 +49,8 @@ public class ErrorView extends CustomComponent implements View {
     }
 
     static void show(@Nullable String message, @Nullable Throwable throwable) {
-        UI ui = UI.getCurrent();
-        VaadinSession session = ui.getSession();
+        var ui = UI.getCurrent();
+        var session = ui.getSession();
         session.setAttribute(ATTR_ERROR_MESSAGE, message);
         session.setAttribute(ATTR_ERROR_THROWABLE, throwable);
         ui.getNavigator().navigateTo(VIEW_NAME);
@@ -84,18 +82,18 @@ public class ErrorView extends CustomComponent implements View {
     }
 
     private Layout createErrorLayout() {
-        ContentPane contentPane = new ContentPane();
+        var contentPane = new ContentPane();
 
-        VaadinSession session = VaadinSession.getCurrent();
-        String message = (String) session.getAttribute(ATTR_ERROR_MESSAGE);
-        Throwable throwable = (Throwable) session.getAttribute(ATTR_ERROR_THROWABLE);
+        var session = VaadinSession.getCurrent();
+        var message = (String) session.getAttribute(ATTR_ERROR_MESSAGE);
+        var throwable = (Throwable) session.getAttribute(ATTR_ERROR_THROWABLE);
 
         // Clear session attribute
         session.setAttribute(ATTR_ERROR_MESSAGE, null);
         session.setAttribute(ATTR_ERROR_THROWABLE, null);
 
         // ERROR label
-        Label errorLabel = new Label("ERROR");
+        var errorLabel = new Label("ERROR");
         errorLabel.setStyleName(Style.ERROR_LABEL.className());
         contentPane.addComponent(errorLabel);
 
@@ -112,8 +110,7 @@ public class ErrorView extends CustomComponent implements View {
         }
 
         // Back button
-        Button backButton = new Button(i18n.get("common.button.back"),
-                e -> getUI().getPage().setLocation(MainUI.PATH));
+        var backButton = new Button(i18n.get("common.button.back"), e -> getUI().getPage().setLocation(MainUI.PATH));
         contentPane.addComponent(backButton);
         contentPane.setComponentAlignment(backButton, Alignment.MIDDLE_CENTER);
 

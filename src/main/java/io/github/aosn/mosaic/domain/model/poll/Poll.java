@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2018 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.domain.model.poll;
 
@@ -15,7 +15,10 @@ import org.hibernate.annotations.NotFoundAction;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.LongAdder;
@@ -117,7 +120,7 @@ public class Poll implements Serializable {
      * @since 0.4
      */
     public static Poll create(User owner, LocalDate now) {
-        Poll poll = new Poll();
+        var poll = new Poll();
         poll.owner = owner;
         poll.state = Poll.PollState.OPEN;
         poll.begin = java.sql.Date.valueOf(now);
@@ -128,15 +131,15 @@ public class Poll implements Serializable {
     }
 
     public Book judgeWinner() {
-        Map<Book, Integer> votesMap = new HashMap<>();
-        AtomicInteger max = new AtomicInteger(0);
+        var votesMap = new HashMap<Book, Integer>();
+        var max = new AtomicInteger(0);
         votes.stream().collect(Collectors.groupingBy(Vote::getBook)).forEach((k, v) -> {
             votesMap.put(k, v.size());
             max.set(Math.max(max.get(), v.size()));
         });
         // duplicate check
-        LongAdder maxCount = new LongAdder();
-        AtomicReference<Book> winner = new AtomicReference<>();
+        var maxCount = new LongAdder();
+        var winner = new AtomicReference<Book>();
         votesMap.forEach((k, v) -> {
             if (v == max.get()) {
                 winner.set(k);
@@ -203,7 +206,7 @@ public class Poll implements Serializable {
     }
 
     public enum PollState {
-        @SuppressWarnings("unused")PRE_OPEN, // currently unused yet
+        @SuppressWarnings("unused") PRE_OPEN, // currently unused yet
         OPEN,
         CLOSED
     }

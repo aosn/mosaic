@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2017-2018 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.ui.view.component;
 
@@ -24,7 +24,7 @@ public class BulkSelector extends HorizontalLayout {
         setSpacing(true);
 
         // Select all
-        Button selectAllButton = new Button(i18n.get("common.button.bulk.select.all"),
+        var selectAllButton = new Button(i18n.get("common.button.bulk.select.all"),
                 e -> rows.forEach(r -> r.getCheckBox().setValue(true)));
         selectAllButton.setIcon(VaadinIcons.CHECK_SQUARE_O);
         selectAllButton.setStyleName(ValoTheme.BUTTON_TINY);
@@ -32,7 +32,7 @@ public class BulkSelector extends HorizontalLayout {
 
         // Select all for each reading parts
         rows.stream().map(r -> r.getCategory().getValue()).distinct().sorted().forEach(p -> {
-            Button partButton = new Button(String.format(i18n.get("common.button.bulk.select.part"), p),
+            var partButton = new Button(String.format(i18n.get("common.button.bulk.select.part"), p),
                     e -> rows.forEach(r -> r.getCheckBox().setValue(r.getCategory().getValue().contains(p))));
             partButton.setCaptionAsHtml(true);
             partButton.setIcon(VaadinIcons.CHECK_SQUARE_O);
@@ -41,7 +41,7 @@ public class BulkSelector extends HorizontalLayout {
         });
 
         // Deselect all
-        Button deselectAllButton = new Button(i18n.get("common.button.bulk.deselect.all"),
+        var deselectAllButton = new Button(i18n.get("common.button.bulk.deselect.all"),
                 e -> rows.forEach(r -> r.getCheckBox().setValue(false)));
         deselectAllButton.setIcon(VaadinIcons.THIN_SQUARE);
         deselectAllButton.setStyleName(ValoTheme.BUTTON_TINY);

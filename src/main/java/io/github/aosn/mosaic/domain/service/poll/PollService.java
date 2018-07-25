@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2018 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.domain.service.poll;
 
@@ -9,7 +9,6 @@ import io.github.aosn.mosaic.domain.model.poll.Vote;
 import io.github.aosn.mosaic.domain.repository.poll.GroupRepository;
 import io.github.aosn.mosaic.domain.repository.poll.PollRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -61,7 +60,6 @@ public class PollService {
     @Value("${mosaic.slack.template.end}")
     private String endTemplate;
 
-    @Autowired
     public PollService(PollRepository pollRepository, GroupRepository groupRepository) {
         this.pollRepository = pollRepository;
         this.groupRepository = groupRepository;
@@ -70,11 +68,11 @@ public class PollService {
     @PostConstruct
     private void init() {
         // insert default record at first time
-        List<Group> allInDataSource = groupRepository.findAll();
-        Group.SlackParam slack = Group.SlackParam.builder()
+        var allInDataSource = groupRepository.findAll();
+        var slack = Group.SlackParam.builder()
                 .webhook(webhook).channel(channel).username(username)
                 .beginTemplate(beginTemplate).endTemplate(endTemplate).build();
-        Group group = new Group(defaultOrganization, defaultRepository, defaultLabelFilter, null, slack);
+        var group = new Group(defaultOrganization, defaultRepository, defaultLabelFilter, null, slack);
         if (allInDataSource.isEmpty()) {
             log.info("Inserting default group: " + group);
             groupRepository.saveAndFlush(group);
@@ -86,7 +84,7 @@ public class PollService {
             return;
         }
         // check default value modification
-        Group defaultGroup = allInDataSource.stream()
+        var defaultGroup = allInDataSource.stream()
                 .filter(g -> g.getOwner() == null) // null for default
                 .findFirst().orElseThrow(IllegalStateException::new);
         if (!group.equals(defaultGroup)) {
@@ -116,7 +114,7 @@ public class PollService {
      * @throws DataAccessException    if the database error occurred
      */
     public Poll get(Long pollId) {
-        Poll poll = pollRepository.findOne(pollId);
+        var poll = pollRepository.findOne(pollId);
         if (poll == null) {
             throw new NoSuchElementException("Poll not found: " + pollId);
         }
@@ -135,7 +133,7 @@ public class PollService {
         log.info("BEGIN submit: " + votes);
         LOCK.lock();
         try {
-            List<Vote> allVotes = poll.getVotes();
+            var allVotes = poll.getVotes();
             allVotes.addAll(votes);
             poll.setVotes(allVotes);
             pollRepository.saveAndFlush(poll);
@@ -182,7 +180,7 @@ public class PollService {
      * @throws IllegalStateException if default entry is missing
      */
     public List<Group> getAllGroup() {
-        List<Group> groups = groupRepository.findAll();
+        var groups = groupRepository.findAll();
         if (groups.isEmpty()) {
             throw new IllegalStateException("Missing default entry");
         }
@@ -197,7 +195,7 @@ public class PollService {
      * @throws IllegalStateException if default entry is missing
      */
     public Group getDefaultGroup() {
-        Group group = groupRepository.findOne(new Group.GroupKey(defaultOrganization, defaultRepository));
+        var group = groupRepository.findOne(new Group.GroupKey(defaultOrganization, defaultRepository));
         if (group == null) {
             throw new IllegalStateException("Missing default entry");
         }

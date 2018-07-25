@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2017-2018 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.ui.view.component;
 
@@ -32,10 +32,10 @@ public class ConfirmWindow extends Window {
         super();
         center();
         setModal(true);
-        VerticalLayout content = new VerticalLayout();
+        var content = new VerticalLayout();
         content.setSpacing(true);
         content.addComponent(new Label(message, ContentMode.HTML));
-        Button okButton = new Button(i18n.get("common.button.ok"), e -> {
+        var okButton = new Button(i18n.get("common.button.ok"), e -> {
             try {
                 okAction.buttonClick(e);
             } finally {
@@ -43,13 +43,11 @@ public class ConfirmWindow extends Window {
             }
         });
         okButton.setStyleName(ValoTheme.BUTTON_PRIMARY);
-        HorizontalLayout buttonArea = new HorizontalLayout(
-                okButton,
-                new Button(i18n.get("common.button.cancel"), e -> close()));
+        var buttonArea = new HorizontalLayout(okButton, new Button(i18n.get("common.button.cancel"), e -> close()));
         buttonArea.setSpacing(true);
         content.addComponent(buttonArea);
         content.setComponentAlignment(buttonArea, Alignment.BOTTOM_CENTER);
-        Panel panel = new Panel(i18n.get("common.caption.confirm"), content);
+        var panel = new Panel(i18n.get("common.caption.confirm"), content);
         panel.setHeight(300, Unit.PIXELS);
         panel.setWidth(400, Unit.PIXELS);
         setContent(panel);

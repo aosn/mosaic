@@ -7,7 +7,6 @@ import io.github.aosn.mosaic.controller.CatalogController;
 import io.github.aosn.mosaic.domain.model.auth.User;
 import io.github.aosn.mosaic.domain.service.auth.UserService;
 import io.github.aosn.mosaic.ui.MainUI;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.UserInfoTokenServices;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -36,7 +35,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Spring Security configurations.
@@ -58,7 +56,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserService userService;
 
     @SuppressWarnings("SpringJavaAutowiringInspection")
-    @Autowired
     public SecurityConfig(OAuth2ClientContext oauth2ClientContext, UserService userService) {
         this.oauth2ClientContext = oauth2ClientContext;
         this.userService = userService;
@@ -88,16 +85,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     private Filter ssoFilter() {
-        CompositeFilter filter = new CompositeFilter();
-        List<Filter> filters = new ArrayList<>();
+        var filter = new CompositeFilter();
+        var filters = new ArrayList<Filter>();
         filters.add(ssoFilter(github(), LOGIN_PATH_GITHUB));
         filter.setFilters(filters);
         return filter;
     }
 
     private Filter ssoFilter(ClientResources client, String path) {
-        OAuth2RestTemplate oAuth2RestTemplate = new OAuth2RestTemplate(client.getClient(), oauth2ClientContext);
-        OAuth2ClientAuthenticationProcessingFilter filter = new OAuth2ClientAuthenticationProcessingFilter(path) {
+        var oAuth2RestTemplate = new OAuth2RestTemplate(client.getClient(), oauth2ClientContext);
+        var filter = new OAuth2ClientAuthenticationProcessingFilter(path) {
             @Override
             protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                                     FilterChain chain, Authentication authResult)
@@ -107,7 +104,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             }
         };
         filter.setRestTemplate(oAuth2RestTemplate);
-        UserInfoTokenServices tokenServices = new UserInfoTokenServices(client.getResource().getUserInfoUri(),
+        var tokenServices = new UserInfoTokenServices(client.getResource().getUserInfoUri(),
                 client.getClient().getClientId());
         tokenServices.setRestTemplate(oAuth2RestTemplate);
         filter.setTokenServices(tokenServices);
@@ -116,7 +113,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public FilterRegistrationBean oauth2ClientFilterRegistration(OAuth2ClientContextFilter filter) {
-        FilterRegistrationBean registration = new FilterRegistrationBean();
+        var registration = new FilterRegistrationBean();
         registration.setFilter(filter);
         registration.setOrder(-100);
         return registration;

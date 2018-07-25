@@ -1,3 +1,6 @@
+/*
+ * Copyright (C) 2016-2018 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ */
 package io.github.aosn.mosaic.ui.view.component;
 
 import com.vaadin.server.ExternalResource;
