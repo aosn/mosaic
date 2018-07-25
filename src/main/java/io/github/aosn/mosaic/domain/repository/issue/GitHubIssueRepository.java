@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2017 Alice on Sunday Nights Workshop Participants. All rights reserved.
+ * Copyright (C) 2016-2018 Alice on Sunday Nights Workshop Participants. All rights reserved.
  */
 package io.github.aosn.mosaic.domain.repository.issue;
 
@@ -59,7 +59,6 @@ public class GitHubIssueRepository {
     public List<GitHubIssue> getWithState(Group group, State state) {
         List<GitHubIssue> overall = new LinkedList<>();
         for (int page = 1; ; page++) { // Retrieves all page
-            log.info("GET /" + group.getOrganization() + "/" + group.getRepository() + "/issues [" + page + "]");
             GitHubIssue[] part = retrievePage(group, state, page);
             if (part.length == 0) {
                 break;
@@ -92,6 +91,7 @@ public class GitHubIssueRepository {
         params.put(Param.REPO.name(), group.getRepository());
         params.put(Param.STATE.name(), state.stateValue);
         params.put(Param.PAGE.name(), Integer.toString(page));
+        log.info("GET " + restTemplate.getUriTemplateHandler().expand(RESOURCE_PATH, params));
         ResponseEntity<GitHubIssue[]> entity = restTemplate.getForEntity(RESOURCE_PATH, GitHubIssue[].class, params);
         if (!entity.getStatusCode().is2xxSuccessful()) {
             log.error("GitHub error: " + entity.getStatusCodeValue());

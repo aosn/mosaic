@@ -33,6 +33,7 @@ public class GitHubOrganizationRepository {
         if (restTemplate == null) {
             throw new NullPointerException("restTemplate is null.");
         }
+        log.info("GET " + restTemplate.getUriTemplateHandler().expand(RESOURCE_PATH));
         ResponseEntity<GitHubOrganization[]> entity = restTemplate.getForEntity(RESOURCE_PATH, GitHubOrganization[].class);
         if (!entity.getStatusCode().is2xxSuccessful()) {
             log.error("GitHub error: " + entity.getStatusCodeValue());

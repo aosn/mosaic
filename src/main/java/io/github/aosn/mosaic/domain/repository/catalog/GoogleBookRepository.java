@@ -45,8 +45,8 @@ public class GoogleBookRepository {
      * @throws RuntimeException if unexpected status returned
      */
     public List<GoogleBook> getByIsbn(String isbn) {
-        log.debug("getByIsbn(" + isbn + ")");
         Map<String, String> params = Collections.singletonMap(PARAM_Q, "isbn:" + isbn);
+        log.info("GET " + restTemplate.getUriTemplateHandler().expand(RESOURCE_PATH, params));
         ResponseEntity<GoogleBookResponse> entity = restTemplate.getForEntity(RESOURCE_PATH,
                 GoogleBookResponse.class, params);
         if (!entity.getStatusCode().is2xxSuccessful()) {
@@ -65,8 +65,8 @@ public class GoogleBookRepository {
      * @throws RuntimeException if unexpected status returned
      */
     public List<GoogleBook> getByKeyword(String keyword) {
-        log.debug("getByKeyword(" + keyword + ")");
         Map<String, String> params = Collections.singletonMap(PARAM_Q, keyword);
+        log.info("GET " + restTemplate.getUriTemplateHandler().expand(RESOURCE_PATH, params));
         ResponseEntity<GoogleBookResponse> entity = restTemplate.getForEntity(RESOURCE_PATH,
                 GoogleBookResponse.class, params);
         if (!entity.getStatusCode().is2xxSuccessful()) {
