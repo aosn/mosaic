@@ -1,20 +1,18 @@
 buildscript {
     ext {
-        vaadinVersion = '8.4.5'
-        springFoxVersion = '2.6.1'
-        checkerFrameworkVersion = '2.5.3'
+        vaadinVersion = '8.6.2'
     }
 }
 
 plugins {
-    id 'com.gradle.build-scan' version '1.15.1'
-    id 'org.springframework.boot' version '1.5.14.RELEASE'
+    id 'com.gradle.build-scan' version '1.16'
+    id 'org.springframework.boot' version '1.5.17.RELEASE'
     id "com.github.kt3k.coveralls" version "2.8.2"
     id 'jacoco'
 }
 
-sourceCompatibility = 10
-targetCompatibility = 10
+sourceCompatibility = 11
+targetCompatibility = 11
 
 repositories {
     mavenCentral()
@@ -36,9 +34,10 @@ dependencies {
     // OkHttp
     compile 'com.squareup.okhttp3:okhttp:3.11.0'
     // Utilities
+    annotationProcessor 'org.projectlombok:lombok'
     compileOnly 'org.projectlombok:lombok'
-    compile "org.checkerframework:checker-qual:${checkerFrameworkVersion}"
-    compile "com.google.guava:guava:20.0"
+    compile 'org.checkerframework:checker-qual:2.5.3'
+    compile 'com.google.guava:guava:20.0'
     compile 'org.pegdown:pegdown:1.6.0'
     compile 'commons-io:commons-io:2.6'
     compile 'commons-validator:commons-validator:1.6'
@@ -47,8 +46,8 @@ dependencies {
     runtime 'com.h2database:h2' // development and test
     runtime 'mysql:mysql-connector-java' // production
     // Docs
-    compile "io.springfox:springfox-swagger2:${springFoxVersion}"
-    compile "io.springfox:springfox-swagger-ui:${springFoxVersion}"
+    compile 'io.springfox:springfox-swagger2:2.6.1'
+    compile 'io.springfox:springfox-swagger-ui:2.6.1'
     // Tests
     testCompile 'org.springframework.boot:spring-boot-starter-test'
 }
@@ -70,8 +69,8 @@ springBoot {
 }
 
 buildScan {
-    licenseAgreementUrl = 'https://gradle.com/terms-of-service'
-    licenseAgree = 'yes'
+    termsOfServiceUrl = 'https://gradle.com/terms-of-service'
+    termsOfServiceAgree = 'yes'
 }
 
 jacocoTestReport {
