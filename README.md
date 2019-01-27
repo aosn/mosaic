@@ -6,7 +6,7 @@ AOSN Workshop book voting system.
 
 Demo:
 
-* [vote.aosn.ws](https://vote.aosn.ws) (works on [VULTR VPS](http://www.vultr.com/?ref=7053029) Tokyo Region)
+* [vote.aosn.ws](https://vote.aosn.ws) (works on Heroku)
 
 ## Key features
 
@@ -30,7 +30,7 @@ Demo:
 
 ### Server
 
-* Java SE Development Kit 8
+* OpenJDK 11
 
 #### Tested databases
 

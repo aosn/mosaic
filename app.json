@@ -6,17 +6,13 @@
   "keywords": [
     "java"
   ],
+  "addons": [
+    "cleardb:",
+    {
+      "plan": "ignite"
+    }
+  ],
   "env": {
-    "MYSQL_URI": {
-      "description": "MySQL JDBC URI",
-      "value": "jdbc:mysql://foo.bar.com:3306/mosaic"
-    },
-    "MYSQL_USER": {
-      "description": "MySQL user"
-    },
-    "MYSQL_PASSWORD": {
-      "description": "MySQL password"
-    },
     "GITHUB_ORG": {
       "description": "Target GitHub organization"
     },
