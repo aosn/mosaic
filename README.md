@@ -6,7 +6,7 @@ AOSN Workshop book voting system.
 
 Demo:
 
-* [vote.aosn.ws](https://vote.aosn.ws) (works on Heroku)
+* [aosn.azurewebsites.net](https://aosn.azurewebsites.net/) (works on Azure App Service)
 
 ## Key features
 
@@ -65,10 +65,6 @@ sudo service mosaic start
 
 NOTE: You need to create `application-production.yml` and systemd configuration.
 See our [Wiki](https://github.com/aosn/mosaic/wiki) for more information.
-
-### Deploy to Heroku
-
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/aosn/mosaic)
 
 ## Author
 
