@@ -1,1 +1,0 @@
-web: java -jar -Dspring.profiles.active=heroku build/libs/mosaic.jar --server.port=$PORT
